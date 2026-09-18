@@ -1,0 +1,29 @@
+# Member 1 — ML / Model Lead
+# Member 3 — Backend / Systems Engineer
+fastapi>=0.110.0
+uvicorn>=0.29.0
+faiss-cpu>=1.8.0
+streamlit>=1.33.0
+pandas>=2.0.0
+
+# Member 2 — Data & Annotation Lead
+requests>=2.31.0
+
+# Claim Extractor (FR-01) — dependency parsing + Hindi/Marathi sentence tokenization
+spacy>=3.7.0
+indic-nlp-library>=0.92
+
+# Core ML
+torch>=2.0.0
+transformers>=4.40.0
+sentence-transformers>=2.7.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+
+# Training / tracking
+wandb>=0.16.0
+
+# Testing
+pytest>=7.4.0
+
+matplotlib

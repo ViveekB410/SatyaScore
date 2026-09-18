@@ -1,0 +1,1102 @@
+{
+  "healthcare_en_00": {
+    "query_text": "What are the common symptoms of dengue fever?",
+    "language": "en",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "Common symptoms of dengue fever include:\n\n1. High fever\n2. Severe headache\n3. Pain behind the eyes\n4. Joint and muscle pain\n5. Rash\n6. Nausea and vomiting\n7. Fatigue \n\nIn severe cases, symptoms can also include:\n1. Bleeding gums\n2. Low platelet count\n3. Blood in stool or vomit\n4. Abdominal pain \n\nIf you suspect dengue fever, it is essential to consult a doctor immediately."
+      }
+    ]
+  },
+  "healthcare_en_01": {
+    "query_text": "How does the human immune system respond to a viral infection?",
+    "language": "en",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The human immune system responds to a viral infection through a multi-step process:\n\n1. **Recognition**: The immune system recognizes viral particles or infected cells through pattern recognition receptors (PRRs).\n2. **Activation of innate immunity**: Innate immune cells, such as macrophages and dendritic cells, are activated to produce cytokines and chemokines, which recruit other immune cells to the site of infection.\n3. **Production of interferons**: Infected cells produce interferons, which inhibit viral replication and activate nearby immune cells.\n4. **Activation of adaptive immunity**: Adaptive immune cells, such as T cells and B cells, are activated to recognize and respond to viral antigens.\n5. **T cell response**: Cytotoxic T cells (CD8+ T cells) recognize and kill infected cells, while helper T cells (CD4+ T cells) coordinate the immune response.\n6. **B cell response**: B cells produce antibodies to neutralize viral particles and prevent further infection.\n7. **Clearance of the virus**: The immune system works to eliminate the virus from the body through a combination of cell-mediated and humoral immunity.\n\nThis response helps to control and eventually clear the viral infection, and also provides long-term immunity against future infections."
+      }
+    ]
+  },
+  "healthcare_en_02": {
+    "query_text": "What is the recommended dosage frequency for a standard paracetamol tablet?",
+    "language": "en",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The recommended dosage frequency for a standard paracetamol tablet (500mg) is every 4-6 hours, not exceeding 4 grams (8 tablets) in 24 hours."
+      }
+    ]
+  },
+  "healthcare_en_03": {
+    "query_text": "What causes Type 2 diabetes?",
+    "language": "en",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "Type 2 diabetes is caused by a combination of factors, including:\n\n1. **Insulin resistance**: The body's cells become less responsive to insulin, a hormone that regulates blood sugar levels.\n2. **Impaired insulin secretion**: The pancreas is unable to produce enough insulin to meet the body's needs.\n3. **Genetics**: Family history and genetic predisposition play a significant role.\n4. **Obesity**: Excess body fat, particularly around the abdominal area, contributes to insulin resistance.\n5. **Physical inactivity**: Lack of regular exercise can lead to insulin resistance.\n6. **Unhealthy diet**: Consuming high amounts of sugar, saturated fats, and refined carbohydrates can contribute to insulin resistance.\n7. **Age**: Risk increases with age, especially after 45.\n8. **Other medical conditions**: Certain conditions, such as high blood pressure, high cholesterol, and polycystic ovary syndrome (PCOS), can increase the risk of developing type 2 diabetes.\n\nThese factors can lead to high blood sugar levels, which can damage organs and tissues over time if left untreated."
+      }
+    ]
+  },
+  "healthcare_en_04": {
+    "query_text": "How is tuberculosis typically diagnosed?",
+    "language": "en",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "Tuberculosis (TB) is typically diagnosed using a combination of the following methods:\n\n1. **Symptom evaluation**: Medical history and physical examination to identify symptoms such as cough, fever, weight loss, and night sweats.\n2. **Chest X-ray**: To look for abnormalities in the lungs.\n3. **Sputum tests**: \n   - **Smear microscopy**: To detect TB bacteria in sputum.\n   - **Culture**: To grow TB bacteria in a laboratory.\n   - **Nucleic acid amplification tests (NAATs)**: To detect genetic material of TB bacteria.\n4. **Mantoux test (Tuberculin skin test)**: To detect the body's immune response to TB bacteria.\n5. **Interferon-gamma release assays (IGRAs)**: Blood tests to detect the body's immune response to TB bacteria.\n\nIn some cases, additional tests such as computed tomography (CT) scans, bronchoscopy, or biopsy may be used to confirm the diagnosis."
+      }
+    ]
+  },
+  "healthcare_en_05": {
+    "query_text": "What vaccinations are part of India's Universal Immunisation Programme?",
+    "language": "en",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "India's Universal Immunisation Programme (UIP) provides vaccinations against the following diseases:\n\n1. Tuberculosis (BCG vaccine)\n2. Diphtheria\n3. Pertussis (Whooping cough)\n4. Tetanus\n5. Poliomyelitis (Oral Polio Vaccine and Inactivated Polio Vaccine)\n6. Measles\n7. Hepatitis B\n8. Haemophilus influenzae type b (Hib)\n9. Rotavirus\n10. Rubella\n11. Pneumococcal conjugate\n12. Japanese Encephalitis (in endemic areas)\n\nThese vaccinations are provided free of cost to all children under the programme."
+      }
+    ]
+  },
+  "healthcare_en_06": {
+    "query_text": "What are the main differences between bacterial and viral infections?",
+    "language": "en",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The main differences between bacterial and viral infections are:\n\n1. **Cause**: Bacterial infections are caused by bacteria, while viral infections are caused by viruses.\n2. **Treatment**: Bacterial infections are typically treated with antibiotics, while viral infections are treated with antiviral medications or supportive care.\n3. **Contagion**: Both can be contagious, but viral infections tend to be more easily spread.\n4. **Incubation period**: Viral infections often have a shorter incubation period than bacterial infections.\n5. **Symptoms**: While some symptoms may overlap, viral infections often cause more systemic symptoms like fever and fatigue, whereas bacterial infections may cause more localized symptoms.\n6. **Duration**: Viral infections often resolve on their own, while bacterial infections may require treatment to clear the infection.\n\nThese differences are crucial for proper diagnosis and treatment."
+      }
+    ]
+  },
+  "healthcare_en_07": {
+    "query_text": "How does high blood pressure affect the cardiovascular system?",
+    "language": "en",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "High blood pressure (hypertension) affects the cardiovascular system in several ways:\n\n1. **Blood vessel damage**: Increased pressure damages blood vessel walls, making them narrower and less flexible.\n2. **Cardiac workload increase**: The heart must work harder to pump blood, leading to hypertrophy (thickening) of the heart muscle.\n3. **Atherosclerosis**: High pressure accelerates the formation of plaque in arteries, increasing the risk of blockages and cardiovascular disease.\n4. **Cardiac failure**: Prolonged high blood pressure can lead to heart failure, as the heart becomes unable to pump blood efficiently.\n5. **Increased risk of stroke and heart attack**: High blood pressure increases the risk of stroke and heart attack by damaging blood vessels and increasing the likelihood of blockages.\n\nOverall, high blood pressure can lead to significant cardiovascular damage and increase the risk of cardiovascular disease, heart failure, and stroke."
+      }
+    ]
+  },
+  "healthcare_en_08": {
+    "query_text": "What is the role of insulin in the human body?",
+    "language": "en",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "Insulin is a hormone produced by the pancreas that plays a crucial role in regulating blood sugar levels in the human body. Its main functions are:\n\n1. **Glucose uptake**: Insulin facilitates the uptake of glucose by cells, particularly by the liver, muscles, and adipose tissue, for energy production, growth, and storage.\n2. **Blood sugar regulation**: Insulin lowers blood sugar levels by stimulating the storage of glucose in the form of glycogen in the liver and muscles.\n3. **Cell growth and repair**: Insulin helps promote cell growth and repair by stimulating the uptake of amino acids and other nutrients.\n\nOverall, insulin helps maintain normal blood sugar levels and ensures that cells receive the energy they need to function properly."
+      }
+    ]
+  },
+  "healthcare_en_09": {
+    "query_text": "What are the WHO's guidelines on daily water intake?",
+    "language": "en",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The World Health Organization (WHO) recommends a daily water intake of at least 2 liters (67.6 ounces) for adults in a temperate climate. However, individual needs may vary depending on factors such as age, sex, weight, activity level, and climate."
+      }
+    ]
+  },
+  "history_en_00": {
+    "query_text": "When did India gain independence from British rule?",
+    "language": "en",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "India gained independence from British rule on August 15, 1947."
+      }
+    ]
+  },
+  "history_en_01": {
+    "query_text": "Who was the first Prime Minister of India?",
+    "language": "en",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "Jawaharlal Nehru was the first Prime Minister of India."
+      }
+    ]
+  },
+  "history_en_02": {
+    "query_text": "What were the main causes of the First World War?",
+    "language": "en",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The main causes of the First World War were:\n\n1. **Imperialism**: Competition for colonies and resources.\n2. **Militarism**: Build-up of military forces and arms races.\n3. **Nationalism**: Rise of patriotic sentiment and ethnic tensions.\n4. **Alliance System**: Complex network of alliances between European powers (e.g., Triple Entente and Triple Alliance).\n5. **Assassination of Archduke Franz Ferdinand**: Triggering event that sparked the war.\n\nThese factors created an unstable environment, making war increasingly likely."
+      }
+    ]
+  },
+  "history_en_03": {
+    "query_text": "When was the Indian Constitution adopted?",
+    "language": "en",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The Indian Constitution was adopted on November 26, 1949."
+      }
+    ]
+  },
+  "history_en_04": {
+    "query_text": "Who founded the Mughal Empire?",
+    "language": "en",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "Babur founded the Mughal Empire in 1526."
+      }
+    ]
+  },
+  "history_en_05": {
+    "query_text": "What was the significance of the Dandi March?",
+    "language": "en",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The Dandi March, also known as the Salt March, was a significant event in Indian history. It was a 24-day march led by Mahatma Gandhi from March 12 to April 6, 1930, from Ahmedabad to the coastal village of Dandi. The march was a protest against the British salt tax, which prohibited Indians from producing or selling salt, forcing them to buy expensive salt from the British. \n\nThe significance of the Dandi March was:\n\n1. **Civil Disobedience**: It marked the beginning of the Civil Disobedience Movement in India, where Indians defied British laws through non-violent means.\n2. **National Unity**: The march drew widespread attention and participation, uniting Indians across the country against British rule.\n3. **Economic Independence**: The march highlighted the need for economic independence and self-sufficiency, as Indians sought to break free from British economic exploitation.\n4. **International Attention**: The Dandi March garnered international attention, putting pressure on the British government to reconsider its policies in India.\n\nThe Dandi March was a pivotal moment in India's struggle for independence, demonstrating the power of non-violent resistance and paving the way for future movements."
+      }
+    ]
+  },
+  "history_en_06": {
+    "query_text": "When did the Battle of Plassey take place?",
+    "language": "en",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The Battle of Plassey took place on June 23, 1757."
+      }
+    ]
+  },
+  "history_en_07": {
+    "query_text": "Who was Chhatrapati Shivaji Maharaj?",
+    "language": "en",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "Chhatrapati Shivaji Maharaj (1630-1680) was an Indian king and a member of the Bhonsle Maratha clan. He is considered the founder of the Maratha Empire, which played a significant role in Indian history. Shivaji Maharaj is known for his bravery, military tactics, and administrative skills, and is revered as a national hero in India. He fought against the Mughal Empire and the Adilshahi Sultanate to establish an independent Hindu kingdom in the Deccan region. His legacy includes the establishment of a robust administrative system, promotion of Hindu culture, and the development of a strong military. He is remembered as a symbol of Indian resistance against foreign rule and a champion of Hindu rights."
+      }
+    ]
+  },
+  "history_en_08": {
+    "query_text": "What was the Non-Cooperation Movement?",
+    "language": "en",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The Non-Cooperation Movement was a civil disobedience movement launched by Mahatma Gandhi in 1920 in India, against British rule. It involved boycotting British goods, institutions, and services, and promoting Indian self-sufficiency. The movement aimed to non-violently resist British authority and achieve Indian independence."
+      }
+    ]
+  },
+  "history_en_09": {
+    "query_text": "When was the United Nations founded?",
+    "language": "en",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The United Nations (UN) was founded on October 24, 1945."
+      }
+    ]
+  },
+  "science_en_00": {
+    "query_text": "What is the chemical formula for water?",
+    "language": "en",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The chemical formula for water is H2O."
+      }
+    ]
+  },
+  "science_en_01": {
+    "query_text": "How does photosynthesis work?",
+    "language": "en",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "Photosynthesis is the process by which plants, algae, and some bacteria convert light energy from the sun into chemical energy in the form of organic compounds, such as glucose. It works as follows:\n\n1. **Light absorption**: Light is absorbed by pigments such as chlorophyll in the plant's cells.\n2. **Water absorption**: Water is absorbed by the plant's roots and transported to the leaves.\n3. **Carbon dioxide absorption**: Carbon dioxide is absorbed from the air through small openings on the leaves called stomata.\n4. **Light-dependent reactions**: Light energy is used to convert water and carbon dioxide into ATP (adenosine triphosphate) and NADPH (nicotinamide adenine dinucleotide phosphate).\n5. **Light-independent reactions** (Calvin cycle): ATP and NADPH are used to convert carbon dioxide into glucose.\n\nThe overall equation for photosynthesis is:\n\n6 CO2 + 6 H2O + light energy → C6H12O6 (glucose) + 6 O2\n\nOxygen is released as a byproduct, which is essential for the survival of most living organisms."
+      }
+    ]
+  },
+  "science_en_02": {
+    "query_text": "What causes the seasons to change on Earth?",
+    "language": "en",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The seasons change on Earth due to the planet's tilt (about 23.5 degrees) on its axis and its orbit around the Sun. As the Earth rotates, different parts of the planet receive varying amounts of sunlight, resulting in changes in temperature and weather patterns. This tilt causes the Northern and Southern Hemispheres to experience opposite seasons."
+      }
+    ]
+  },
+  "science_en_03": {
+    "query_text": "What is the speed of light in a vacuum?",
+    "language": "en",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The speed of light in a vacuum is approximately 299,792,458 meters per second (m/s)."
+      }
+    ]
+  },
+  "science_en_04": {
+    "query_text": "How do vaccines train the immune system?",
+    "language": "en",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "Vaccines train the immune system by introducing a small, harmless piece of a pathogen, such as a virus or bacteria, or a weakened form of the pathogen. This triggers an immune response, allowing the body to:\n\n1. Recognize the pathogen\n2. Produce antibodies to fight it\n3. Develop immune cells (T-cells and B-cells) that remember the pathogen\n4. Mount a rapid and effective response if exposed to the pathogen again in the future.\n\nThis process is called immunological memory, and it helps protect the body against future infections."
+      }
+    ]
+  },
+  "science_en_05": {
+    "query_text": "What is the difference between mass and weight?",
+    "language": "en",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "Mass and weight are often used interchangeably, but they have distinct meanings:\n\n1. **Mass**: A measure of the amount of matter in an object, which remains constant regardless of location. It is typically measured in kilograms (kg) or grams (g).\n2. **Weight**: A measure of the force exerted on an object due to gravity, which varies depending on the object's location and the strength of the gravitational field. It is typically measured in Newtons (N) or pounds (lb).\n\nIn other words, mass is an intrinsic property of an object, while weight is a force that depends on the object's mass and the gravitational field it is in. For example, an object with a mass of 10 kg will weigh approximately 98 N on Earth, but its weight would be different on the Moon or Mars due to the weaker gravitational fields."
+      }
+    ]
+  },
+  "science_en_06": {
+    "query_text": "How does the greenhouse effect contribute to climate change?",
+    "language": "en",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The greenhouse effect contributes to climate change by trapping heat in the Earth's atmosphere, leading to global warming. Here's how:\n\n1. **Greenhouse gases**: Burning fossil fuels and other human activities release greenhouse gases like carbon dioxide (CO2), methane (CH4), and water vapor (H2O) into the atmosphere.\n2. **Heat trapping**: These gases trap heat from the sun, preventing it from escaping back into space.\n3. **Temperature increase**: The trapped heat warms the Earth's surface and atmosphere, leading to rising global temperatures.\n4. **Climate change**: The increased temperature causes melting of polar ice caps, sea-level rise, more extreme weather events, and altered ecosystems, ultimately contributing to climate change.\n\nThe main greenhouse gases responsible for climate change are:\n\n* CO2 (65% of the warming)\n* CH4 (20% of the warming)\n* H2O (5-10% of the warming)\n\nHuman activities, such as burning fossil fuels, deforestation, and land-use changes, have increased the concentration of these gases in the atmosphere, amplifying the natural greenhouse effect and driving climate change."
+      }
+    ]
+  },
+  "science_en_07": {
+    "query_text": "What is the theory of plate tectonics?",
+    "language": "en",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The theory of plate tectonics states that the Earth's lithosphere (outer layer) is divided into large, rigid plates that move relative to each other. These plates are in constant motion, sliding over the more fluid asthenosphere (lower layer) below, resulting in geological phenomena such as earthquakes, volcanoes, and mountain formation. The movement of the plates is driven by convection currents in the Earth's mantle."
+      }
+    ]
+  },
+  "science_en_08": {
+    "query_text": "How do black holes form?",
+    "language": "en",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "Black holes form when a massive star (at least 3-4 times larger than the sun) runs out of fuel and dies. The star collapses under its own gravity, causing a massive amount of matter to be compressed into an incredibly small space, creating a singularity with an intense gravitational pull. This process is known as a supernova explosion. The gravity is so strong that not even light can escape, resulting in a black hole."
+      }
+    ]
+  },
+  "science_en_09": {
+    "query_text": "What is the function of DNA in living organisms?",
+    "language": "en",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The primary function of DNA (Deoxyribonucleic acid) in living organisms is to:\n\n1. Store genetic information: DNA carries the genetic instructions for the development, growth, and function of an organism.\n2. Pass on genetic traits: DNA is responsible for transmitting genetic information from one generation to the next.\n3. Provide instructions for protein synthesis: DNA contains the instructions for the production of proteins, which are essential for various cellular functions.\n4. Regulate cellular activities: DNA helps regulate gene expression, cell division, and other cellular processes.\n\nIn summary, DNA serves as a blueprint or instructions for the development, growth, and function of living organisms."
+      }
+    ]
+  },
+  "government_en_00": {
+    "query_text": "How is the President of India elected?",
+    "language": "en",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The President of India is elected through an indirect election process, where the electoral college consists of:\n\n1. Elected members of both houses of Parliament (Lok Sabha and Rajya Sabha)\n2. Elected members of the legislative assemblies of all states\n\nThe election is held by a secret ballot, and the winner is determined by a single transferable vote system. The candidate with the majority of votes (more than 50% of the total votes) is elected as the President of India."
+      }
+    ]
+  },
+  "government_en_01": {
+    "query_text": "What are the fundamental rights guaranteed by the Indian Constitution?",
+    "language": "en",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The Indian Constitution guarantees the following six fundamental rights:\n\n1. Right to Equality (Articles 14-18)\n2. Right to Freedom (Articles 19-22)\n3. Right against Exploitation (Articles 23-24)\n4. Right to Freedom of Religion (Articles 25-28)\n5. Right to Cultural and Educational Rights (Articles 29-30)\n6. Right to Constitutional Remedies (Article 32)\n\nThese rights are enshrined in Part III of the Indian Constitution and are enforceable by the courts."
+      }
+    ]
+  },
+  "government_en_02": {
+    "query_text": "How many members are in the Lok Sabha?",
+    "language": "en",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The Lok Sabha has 543 elected members and 2 nominated members, making a total of 545 members."
+      }
+    ]
+  },
+  "government_en_03": {
+    "query_text": "What is the role of the Election Commission of India?",
+    "language": "en",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The Election Commission of India (ECI) is responsible for administering and conducting free and fair elections in India. Its roles include:\n\n1. Conducting elections to the Parliament, State Legislatures, and the offices of the President and the Vice-President.\n2. Ensuring the integrity of the electoral process.\n3. Registering and regulating political parties.\n4. Maintaining the electoral rolls and voter lists.\n5. Setting election schedules and rules.\n6. Monitoring campaign finance and expenditure.\n7. Implementing the Model Code of Conduct for political parties and candidates.\n8. Addressing electoral complaints and disputes.\n\nOverall, the ECI plays a crucial role in upholding the democratic process in India."
+      }
+    ]
+  },
+  "government_en_04": {
+    "query_text": "How does a bill become a law in the Indian Parliament?",
+    "language": "en",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "In the Indian Parliament, a bill becomes a law through the following steps:\n\n1. **Introduction**: A bill is introduced in either the Lok Sabha (Lower House) or the Rajya Sabha (Upper House) by a minister or a member.\n2. **First Reading**: The bill is read and discussed in the house where it was introduced.\n3. **Referral to Committee**: The bill is referred to a parliamentary committee for examination and scrutiny.\n4. **Report by Committee**: The committee submits its report to the house.\n5. **Second Reading**: The bill is debated and voted on in the house.\n6. **Amendments**: Amendments to the bill can be proposed and voted on.\n7. **Third Reading**: The bill is read again and voted on in its final form.\n8. **Passage in the Other House**: The bill is sent to the other house (if it was introduced in the Lok Sabha, it goes to the Rajya Sabha, and vice versa) for passage.\n9. **Presidential Assent**: If the bill is passed by both houses, it is sent to the President of India for assent.\n10. **Signing into Law**: The President signs the bill, and it becomes an Act of Parliament, or a law.\n\nNote: If the President returns the bill to the Parliament for reconsideration, it is sent back to the houses for revision and voting. If the Parliament passes the bill again with or without amendments, it is sent back to the President, who must give assent."
+      }
+    ]
+  },
+  "government_en_05": {
+    "query_text": "What is the difference between the Lok Sabha and Rajya Sabha?",
+    "language": "en",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The Lok Sabha (House of the People) and Rajya Sabha (Council of States) are the two houses of the Parliament of India. The main differences are:\n\n1. **Membership**: Lok Sabha has 543 elected members, while Rajya Sabha has 245 members, with 233 elected and 12 nominated by the President.\n2. **Term**: Lok Sabha members are elected for a term of 5 years, while Rajya Sabha members have a term of 6 years, with one-third of the members retiring every 2 years.\n3. **Election**: Lok Sabha members are directly elected by the people, while Rajya Sabha members are elected by the elected members of the State Legislative Assemblies.\n4. **Representation**: Lok Sabha represents the people of India, while Rajya Sabha represents the interests of the states.\n5. **Powers**: Both houses have equal powers in matters of legislation, except in cases of money bills, where Lok Sabha has more power."
+      }
+    ]
+  },
+  "government_en_06": {
+    "query_text": "What is the tenure of a Chief Minister in an Indian state?",
+    "language": "en",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The tenure of a Chief Minister in an Indian state is 5 years."
+      }
+    ]
+  },
+  "government_en_07": {
+    "query_text": "What is the function of the Reserve Bank of India?",
+    "language": "en",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The Reserve Bank of India (RBI) is the central bank of India, and its primary functions include:\n\n1. Monetary Policy: Regulating money supply and interest rates.\n2. Currency Management: Managing the supply of currency and coins.\n3. Banking Regulation: Supervising and regulating commercial banks.\n4. Lender of Last Resort: Providing liquidity to banks during financial crises.\n5. Foreign Exchange Management: Regulating foreign exchange transactions.\n6. Government Banker: Managing the government's accounts and providing banking services.\n\nOverall, the RBI aims to maintain price stability, promote economic growth, and ensure financial stability in India."
+      }
+    ]
+  },
+  "government_en_08": {
+    "query_text": "How is a state Governor appointed?",
+    "language": "en",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "A state Governor is typically elected through a direct vote by the people of the state, although the specific process may vary. Here are the general steps:\n\n1. **Candidate nomination**: Candidates from various political parties or as independents file their nominations to contest the election.\n2. **Election campaign**: Candidates participate in debates, rallies, and other campaigns to win the support of voters.\n3. **Voting**: Eligible voters cast their ballots on election day.\n4. **Counting and results**: Votes are counted, and the candidate with the most votes is declared the winner.\n5. **Oath of office**: The elected Governor takes an oath of office, marking the beginning of their term.\n\nIn some countries, like India, the Governor is appointed by the central government, typically the President, on the advice of the Prime Minister or the Council of Ministers. However, in many countries and states, the Governor is directly elected by the people."
+      }
+    ]
+  },
+  "government_en_09": {
+    "query_text": "What is the significance of Article 370?",
+    "language": "en",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "Article 370 of the Indian Constitution granted special autonomous status to the state of Jammu and Kashmir, allowing it to have its own constitution, flag, and laws, except for matters related to defense, foreign affairs, and communications. The significance of Article 370 includes:\n\n1. **Autonomy**: It provided Jammu and Kashmir with a significant degree of autonomy, allowing the state to make its own laws on various matters.\n2. **Special status**: It recognized the unique history, culture, and geography of Jammu and Kashmir, setting it apart from other Indian states.\n3. **Protection of state laws**: It protected the state's laws and regulations from being altered or repealed by the Indian Parliament without the state's consent.\n4. **Restrictions on non-residents**: It restricted non-residents from purchasing land or property in Jammu and Kashmir, aiming to preserve the state's distinct cultural and demographic identity.\n\nHowever, on August 5, 2019, the Indian government abrogated Article 370, effectively revoking Jammu and Kashmir's special status and dividing the state into two union territories: Jammu and Kashmir, and Ladakh."
+      }
+    ]
+  },
+  "sports_en_00": {
+    "query_text": "How many players are on a cricket team?",
+    "language": "en",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "There are 11 players on a cricket team."
+      }
+    ]
+  },
+  "sports_en_01": {
+    "query_text": "When was the first Cricket World Cup held?",
+    "language": "en",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The first Cricket World Cup was held in 1975 in England."
+      }
+    ]
+  },
+  "sports_en_02": {
+    "query_text": "What are the rules for a run-out in cricket?",
+    "language": "en",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "In cricket, a run-out occurs when a batsman is dismissed by a fielder hitting the stumps while the batsman is outside their crease. The rules for a run-out are:\n\n1. The batsman must be outside their crease.\n2. The fielder must be in possession of the ball.\n3. The fielder must hit the stumps, either directly or by throwing the ball, before the batsman can make their ground.\n4. The batsman is given out if the stumps are hit and the bails are knocked off, even if the batsman has not touched the ball.\n5. If the fielder throws the ball to the wicketkeeper or another fielder, who then hits the stumps, it is still considered a run-out.\n6. The batsman can be run-out at either end of the pitch, whether they are the striker or the non-striker.\n\nIf these conditions are met, the umpire will raise their arm and signal the batsman is out, and the batsman must leave the field."
+      }
+    ]
+  },
+  "sports_en_03": {
+    "query_text": "How many Olympic gold medals has India won in hockey?",
+    "language": "en",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "India has won 8 Olympic gold medals in hockey."
+      }
+    ]
+  },
+  "sports_en_04": {
+    "query_text": "What is the offside rule in football?",
+    "language": "en",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "In football, the offside rule states that a player is offside if they are closer to the opponent's goal line than both the ball and the second-to-last opponent when the ball is played forward. To be considered offside, the player must also be in the opponent's half of the field and become involved in the play."
+      }
+    ]
+  },
+  "sports_en_05": {
+    "query_text": "How is a chess game scored in tournaments?",
+    "language": "en",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "In chess tournaments, a win is typically scored as 1 point, a draw as 0.5 points, and a loss as 0 points. The player with the most points at the end of the tournament is usually declared the winner."
+      }
+    ]
+  },
+  "sports_en_06": {
+    "query_text": "What is the format of the Indian Premier League?",
+    "language": "en",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The Indian Premier League (IPL) is a professional Twenty20 cricket league in India. The format is as follows:\n\n1. **Group Stage**: 10 teams compete in a double round-robin format, where each team plays the other 9 teams twice (home and away).\n2. **League Table**: Teams are ranked based on points earned (2 points for a win, 1 point for a tie or no result).\n3. **Playoffs**: The top 4 teams qualify for the playoffs.\n   - **Qualifier 1**: 1st-ranked team vs. 2nd-ranked team.\n   - **Eliminator**: 3rd-ranked team vs. 4th-ranked team.\n   - **Qualifier 2**: Winner of Eliminator vs. loser of Qualifier 1.\n4. **Final**: Winner of Qualifier 1 vs. winner of Qualifier 2.\n\nThe team with the most points at the end of the group stage is ranked 1st, and the team with the fewest points is ranked 10th."
+      }
+    ]
+  },
+  "sports_en_07": {
+    "query_text": "How many sets are played in a standard tennis match?",
+    "language": "en",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "In a standard tennis match, a best-of-three or best-of-five sets format is used. \n\n- Best-of-three sets: 2 or 3 sets (a player must win 2 sets to win the match)\n- Best-of-five sets: 3, 4, or 5 sets (a player must win 3 sets to win the match)"
+      }
+    ]
+  },
+  "sports_en_08": {
+    "query_text": "What is the significance of the Ranji Trophy?",
+    "language": "en",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "The Ranji Trophy is India's premier domestic first-class cricket championship. Its significance includes:\n\n1. Identifying national team talent: It serves as a platform for selecting players for the Indian national cricket team.\n2. Promoting domestic cricket: The tournament promotes cricket at the state and regional level, fostering competition and development.\n3. Honoring Indian cricket history: The trophy is named after Kumar Shri Ranjitsinhji, a legendary Indian cricketer, paying tribute to his contributions to the sport.\n\nOverall, the Ranji Trophy plays a crucial role in Indian cricket, providing a pathway for players to showcase their skills and potentially represent the country at the international level."
+      }
+    ]
+  },
+  "sports_en_09": {
+    "query_text": "How does the points system work in Formula 1?",
+    "language": "en",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "In Formula 1, the points system awards drivers points based on their finishing position in a Grand Prix. The current points system is as follows:\n\n* 1st place: 25 points\n* 2nd place: 18 points\n* 3rd place: 15 points\n* 4th place: 12 points\n* 5th place: 10 points\n* 6th place: 8 points\n* 7th place: 6 points\n* 8th place: 4 points\n* 9th place: 2 points\n* 10th place: 1 point\n\nOnly the top 10 finishers score points. The driver with the most points at the end of the season is crowned the World Drivers' Champion. The same points system applies to the Constructors' Championship, with the points earned by each team's drivers being combined to determine the team's overall score."
+      }
+    ]
+  },
+  "healthcare_hi_00": {
+    "query_text": "डेंगू बुखार के सामान्य लक्षण क्या हैं?",
+    "language": "hi",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "डेंगू बुखार के सामान्य लक्षणों में उच्च बुखार, सिरदर्द, मांसपेशियों और जोड़ों में दर्द, और त्वचा पर चकत्ते शामिल हैं।"
+      }
+    ]
+  },
+  "healthcare_hi_01": {
+    "query_text": "मानव प्रतिरक्षा प्रणाली वायरल संक्रमण पर कैसे प्रतिक्रिया करती है?",
+    "language": "hi",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "मानव प्रतिरक्षा प्रणाली वायरल संक्रमण के प्रति कई तरीकों से प्रतिक्रिया करती है:\n\n१) **प्राकृतिक प्रतिरक्षा**: त्वचा और श्लेष्म झिल्ली जैसे बाधाएं वायरस के प्रवेश को रोकती हैं।\n२) **प्रतिरक्षा कोशिकाएं**: व्हाइट ब्लड सेल्स जैसे न्यूट्रोफिल और मैक्रोफेज वायरस को पहचानकर और नष्ट करके काम करते हैं।\n३) **एंटीबॉडी**: बी सेल्स एंटीबॉडी का उत्पादन करते हैं जो वायरस को निष्क्रिय करते हैं।\n४) **सेल-मध्यस्थ प्रतिरक्षा**: टी सेल्स वायरस से संक्रमित कोशिकाओं को पहचानकर और नष्ट करके काम करते हैं।\n५) **सूजन**: प्रतिरक्षा प्रणाली सूजन पैदा करती है जो वायरस के प्रसार को रोकने में मदद करती है।\n६) **इंटरफेरॉन**: कुछ कोशिकाएं इंटरफेरॉन नामक प्रोटीन का उत्पादन करती हैं जो वायरस की प्रतिलिपि बनाने से रोकते हैं।\n\nइन तरीकों से, मानव प्रतिरक्षा प्रणाली वायरल संक्रमण का मुकाबला करने और शरीर को सुरक्षित रखने में मदद करती है।"
+      }
+    ]
+  },
+  "healthcare_hi_02": {
+    "query_text": "एक सामान्य पैरासिटामोल टैबलेट की अनुशंसित खुराक आवृत्ति क्या है?",
+    "language": "hi",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "एक सामान्य पैरासिटामोल टैबलेट की अनुशंसित खुराक आवृत्ति आमतौर पर 4-6 घंटे होती है, लेकिन यह व्यक्ति की उम्र, वजन और स्वास्थ्य स्थिति पर निर्भर करती है। यह महत्वपूर्ण है कि आप अपने डॉक्टर या फार्मासिस्ट से परामर्श लें और उनकी सलाह का पालन करें।"
+      }
+    ]
+  },
+  "healthcare_hi_03": {
+    "query_text": "टाइप 2 मधुमेह का कारण क्या है?",
+    "language": "hi",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "टाइप 2 मधुमेह का कारण शरीर में इंसुलिन की कमी या इंसुलिन प्रतिरोध है, जिसके परिणामस्वरूप रक्त शर्करा का स्तर बढ़ जाता है। इसके कई कारण हो सकते हैं, जिनमें शामिल हैं:\n\n१) अनुवांशिक कारक\n२) मोटापा\n३) शारीरिक निष्क्रियता\n४) अस्वस्थ आहार\n५) उम्र\n६) अन्य स्वास्थ्य समस्याएं, जैसे कि उच्च रक्तचाप और उच्च कोलेस्ट्रॉल।"
+      }
+    ]
+  },
+  "healthcare_hi_04": {
+    "query_text": "तपेदिक (टीबी) का निदान आमतौर पर कैसे किया जाता है?",
+    "language": "hi",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "तपेदिक (टीबी) का निदान आमतौर पर निम्नलिखित तरीकों से किया जाता है:\n\n१) छाती का एक्स-रे: यह टीबी के संदेह में सबसे पहले किया जाने वाला परीक्षण है, जो फेफड़ों में सूजन या घावों की जांच करता है।\n२) म्यूकोबैक्टीरिया की जांच: यह परीक्षण थूक या अन्य शरीर के तरल पदार्थों में टीबी के जीवाणु की जांच करता है।\n३) मांसलता परीक्षण: यह परीक्षण शरीर की प्रतिरक्षा प्रणाली की प्रतिक्रिया को मापता है और यह जांचता है कि व्यक्ति टीबी से संक्रमित है या नहीं।\n४) स्पुतम स्मीयर माइक्रोस्कोपी: यह परीक्षण थूक में टीबी के जीवाणु की जांच करता है।\n५) जेनएक्सपért परीक्षण: यह परीक्षण थूक में टीबी के जीवाणु की जांच करता है और यह जांचता है कि व्यक्ति टीबी से संक्रमित है या नहीं।\n\nइन परीक्षणों के परिणामों के आधार पर, डॉक्टर टीबी का निदान कर सकते हैं और उचित उपचार की सिफारिश कर सकते हैं।"
+      }
+    ]
+  },
+  "healthcare_hi_05": {
+    "query_text": "भारत के सार्वभौमिक टीकाकरण कार्यक्रम में कौन से टीके शामिल हैं?",
+    "language": "hi",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "भारत के सार्वभौमिक टीकाकरण कार्यक्रम में निम्नलिखित टीके शामिल हैं:\n\n1. बीसीजी (बेसिलस कैलमेट-गुएरिन) - टीबी के लिए\n2. ओपीवी (ओरल पोलियो वायरस) - पोलियो के लिए\n3. हेपेटाइटिस बी - हेपेटाइटिस बी के लिए\n4. डीपीटी (डिप्थीरिया, पेट्यूसिस, टेटनस) - डिप्थीरिया, पेट्यूसिस, और टेटनस के लिए\n5. एचआईबी (हीमोफिलस इन्फ्लुएंजा टाइप बी) - हीमोफिलस इन्फ्लुएंजा टाइप बी के लिए\n6. रोटावायरस - रोटावायरस के लिए\n7. पीसीवी (प्न्यूमोकोकल कंजुगेट) - न्यूमोकोकल रोग के लिए\n8. रूबेला, मम्प्स, और खसरा (एमएमआर) - रूबेला, मम्प्स, और खसरा के लिए\n9. जापानी एन्सेफलाइटिस - जापानी एन्सेफलाइटिस के लिए\n10. टेटनस और डिप्थीरिया (टीडी) - टेटनस और डिप्थीरिया के लिए\n11. एचपीवी (ह्यूमन पैपिलोमावायरस) - ह्यूमन पैपिलोमावायरस के लिए\n\nयह सूची समय-समय पर अपडेट होती रहती है और नए टीकों को जोड़ा जा सकता है।"
+      }
+    ]
+  },
+  "healthcare_hi_06": {
+    "query_text": "बैक्टीरियल और वायरल संक्रमण में मुख्य अंतर क्या हैं?",
+    "language": "hi",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "बैक्टीरियल और वायरल संक्रमण में मुख्य अंतर हैं:\n\n1. **कारण:** बैक्टीरियल संक्रमण बैक्टीरिया के कारण होता है, जबकि वायरल संक्रमण वायरस के कारण होता है।\n2. **संरचना:** बैक्टीरिया जीवित कोशिकाएं होती हैं, जबकि वायरस जीवित कोशिकाओं के भीतर प्रोटीन और जेनेटिक पदार्थ के कण होते हैं।\n3. **प्रजनन:** बैक्टीरिया अपने आप प्रजनन कर सकते हैं, जबकि वायरस को जीवित कोशिकाओं की आवश्यकता होती है ताकि वे प्रजनन कर सकें।\n4. **उपचार:** बैक्टीरियल संक्रमण का इलाज आमतौर पर एंटीबायोटिक्स से किया जा सकता है, जबकि वायरल संक्रमण के लिए एंटीवायरल दवाएं या अन्य उपचारों की आवश्यकता होती है।\n5. **लक्षण:** बैक्टीरियल और वायरल संक्रमण के लक्षण अलग-अलग हो सकते हैं, लेकिन कुछ सामान्य लक्षणों में बुखार, दर्द, और थकान शामिल हो सकते हैं।\n\nइन अंतरों को समझने से संक्रमण के कारण का पता लगाने और उचित उपचार प्रदान करने में मदद मिलती है।"
+      }
+    ]
+  },
+  "healthcare_hi_07": {
+    "query_text": "उच्च रक्तचाप हृदय प्रणाली को कैसे प्रभावित करता है?",
+    "language": "hi",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "उच्च रक्तचाप हृदय प्रणाली को कई तरह से प्रभावित कर सकता है:\n\n१. **हृदय की मांसपेशियों पर दबाव**: उच्च रक्तचाप हृदय की मांसपेशियों पर अधिक दबाव डालता है, जिससे हृदय की कार्यक्षमता कम हो सकती है।\n२. **धमनियों की सख्ती**: उच्च रक्तचाप से धमनियाँ सख्त हो जाती हैं, जिससे उनमें रक्त का प्रवाह कम हो जाता है।\n३. **हृदय की विफलता**: लंबे समय तक उच्च रक्तचाप से हृदय की विफलता हो सकती है, जिससे हृदय रक्त को प्रभावी ढंग से पंप नहीं कर पाता है।\n४. **धमनियों में प्लेक का निर्माण**: उच्च रक्तचाप से धमनियों में प्लेक का निर्माण हो सकता है, जिससे हृदय रोग का खतरा बढ़ जाता है।\n५. **हृदय के वाल्वों पर दबाव**: उच्च रक्तचाप से हृदय के वाल्वों पर दबाव पड़ सकता है, जिससे वाल्वों की कार्यक्षमता कम हो सकती है।\n\nइन सभी कारणों से, उच्च रक्तचाप को नियंत्रित करना और हृदय प्रणाली की सेहत को बनाए रखना बहुत महत्वपूर्ण है।"
+      }
+    ]
+  },
+  "healthcare_hi_08": {
+    "query_text": "मानव शरीर में इंसुलिन की भूमिका क्या है?",
+    "language": "hi",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "मानव शरीर में इंसुलिन एक महत्वपूर्ण हार्मोन है जो ग्लूकोज के स्तर को नियंत्रित करने में मदद करता है। इसकी मुख्य भूमिका है:\n\nग्लूकोज को कोशिकाओं में पहुंचाना: इंसुलिन ग्लूकोज को कोशिकाओं में प्रवेश करने में मदद करता है, जहां यह ऊर्जा के रूप में उपयोग किया जाता है या भंडारित किया जाता है।\n\nग्लूकोज के स्तर को नियंत्रित करना: इंसुलिन रक्त में ग्लूकोज के स्तर को नियंत्रित करने में मदद करता है, जो शरीर के लिए आवश्यक है। यदि ग्लूकोज का स्तर बहुत अधिक हो जाता है, तो इंसुलिन इसके स्तर को कम करने में मदद करता है।\n\nवजन प्रबंधन में मदद: इंसुलिन वजन प्रबंधन में भी मदद करता है, क्योंकि यह ग्लूकोज को कोशिकाओं में पहुंचाने में मदद करता है, जो ऊर्जा के रूप में उपयोग किया जाता है या भंडारित किया जाता है।"
+      }
+    ]
+  },
+  "healthcare_hi_09": {
+    "query_text": "दैनिक जल सेवन पर WHO के दिशानिर्देश क्या हैं?",
+    "language": "hi",
+    "domain": "healthcare",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "विश्व स्वास्थ्य संगठन (WHO) के अनुसार, दैनिक जल सेवन के लिए कोई निश्चित मानक नहीं है, लेकिन यह सिफारिश की जाती है कि वयस्कों को प्रतिदिन कम से कम 2 लीटर पानी पीना चाहिए।"
+      }
+    ]
+  },
+  "history_hi_00": {
+    "query_text": "भारत को ब्रिटिश शासन से स्वतंत्रता कब मिली?",
+    "language": "hi",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "भारत को ब्रिटिश शासन से स्वतंत्रता 15 अगस्त 1947 को मिली।"
+      }
+    ]
+  },
+  "history_hi_01": {
+    "query_text": "भारत के पहले प्रधानमंत्री कौन थे?",
+    "language": "hi",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "जवाहरलाल नेहरू भारत के पहले प्रधानमंत्री थे।"
+      }
+    ]
+  },
+  "history_hi_02": {
+    "query_text": "प्रथम विश्व युद्ध के मुख्य कारण क्या थे?",
+    "language": "hi",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "प्रथम विश्व युद्ध के मुख्य कारण निम्नलिखित हैं:\n\n१. राष्ट्रवाद: विभिन्न देशों में राष्ट्रवादी भावनाएं बढ़ रही थीं, जिससे देशों के बीच तनाव बढ़ रहा था।\n२. साम्राज्यवाद: यूरोपीय देशों के बीच साम्राज्यवादी प्रतिस्पर्धा बढ़ रही थी, जिससे उपनिवेशों और बाजारों के लिए संघर्ष हो रहा था।\n३. गठबंधन प्रणाली: यूरोपीय देशों के बीच गठबंधन प्रणाली बन गई थी, जिसमें देश एक दूसरे के साथ मिलकर अपने हितों की रक्षा करने के लिए तैयार थे।\n४. आर्थिक प्रतिस्पर्धा: यूरोपीय देशों के बीच आर्थिक प्रतिस्पर्धा बढ़ रही थी, जिससे व्यापार और उद्योग के लिए संघर्ष हो रहा था।\n५. सैन्यीकरण: यूरोपीय देशों में सैन्यीकरण बढ़ रहा था, जिससे युद्ध की संभावना बढ़ रही थी।\n६. ऑस्ट्रिया के राजकुमार फ्रांज फेर्डिनांड की हत्या: २८ जून १९१४ को ऑस्ट्रिया के राजकुमार फ्रांज फेर्डिनांड की हत्या हुई, जिससे ऑस्ट्रिया और सербिया के बीच तनाव बढ़ गया और युद्ध शुरू हो गया।"
+      }
+    ]
+  },
+  "history_hi_03": {
+    "query_text": "भारतीय संविधान कब अपनाया गया था?",
+    "language": "hi",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "भारतीय संविधान 26 नवंबर, 1949 को अपनाया गया था।"
+      }
+    ]
+  },
+  "history_hi_04": {
+    "query_text": "मुग़ल साम्राज्य की स्थापना किसने की?",
+    "language": "hi",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "मुग़ल साम्राज्य की स्थापना बाबर ने की थी।"
+      }
+    ]
+  },
+  "history_hi_05": {
+    "query_text": "दांडी मार्च का महत्व क्या था?",
+    "language": "hi",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "दांडी मार्च, जिसे नमक सत्याग्रह भी कहा जाता है, एक महत्वपूर्ण घटना थी जो 12 मार्च 1930 से 6 अप्रैल 1930 तक हुई थी। इस मार्च का नेतृत्व महात्मा गांधी ने किया था और इसका उद्देश्य ब्रिटिश सरकार द्वारा लगाए गए नमक कर के खिलाफ विरोध करना था।\n\nदांडी मार्च का महत्व इस प्रकार है:\n\n1. **नमक कर के खिलाफ विरोध**: दांडी मार्च नमक कर के खिलाफ विरोध करने के लिए आयोजित किया गया था, जो भारतीयों पर एक अन्यायपूर्ण कर था।\n2. **स्वदेशी और आत्मनिर्भरता**: इस मार्च ने स्वदेशी और आत्मनिर्भरता की भावना को बढ़ावा दिया और लोगों को अपने देश के उत्पादों का समर्थन करने के लिए प्रेरित किया।\n3. **अहिंसक विरोध**: दांडी मार्च ने अहिंसक विरोध की शक्ति को प्रदर्शित किया और दुनिया को दिखाया कि बिना हिंसा के भी बड़े परिवर्तन लाए जा सकते हैं।\n4. **भारतीय स्वतंत्रता संग्राम**: दांडी मार्च भारतीय स्वतंत्रता संग्राम के लिए एक महत्वपूर्ण मील का पत्थर था और इसने भारतीयों को स्वतंत्रता के लिए लड़ने के लिए प्रेरित किया।\n5. **महात्मा गांधी की नेतृत्व**: दांडी मार्च ने महात्मा गांधी की नेतृत्व क्षमता को प्रदर्शित किया और उन्हें विश्व स्तर पर एक प्रमुख नेता के रूप में स्थापित किया।\n\nइस प्रकार, दांडी मार्च एक महत्वपूर्ण घटना थी जिसने भारतीय स्वतंत्रता संग्राम को गति प्रदान की और दुनिया को अहिंसक विरोध की शक्ति को दिखाया।"
+      }
+    ]
+  },
+  "history_hi_06": {
+    "query_text": "प्लासी की लड़ाई कब हुई थी?",
+    "language": "hi",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "प्लासी की लड़ाई 23 जून 1757 को हुई थी।"
+      }
+    ]
+  },
+  "history_hi_07": {
+    "query_text": "छत्रपति शिवाजी महाराज कौन थे?",
+    "language": "hi",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "छत्रपति शिवाजी महाराज भारत के एक महान योद्धा और मराठा साम्राज्य के संस्थापक थे। उन्होंने 17वीं शताब्दी में महाराष्ट्र क्षेत्र में एक शक्तिशाली और स्वतंत्र राज्य की स्थापना की। वह एक महान सैन्य नेता और राजनेता थे जिन्होंने अपने जीवनकाल में कई युद्ध लड़े और अपने राज्य की सीमाओं का विस्तार किया। उन्हें भारतीय इतिहास में एक महान नायक के रूप में याद किया जाता है और उनकी वीरता और नेतृत्व क्षमता के लिए सम्मानित किया जाता है।"
+      }
+    ]
+  },
+  "history_hi_08": {
+    "query_text": "असहयोग आंदोलन क्या था?",
+    "language": "hi",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "असहयोग आंदोलन एक राजनीतिक आंदोलन था जो 1920-22 के दौरान महात्मा गांधी के नेतृत्व में भारत में ब्रिटिश सरकार के खिलाफ चलाया गया था। इसका उद्देश्य भारतीयों को ब्रिटिश सरकार के साथ सहयोग करने से इनकार करना और स्वराज की मांग करना था।"
+      }
+    ]
+  },
+  "history_hi_09": {
+    "query_text": "संयुक्त राष्ट्र की स्थापना कब हुई थी?",
+    "language": "hi",
+    "domain": "history",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "संयुक्त राष्ट्र की स्थापना 24 अक्टूबर 1945 को हुई थी।"
+      }
+    ]
+  },
+  "science_hi_00": {
+    "query_text": "पानी का रासायनिक सूत्र क्या है?",
+    "language": "hi",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "पानी का रासायनिक सूत्र H2O है।"
+      }
+    ]
+  },
+  "science_hi_01": {
+    "query_text": "प्रकाश संश्लेषण कैसे काम करता है?",
+    "language": "hi",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "प्रकाश संश्लेषण एक जटिल प्रक्रिया है जिसमें पौधे और कुछ अन्य जीव सूर्य की ऊर्जा का उपयोग करके कार्बन डाइऑक्साइड और पानी से ग्लूकोज और ऑक्सीजन बनाते हैं। यह प्रक्रिया वायुमंडल में ऑक्सीजन की मात्रा को बढ़ाने और पृथ्वी पर जीवन को बनाए रखने में महत्वपूर्ण भूमिका निभाती है।\n\nप्रकाश संश्लेषण की प्रक्रिया में दो मुख्य चरण होते हैं: प्रकाश-निर्भर चरण और प्रकाश-स्वतंत्र चरण।\n\nप्रकाश-निर्भर चरण:\nइस चरण में, पौधे के पत्तों में मौजूद क्लोरोफिल नामक वर्णक सूर्य की ऊर्जा को अवशोषित करता है और इसे रासायनिक ऊर्जा में परिवर्तित करता है। यह ऊर्जा तब एटीपी (एडेनोसिन ट्राइफॉस्फेट) और एनएडीपी (निकोटिनamide एडेनिन डाइन्यूक्लियोटाइड फॉस्फेट) नामक अणुओं में संग्रहीत की जाती है, जो ऊर्जा के भंडार के रूप में कार्य करते हैं।\n\nप्रकाश-स्वतंत्र चरण:\nइस चरण में, पौधे कार्बन डाइऑक्साइड और पानी का उपयोग करके ग्लूकोज और ऑक्सीजन बनाते हैं। यह प्रक्रिया कैलविन चक्र नामक एक जटिल रासायनिक प्रतिक्रिया द्वारा होती है, जिसमें विभिन्न एंजाइम और सह-एंजाइम शामिल होते हैं।\n\nप्रकाश संश्लेषण की समीकरण है:\n६ सीओ२ + ६ एच२ओ + प्रकाश ऊर्जा → सी६एच₁₂ओ६ (ग्लूकोज) + ६ ओ२\n\nइस प्रकार, प्रकाश संश्लेषण एक महत्वपूर्ण प्रक्रिया है जो पृथ्वी पर जीवन को बनाए रखने में मदद करती है।"
+      }
+    ]
+  },
+  "science_hi_02": {
+    "query_text": "पृथ्वी पर मौसम बदलने का कारण क्या है?",
+    "language": "hi",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "पृथ्वी पर मौसम बदलने के कई कारण हैं, जिनमें से कुछ प्रमुख कारण हैं:\n\nसूरज की किरणों का पृथ्वी पर पड़ने का कोण\nपृथ्वी की घूर्णन गति और इसके अक्ष का झुकाव\nमहासागरों और वायुमंडल में गर्मी का संचार\nवायुमंडलीय दबाव और तापमान में परिवर्तन\nजलवायु परिवर्तन और मानव गतिविधियों का प्रभाव\n\nइन कारणों से पृथ्वी पर मौसम में परिवर्तन होता है, जैसे कि तापमान में बदलाव, वर्षा की मात्रा में परिवर्तन, और हवा की दिशा में बदलाव।"
+      }
+    ]
+  },
+  "science_hi_03": {
+    "query_text": "निर्वात में प्रकाश की गति कितनी है?",
+    "language": "hi",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "निर्वात में प्रकाश की गति लगभग 299,792,458 मीटर प्रति सेकंड है।"
+      }
+    ]
+  },
+  "science_hi_04": {
+    "query_text": "टीके प्रतिरक्षा प्रणाली को कैसे प्रशिक्षित करते हैं?",
+    "language": "hi",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "टीके प्रतिरक्षा प्रणाली को एक विशिष्ट रोगज़नक़ के खिलाफ प्रतिक्रिया करने के लिए प्रशिक्षित करते हैं। यह प्रतिरक्षा प्रणाली को रोगज़नक़ को पहचानने और उसे नष्ट करने में मदद करता है, जिससे भविष्य में उस रोगज़नक़ से सुरक्षा मिलती है।"
+      }
+    ]
+  },
+  "science_hi_05": {
+    "query_text": "द्रव्यमान और भार में क्या अंतर है?",
+    "language": "hi",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "द्रव्यमान और भार दो अलग-अलग भौतिक गुण हैं जो अक्सर एक दूसरे के साथ भ्रमित हो जाते हैं।\n\nद्रव्यमान: द्रव्यमान किसी वस्तु के पदार्थ की मात्रा को मापता है, जो वस्तु के अणुओं और परमाणुओं की संख्या से संबंधित है। यह एक निश्चित गुण है जो वस्तु के स्थान और परिस्थितियों से स्वतंत्र है। द्रव्यमान की इकाई किलोग्राम (किग्रा) होती है।\n\nभार: भार किसी वस्तु पर गुरुत्वाकर्षण के कारण लगने वाले बल को मापता है। यह वस्तु के द्रव्यमान और गुरुत्वाकर्षण के त्वरण के गुणनफल के बराबर होता है। भार की इकाई न्यूटन (एन) होती है।\n\nउदाहरण के लिए, यदि किसी वस्तु का द्रव्यमान 10 किग्रा है, तो उसका भार पृथ्वी पर लगभग 98 न्यूटन (10 किग्रा x 9.8 मीटर/सेकंड²) होगा। लेकिन यदि वही वस्तु चंद्रमा पर हो, जहां गुरुत्वाकर्षण का त्वरण पृथ्वी के गुरुत्वाकर्षण के त्वरण का लगभग 1/6 है, तो उसका भार लगभग 16.3 न्यूटन (10 किग्रा x 1.6 मीटर/सेकंड²) होगा, जबकि उसका द्रव्यमान अभी भी 10 किग्रा होगा।\n\nइस प्रकार, द्रव्यमान और भार दो अलग-अलग गुण हैं जो वस्तु के स्थान और परिस्थितियों पर निर्भर करते हैं।"
+      }
+    ]
+  },
+  "science_hi_06": {
+    "query_text": "ग्रीनहाउस प्रभाव जलवायु परिवर्तन में कैसे योगदान देता है?",
+    "language": "hi",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "ग्रीनहाउस प्रभाव जलवायु परिवर्तन में महत्वपूर्ण योगदान देता है। यह पृथ्वी की सतह पर गर्मी को फंसाने की प्रक्रिया है, जिससे तापमान बढ़ता है। मुख्य ग्रीनहाउस गैसें, जैसे कि कार्बन डाइऑक्साइड, मेथेन और नाइट्रस ऑक्साइड, वायुमंडल में जमा होकर सूर्य की किरणों को फंसाती हैं, जिससे पृथ्वी की सतह पर तापमान बढ़ता है। यह प्रभाव जलवायु परिवर्तन के मुख्य कारणों में से एक है, जो तापमान वृद्धि, ग्लेशियर पिघलने, समुद्र के स्तर में वृद्धि, और चरम मौसम की घटनाओं जैसे तूफान और सूखा को बढ़ावा देता है।"
+      }
+    ]
+  },
+  "science_hi_07": {
+    "query_text": "प्लेट टेक्टोनिक्स का सिद्धांत क्या है?",
+    "language": "hi",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "प्लेट टेक्टोनिक्स का सिद्धांत यह है कि पृथ्वी की सतह पर कई बड़ी प्लेटें होती हैं जो लगातार गति में होती हैं और उनकी गति से पृथ्वी की सतह पर परिवर्तन होता है। ये प्लेटें एक दूसरे से टकराती हैं, अलग होती हैं और एक दूसरे के नीचे जाती हैं, जिससे भूकंप, ज्वालामुखी और पहाड़ बनते हैं। यह सिद्धांत पृथ्वी की सतह पर होने वाली कई भूगर्भिक गतिविधियों को समझाने में मदद करता है।"
+      }
+    ]
+  },
+  "science_hi_08": {
+    "query_text": "ब्लैक होल कैसे बनते हैं?",
+    "language": "hi",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "ब्लैक होल एक ऐसा खगोलीय वस्तु है जो एक तारे के गुरुत्वाकर्षण के कारण उसके पतन के बाद बनता है। जब एक तारा अपने जीवनकाल के अंत में पहुँच जाता है और उसका ईंधन समाप्त हो जाता है, तो वह अपने गुरुत्वाकर्षण के कारण सिकुड़ने लगता है। यदि तारे का द्रव्यमान पर्याप्त रूप से अधिक होता है, तो यह सिकुड़ना एक बिंदु पर पहुँच जाता है जहाँ गुरुत्वाकर्षण इतना मजबूत होता है कि यह प्रकाश को भी अपनी ओर खींच लेता है, और यह एक ब्लैक होल बन जाता है।"
+      }
+    ]
+  },
+  "science_hi_09": {
+    "query_text": "जीवित जीवों में डीएनए का कार्य क्या है?",
+    "language": "hi",
+    "domain": "science",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "जीवित जीवों में डीएनए का मुख्य कार्य जीनेटिक सूचना को संग्रहीत और प्रेषित करना है। यह जीव के विकास, वृद्धि और कार्य को नियंत्रित करने वाले जीनों को ले जाता है। डीएनए जीव की विशेषताओं, जैसे कि रंग, आकार और कार्य, को निर्धारित करने में मदद करता है। यह जीव को अपने पर्यावरण के अनुसार अनुकूलन करने और विकसित होने में भी मदद करता है।"
+      }
+    ]
+  },
+  "government_hi_00": {
+    "query_text": "भारत के राष्ट्रपति का चुनाव कैसे होता है?",
+    "language": "hi",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "भारत के राष्ट्रपति का चुनाव एक जटिल प्रक्रिया है, जिसमें संसद और राज्य विधानमंडलों के सदस्य भाग लेते हैं। यहाँ इस प्रक्रिया का संक्षिप्त विवरण है:\n\n1. **चुनाव आयोग की भूमिका**: चुनाव आयोग राष्ट्रपति चुनाव की प्रक्रिया को नियंत्रित और संचालित करता है।\n2. **निर्वाचक मंडल**: राष्ट्रपति का चुनाव एक निर्वाचक मंडल द्वारा किया जाता है, जिसमें संसद के दोनों सदनों (लोकसभा और राज्यसभा) के सदस्य और राज्य विधानमंडलों के सदस्य शामिल होते हैं।\n3. **चुनाव प्रणाली**: राष्ट्रपति चुनाव में एकल संक्रमणीय मत प्रणाली का उपयोग किया जाता है, जिसमें प्रत्येक सदस्य को अपनी वरीयता के अनुसार उम्मीदवारों को मत देने का अधिकार होता है।\n4. **उम्मीदवारी**: कोई भी नागरिक, जो 35 वर्ष से अधिक आयु का है और लोकसभा के सदस्य बनने के लिए योग्य है, राष्ट्रपति पद के लिए उम्मीदवार बन सकता है।\n5. **नामांकन**: उम्मीदवारों को अपने नामांकन पत्र जमा करने होते हैं, जिन्हें चुनाव आयोग द्वारा जांचा जाता है।\n6. **चुनाव**: निर्वाचक मंडल द्वारा मतदान किया जाता है, और उम्मीदवार जो सबसे अधिक मत प्राप्त करता है, वह राष्ट्रपति चुना जाता है।\n7. **परिणाम**: चुनाव आयोग परिणामों की घोषणा करता है, और नवनिर्वाचित राष्ट्रपति को शपथ दिलाई जाती है।\n\nयह प्रक्रिया भारतीय संविधान के अनुच्छेद 55 में वर्णित है, और यह सुनिश्चित करती है कि राष्ट्रपति का चुनाव निष्पक्ष और पारदर्शी तरीके से हो।"
+      }
+    ]
+  },
+  "government_hi_01": {
+    "query_text": "भारतीय संविधान द्वारा प्रदत्त मौलिक अधिकार क्या हैं?",
+    "language": "hi",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "भारतीय संविधान द्वारा प्रदत्त मौलिक अधिकार निम्नलिखित हैं:\n\n1.  समानता का अधिकार (अनुच्छेद 14-18)\n2.  स्वतंत्रता का अधिकार (अनुच्छेद 19-22)\n3.  धर्म की स्वतंत्रता का अधिकार (अनुच्छेद 25-28)\n4.  संस्कृति और शिक्षा का अधिकार (अनुच्छेद 29-30)\n5.  संपत्ति का अधिकार (अनुच्छेद 31)\n6.  लोक सेवाओं में नियुक्ति का अधिकार (अनुच्छेद 16)\n7.  विदेशों में रोजगार का अधिकार (अनुच्छेद 21)\n8.  जीवन और व्यक्तिगत स्वतंत्रता का अधिकार (अनुच्छेद 21)\n9.  शिकायत का अधिकार (अनुच्छेद 32)"
+      }
+    ]
+  },
+  "government_hi_02": {
+    "query_text": "लोकसभा में कितने सदस्य होते हैं?",
+    "language": "hi",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "लोकसभा में ५४३ सदस्य होते हैं।"
+      }
+    ]
+  },
+  "government_hi_03": {
+    "query_text": "भारत के चुनाव आयोग की भूमिका क्या है?",
+    "language": "hi",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "भारत के चुनाव आयोग की भूमिका भारत में निष्पक्ष और स्वतंत्र चुनाव कराने की है। यह आयोग संविधान के अनुच्छेद 324 के तहत स्थापित किया गया है और इसके मुख्य कार्य हैं:\n\nचुनावों का संचालन और प्रबंधन करना।\nराजनीतिक दलों को मान्यता देना और उनकी गतिविधियों की निगरानी करना।\nचुनावी प्रक्रिया को निष्पक्ष और पारदर्शी बनाने के लिए नियमों और दिशानिर्देशों का निर्माण करना।\nचुनावों में होने वाली अनियमितताओं और शिकायतों की जांच करना और कार्रवाई करना।\nचुनावी प्रक्रिया में पारदर्शिता और जवाबदेही सुनिश्चित करने के लिए डेटा और जानकारी का संग्रह और विश्लेषण करना।\nचुनाव आयोग का मुख्य उद्देश्य भारतीय लोकतंत्र को मजबूत बनाने और नागरिकों को अपने नेताओं का चयन करने का अवसर प्रदान करना है।"
+      }
+    ]
+  },
+  "government_hi_04": {
+    "query_text": "भारतीय संसद में एक विधेयक कानून कैसे बनता है?",
+    "language": "hi",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "भारतीय संसद में एक विधेयक कानून बनने की प्रक्रिया निम्नलिखित है:\n\n1. **विधेयक का प्रस्तुतीकरण**: कोई भी सांसद या मंत्री लोकसभा या राज्यसभा में विधेयक प्रस्तुत कर सकता है।\n2. **पहली पढ़ाई**: विधेयक को पहली बार पढ़ा जाता है और इसके उद्देश्यों पर चर्चा की जाती है।\n3. **दूसरी पढ़ाई**: विधेयक को दूसरी बार पढ़ा जाता है और इसके प्रावधानों पर विस्तार से चर्चा की जाती है।\n4. **समिति में भेजा जाना**: विधेयक को एक समिति में भेजा जाता है, जो इसके प्रावधानों की जांच करती है और सुझाव देती है।\n5. **समिति की रिपोर्ट**: समिति अपनी रिपोर्ट प्रस्तुत करती है, जिसमें विधेयक में संशोधनों के सुझाव होते हैं।\n6. **तीसरी पढ़ाई**: विधेयक को तीसरी बार पढ़ा जाता है और इसके प्रावधानों पर अंतिम चर्चा की जाती है।\n7. **मतदान**: विधेयक पर मतदान किया जाता है, और यदि यह पारित हो जाता है, तो यह दूसरे सदन में भेजा जाता है।\n8. **राष्ट्रपति की मंजूरी**: दोनों सदनों द्वारा पारित विधेयक को राष्ट्रपति के पास मंजूरी के लिए भेजा जाता है।\n9. **कानून बनना**: राष्ट्रपति की मंजूरी मिलने के बाद, विधेयक कानून बन जाता है और देश में लागू हो जाता है।"
+      }
+    ]
+  },
+  "government_hi_05": {
+    "query_text": "लोकसभा और राज्यसभा में क्या अंतर है?",
+    "language": "hi",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "लोकसभा और राज्यसभा में मुख्य अंतर यह है:\n\n1.  **चयन प्रक्रिया**: लोकसभा के सदस्य सीधे जनता द्वारा चुने जाते हैं, जबकि राज्यसभा के सदस्य राज्यों की विधानसभाओं द्वारा चुने जाते हैं।\n2.  **कार्यकाल**: लोकसभा के सदस्यों का कार्यकाल 5 वर्ष है, जबकि राज्यसभा के सदस्यों का कार्यकाल 6 वर्ष है।\n3.  **सदस्य संख्या**: लोकसभा में 543 सदस्य हैं, जबकि राज्यसभा में 245 सदस्य हैं।\n4.  **विधायी शक्तियाँ**: दोनों सदनों की विधायी शक्तियाँ लगभग समान हैं, लेकिन लोकसभा को वित्तीय विधेयकों को प्रस्तुत करने का विशेषाधिकार है।\n5.  **विशेष शक्तियाँ**: राज्यसभा को कुछ विशेष शक्तियाँ प्रदान की गई हैं, जैसे कि राष्ट्रीय महत्व के मामलों पर विचार करना और राष्ट्रीय नीतियों का निर्धारण करना।"
+      }
+    ]
+  },
+  "government_hi_06": {
+    "query_text": "किसी भारतीय राज्य में मुख्यमंत्री का कार्यकाल कितना होता है?",
+    "language": "hi",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "भारतीय संविधान के अनुसार, किसी भी राज्य के मुख्यमंत्री का कार्यकाल ५ वर्ष का होता है। हालांकि, यदि विधानसभा भंग हो जाए या मुख्यमंत्री इस्तीफा दे दें, तो उनका कार्यकाल पहले ही समाप्त हो सकता है।"
+      }
+    ]
+  },
+  "government_hi_07": {
+    "query_text": "भारतीय रिजर्व बैंक का कार्य क्या है?",
+    "language": "hi",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "भारतीय रिजर्व बैंक (आरबीआई) भारत का केंद्रीय बैंक है, जो देश की मौद्रिक नीति और बैंकिंग प्रणाली को नियंत्रित करता है। इसके कुछ मुख्य कार्य हैं:\n\nमौद्रिक नीति का निर्धारण: आरबीआई मौद्रिक नीति को निर्धारित करता है, जिसमें ब्याज दरों और मुद्रा आपूर्ति को नियंत्रित करना शामिल है।\nबैंकिंग नियमन: आरबीआई बैंकों और अन्य वित्तीय संस्थानों को नियंत्रित और नियमित करता है, ताकि वे सुरक्षित और स्थिर तरीके से काम करें।\nमुद्रा प्रबंधन: आरबीआई देश की मुद्रा को प्रबंधित करता है, जिसमें मुद्रा की आपूर्ति और मांग को संतुलित करना शामिल है।\nविदेशी मुद्रा प्रबंधन: आरबीआई विदेशी मुद्रा को प्रबंधित करता है, जिसमें विदेशी मुद्रा की खरीद और बिक्री को नियंत्रित करना शामिल है।\nबैंकिंग लाइसेंस: आरबीआई बैंकों और अन्य वित्तीय संस्थानों को लाइसेंस प्रदान करता है और उनकी गतिविधियों को नियंत्रित करता है।\nवित्तीय स्थिरता: आरबीआई वित्तीय स्थिरता को बनाए रखने के लिए काम करता है, जिसमें आर्थिक संकटों को रोकने और उनके प्रभाव को कम करने में मदद करना शामिल है।"
+      }
+    ]
+  },
+  "government_hi_08": {
+    "query_text": "राज्यपाल की नियुक्ति कैसे होती है?",
+    "language": "hi",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "राज्यपाल की नियुक्ति भारत के राष्ट्रपति द्वारा की जाती है, जो केंद्र सरकार की सलाह पर करते हैं। राज्यपाल का कार्यकाल पांच वर्ष का होता है, लेकिन राष्ट्रपति को यह अधिकार है कि वह किसी भी समय राज्यपाल को हटा सकते हैं। राज्यपाल की नियुक्ति में कुछ शर्तें होती हैं, जैसे कि वह भारत का नागरिक होना चाहिए, कम से कम 35 वर्ष की आयु होनी चाहिए और लाभ का पद नहीं रखना चाहिए।"
+      }
+    ]
+  },
+  "government_hi_09": {
+    "query_text": "अनुच्छेद 370 का महत्व क्या था?",
+    "language": "hi",
+    "domain": "government",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "अनुच्छेद 370 भारतीय संविधान का एक अनुच्छेद था जो जम्मू और कश्मीर राज्य को विशेष दर्जा प्रदान करता था। इसका महत्व निम्नलिखित था:\n\n*   जम्मू और कश्मीर राज्य को स्वायत्तता प्रदान करना\n*   राज्य के नागरिकों के लिए अलग नागरिकता कानून\n*   राज्य में भारतीय संसद के दोनों सदनों के लिए अलग चुनाव प्रणाली\n*   राज्य में केंद्र सरकार की शक्तियों को सीमित करना\n*   राज्य के मामलों में न्यायपालिका की भूमिका को सीमित करना"
+      }
+    ]
+  },
+  "sports_hi_00": {
+    "query_text": "क्रिकेट टीम में कितने खिलाड़ी होते हैं?",
+    "language": "hi",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "क्रिकेट टीम में 11 खिलाड़ी होते हैं।"
+      }
+    ]
+  },
+  "sports_hi_01": {
+    "query_text": "पहला क्रिकेट विश्व कप कब आयोजित हुआ था?",
+    "language": "hi",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "पहला क्रिकेट विश्व कप 1975 में आयोजित हुआ था। यह इंग्लैंड में आयोजित किया गया था और इसमें 8 टीमों ने भाग लिया था। वेस्टइंडीज ने पहला क्रिकेट विश्व कप जीता था।"
+      }
+    ]
+  },
+  "sports_hi_02": {
+    "query_text": "क्रिकेट में रन-आउट के नियम क्या हैं?",
+    "language": "hi",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "क्रिकेट में रन-आउट के नियम इस प्रकार हैं:\n\n१) रन-आउट तब होता है जब बल्लेबाज क्रीज से बाहर निकलता है और कोई फील्डर गेंद को पकड़कर विकेट पर मार देता है, जिससे विकेट गिर जाता है।\n\n२) रन-आउट तब भी हो सकता है जब बल्लेबाज रन लेने के दौरान क्रीज से बाहर निकलता है और कोई फील्डर गेंद को पकड़कर विकेट पर मार देता है।\n\n३) रन-आउट के लिए, फील्डर को गेंद को विकेट पर मारने से पहले गेंद को अपने हाथ में रखना होता है।\n\n४) यदि फील्डर ने गेंद को विकेट पर मार दिया है और बल्लेबाज क्रीज से बाहर है, तो अम्पायर रन-आउट का संकेत देता है और बल्लेबाज आउट हो जाता है।\n\n५) रन-आउट के नियमों का पालन करने के लिए, अम्पायर यह सुनिश्चित करते हैं कि फील्डर ने गेंद को विकेट पर मारने से पहले गेंद को अपने हाथ में रखा है और बल्लेबाज क्रीज से बाहर है।"
+      }
+    ]
+  },
+  "sports_hi_03": {
+    "query_text": "हॉकी में भारत ने कितने ओलंपिक स्वर्ण पदक जीते हैं?",
+    "language": "hi",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "हॉकी में भारत ने 8 ओलंपिक स्वर्ण पदक जीते हैं।"
+      }
+    ]
+  },
+  "sports_hi_04": {
+    "query_text": "फुटबॉल में ऑफसाइड नियम क्या है?",
+    "language": "hi",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "फुटबॉल में ऑफसाइड नियम यह है कि जब कोई खिलाड़ी विरोधी टीम के गोल की ओर बढ़ रहा होता है और गेंद को प्राप्त करने से पहले वह विरोधी टीम के दूसरे आखिरी खिलाड़ी से आगे होता है, तो उसे ऑफसाइड घोषित किया जाता है। इस नियम का उद्देश्य यह सुनिश्चित करना है कि खिलाड़ी अनुचित लाभ न उठाएं और खेल को निष्पक्ष बनाए रखें।"
+      }
+    ]
+  },
+  "sports_hi_05": {
+    "query_text": "टूर्नामेंट में शतरंज के खेल का स्कोर कैसे होता है?",
+    "language": "hi",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "टूर्नामेंट में शतरंज के खेल का स्कोर जीत, हार, और ड्रा के आधार पर तय होता है। आमतौर पर जीत के लिए 1 अंक, हार के लिए 0 अंक, और ड्रा के लिए 0.5 अंक दिए जाते हैं।"
+      }
+    ]
+  },
+  "sports_hi_06": {
+    "query_text": "इंडियन प्रीमियर लीग का प्रारूप क्या है?",
+    "language": "hi",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "इंडियन प्रीमियर लीग (आईपीएल) का प्रारूप इस प्रकार है:\n\n1. **लीग चरण**: आठ टीमें एक दूसरे के साथ दो बार मैच खेलती हैं, जिससे कुल 56 मैच होते हैं।\n2. **प्लेऑफ**: लीग चरण के बाद, शीर्ष चार टीमें प्लेऑफ में प्रवेश करती हैं।\n * **क्वालिफायर 1**: पहले और दूसरे स्थान पर रहने वाली टीमें एक दूसरे के साथ मैच खेलती हैं। जीतने वाली टीम सीधे फाइनल में पहुंचती है।\n * **एलिमिनेटर**: तीसरे और चौथे स्थान पर रहने वाली टीमें एक दूसरे के साथ मैच खेलती हैं। हारने वाली टीम बाहर हो जाती है।\n * **क्वालिफायर 2**: क्वालिफायर 1 की हारने वाली टीम और एलिमिनेटर की जीतने वाली टीम एक दूसरे के साथ मैच खेलती हैं। जीतने वाली टीम फाइनल में पहुंचती है।\n3. **फाइनल**: क्वालिफायर 1 की जीतने वाली टीम और क्वालिफायर 2 की जीतने वाली टीम एक दूसरे के साथ मैच खेलती हैं। जीतने वाली टीम आईपीएल की विजेता बनती है।"
+      }
+    ]
+  },
+  "sports_hi_07": {
+    "query_text": "एक मानक टेनिस मैच में कितने सेट खेले जाते हैं?",
+    "language": "hi",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "एक मानक टेनिस मैच में 3 या 5 सेट खेले जाते हैं। पुरुषों के मैच में आमतौर पर 5 सेट और महिलाओं के मैच में 3 सेट खेले जाते हैं।"
+      }
+    ]
+  },
+  "sports_hi_08": {
+    "query_text": "रणजी ट्रॉफी का महत्व क्या है?",
+    "language": "hi",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "रणजी ट्रॉफी भारतीय क्रिकेट की प्रमुख घरेलू प्रतियोगिता है, जिसमें विभिन्न राज्यों और क्षेत्रों की टीमें भाग लेती हैं। इसका महत्व इस प्रकार है:\n\n1. **प्रतिभा की पहचान**: रणजी ट्रॉफी में नए और उभरते खिलाड़ियों को अपनी प्रतिभा दिखाने का अवसर मिलता है, जिससे वे राष्ट्रीय टीम में चयन के लिए प्रतिस्पर्धा कर सकते हैं।\n2. **क्रिकेट का विकास**: रणजी ट्रॉफी क्रिकेट के विकास में महत्वपूर्ण भूमिका निभाती है, क्योंकि यह प्रतियोगिता घरेलू स्तर पर खेल को बढ़ावा देती है और नए खिलाड़ियों को तैयार करती है।\n3. **राष्ट्रीय टीम के लिए चयन**: रणजी ट्रॉफी में अच्छा प्रदर्शन करने वाले खिलाड़ियों को राष्ट्रीय टीम में चयन का मौका मिल सकता है, जो उनके करियर के लिए महत्वपूर्ण होता है।\n4. **क्रिकेट की लोकप्रियता**: रणजी ट्रॉफी क्रिकेट की लोकप्रियता को बढ़ावा देती है, क्योंकि यह प्रतियोगिता घरेलू स्तर पर खेल को बढ़ावा देती है और नए प्रशंसकों को आकर्षित करती है।\n5. **राज्यों के बीच प्रतिस्पर्धा**: रणजी ट्रॉफी में विभिन्न राज्यों और क्षेत्रों की टीमें भाग लेती हैं, जिससे राज्यों के बीच प्रतिस्पर्धा बढ़ती है और खेल का स्तर ऊंचा होता है।"
+      }
+    ]
+  },
+  "sports_hi_09": {
+    "query_text": "फॉर्मूला 1 में अंक प्रणाली कैसे काम करती है?",
+    "language": "hi",
+    "domain": "sports",
+    "responses": [
+      {
+        "source_llm": "llama-3.3-70b-versatile",
+        "response_text": "फॉर्मूला 1 में अंक प्रणाली इस प्रकार काम करती है:\n\n1. प्रत्येक रेस में पहले 10 ड्राइवरों को अंक दिए जाते हैं।\n2. पहले स्थान पर आने वाले ड्राइवर को 25 अंक मिलते हैं।\n3. दूसरे स्थान पर आने वाले ड्राइवर को 18 अंक मिलते हैं।\n4. तीसरे स्थान पर आने वाले ड्राइवर को 15 अंक मिलते हैं।\n5. चौथे स्थान पर आने वाले ड्राइवर को 12 अंक मिलते हैं।\n6. पांचवें स्थान पर आने वाले ड्राइवर को 10 अंक मिलते हैं।\n7. छठे स्थान पर आने वाले ड्राइवर को 8 अंक मिलते हैं।\n8. सातवें स्थान पर आने वाले ड्राइवर को 6 अंक मिलते हैं।\n9. आठवें स्थान पर आने वाले ड्राइवर को 4 अंक मिलते हैं।\n10. नौवें स्थान पर आने वाले ड्राइवर को 2 अंक मिलते हैं।\n11. दसवें स्थान पर आने वाले ड्राइवर को 1 अंक मिलता है।\n\nयह अंक प्रणाली पूरे सीज़न में लागू होती है, और जो ड्राइवर सबसे अधिक अंक हासिल करता है, वह विश्व चैंपियन बनता है।"
+      }
+    ]
+  }
+}

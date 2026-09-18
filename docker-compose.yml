@@ -1,0 +1,18 @@
+# One-command deploy:  docker compose up --build
+# Then: http://localhost:8000/docs   (dev API key: dev-key-satyascore-2026)
+services:
+  satyascore-api:
+    build: .
+    image: satyascore-api:latest
+    ports:
+      - "8000:8000"
+    environment:
+      HF_HUB_OFFLINE: "1"
+      TRANSFORMERS_OFFLINE: "1"
+      TOKENIZERS_PARALLELISM: "false"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health').status==200 else 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

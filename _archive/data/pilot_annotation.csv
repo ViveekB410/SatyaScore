@@ -1,0 +1,72 @@
+claim_id,source_query_id,source_llm,language,domain,claim_text,sem_sim,nli_prob,kg_conf,gold_verdict,evidence_url
+government_en_00_llama-3.3-70b-versatile_1,government_en_00,llama-3.3-70b-versatile,en,government,Elected members of both houses of Parliament Lok Sabha and Rajya Sabha 2.,0.7595,0.6914,,,
+government_en_01_llama-3.3-70b-versatile_0,government_en_01,llama-3.3-70b-versatile,en,government,The Indian Constitution guarantees the following six fundamental rights 1.,0.7453,0.0387,,,
+government_en_03_llama-3.3-70b-versatile_0,government_en_03,llama-3.3-70b-versatile,en,government,The Election Commission of India ECI is responsible for administering and conducting free and fair elections in India.,0.8784,0.9751,,,
+government_en_03_llama-3.3-70b-versatile_11,government_en_03,llama-3.3-70b-versatile,en,government,Overall the ECI plays a crucial role in upholding the democratic process in India.,0.6574,0.0042,,,
+government_en_05_llama-3.3-70b-versatile_6,government_en_05,llama-3.3-70b-versatile,en,government,3 Election Lok Sabha members are directly elected by the people while Rajya Sabha members are elected by the elected members of the State Legislative Assemblies.,0.7628,0.01,,,
+government_en_07_llama-3.3-70b-versatile_4,government_en_07,llama-3.3-70b-versatile,en,government,2 Currency Management Managing the supply of currency and coins.,0.4721,0.7661,,,
+government_en_07_llama-3.3-70b-versatile_8,government_en_07,llama-3.3-70b-versatile,en,government,6 Government Banker Managing the government 's accounts and providing banking services.,0.5186,0.0091,,,
+government_en_08_llama-3.3-70b-versatile_0,government_en_08,llama-3.3-70b-versatile,en,government,A state Governor is typically elected through a direct vote by the people of the state although the specific process may vary.,0.5513,0.0021,,,
+government_en_09_llama-3.3-70b-versatile_3,government_en_09,llama-3.3-70b-versatile,en,government,2 Special status 2 recognized the unique history culture and geography of Jammu and Kashmir setting Kashmir apart from other Indian states.,0.589,0.005,,,
+government_en_09_llama-3.3-70b-versatile_4,government_en_09,llama-3.3-70b-versatile,en,government,Protection of state laws 3 protected the state 's laws and regulations from being altered or repealed by the Indian Parliament without the state 's consent.,0.5513,0.0048,,,
+government_hi_00_llama-3.3-70b-versatile_6,government_hi_00,llama-3.3-70b-versatile,hi,government,"6. **चुनाव**: निर्वाचक मंडल द्वारा मतदान किया जाता है, और उम्मीदवार जो सबसे अधिक मत प्राप्त करता है, वह राष्ट्रपति चुना जाता है।",0.4561,0.0005,,,
+government_hi_03_llama-3.3-70b-versatile_4,government_hi_03,llama-3.3-70b-versatile,hi,government,चुनावों में होने वाली अनियमितताओं और शिकायतों की जांच करना और कार्रवाई करना।,0.4177,0.0009,,,
+government_hi_04_llama-3.3-70b-versatile_0,government_hi_04,llama-3.3-70b-versatile,hi,government,"भारतीय संसद में एक विधेयक कानून बनने की प्रक्रिया निम्नलिखित है:
+
+1. **विधेयक का प्रस्तुतीकरण**: कोई भी सांसद या मंत्री लोकसभा या राज्यसभा में विधेयक प्रस्तुत कर सकता है।",0.5061,0.0065,,,
+government_hi_07_llama-3.3-70b-versatile_6,government_hi_07,llama-3.3-70b-versatile,hi,government,"वित्तीय स्थिरता: आरबीआई वित्तीय स्थिरता को बनाए रखने के लिए काम करता है, जिसमें आर्थिक संकटों को रोकने और उनके प्रभाव को कम करने में मदद करना शामिल है।",0.4539,0.0018,,,
+government_hi_08_llama-3.3-70b-versatile_0,government_hi_08,llama-3.3-70b-versatile,hi,government,"राज्यपाल की नियुक्ति भारत के राष्ट्रपति द्वारा की जाती है, जो केंद्र सरकार की सलाह पर करते हैं।",0.7782,0.0152,,,
+healthcare_en_03_llama-3.3-70b-versatile_13,healthcare_en_03,llama-3.3-70b-versatile,en,healthcare,These factors can lead to high blood sugar levels which can damage organs and tissues over time if left untreated.,0.5832,0.0533,,,
+healthcare_en_04_llama-3.3-70b-versatile_0,healthcare_en_04,llama-3.3-70b-versatile,en,healthcare,Tuberculosis is ( TB.,0.7521,0.2986,,,
+healthcare_en_04_llama-3.3-70b-versatile_1,healthcare_en_04,llama-3.3-70b-versatile,en,healthcare,Tuberculosis is typically diagnosed using a combination of the following methods 1.,0.659,0.0104,,,
+healthcare_en_04_llama-3.3-70b-versatile_2,healthcare_en_04,llama-3.3-70b-versatile,en,healthcare,Symptom evaluation Medical history and physical examination to identify symptoms such as cough fever weight loss and night sweats.,0.4412,0.0084,,,
+healthcare_en_04_llama-3.3-70b-versatile_5,healthcare_en_04,llama-3.3-70b-versatile,en,healthcare,2 Chest X ray To look for abnormalities in the lungs.,0.2724,0.0051,,,
+healthcare_en_04_llama-3.3-70b-versatile_9,healthcare_en_04,llama-3.3-70b-versatile,en,healthcare,Mantoux test Tuberculin skin test.,0.2969,0.0518,,,
+healthcare_en_06_llama-3.3-70b-versatile_7,healthcare_en_06,llama-3.3-70b-versatile,en,healthcare,Symptoms is *.,0.3641,0.039,,,
+healthcare_en_07_llama-3.3-70b-versatile_0,healthcare_en_07,llama-3.3-70b-versatile,en,healthcare,Pressure is hypertension.,0.5945,0.8555,,,
+healthcare_en_07_llama-3.3-70b-versatile_4,healthcare_en_07,llama-3.3-70b-versatile,en,healthcare,3 Atherosclerosis High pressure accelerates the formation of plaque in arteries increasing the risk of blockages and cardiovascular disease.,0.6723,0.0075,,,
+healthcare_en_07_llama-3.3-70b-versatile_7,healthcare_en_07,llama-3.3-70b-versatile,en,healthcare,5 Increased risk of stroke and heart attack High blood pressure increases the risk of stroke and heart attack by damaging blood vessels and increasing the likelihood of blockages.,0.6288,0.0021,,,
+healthcare_en_07_llama-3.3-70b-versatile_8,healthcare_en_07,llama-3.3-70b-versatile,en,healthcare,"Pressure increase the risk of cardiovascular disease, heart failure, and stroke.",0.6387,0.8999,,,
+healthcare_en_09_llama-3.3-70b-versatile_2,healthcare_en_09,llama-3.3-70b-versatile,en,healthcare,However individual needs may vary depending on factors such as age sex weight activity level and climate.,0.3714,0.0044,,,
+healthcare_hi_01_llama-3.3-70b-versatile_1,healthcare_hi_01,llama-3.3-70b-versatile,hi,healthcare,२) **प्रतिरक्षा कोशिकाएं**: व्हाइट ब्लड सेल्स जैसे न्यूट्रोफिल और मैक्रोफेज वायरस को पहचानकर और नष्ट करके काम करते हैं।,0.6229,0.1056,,,
+healthcare_hi_04_llama-3.3-70b-versatile_5,healthcare_hi_04,llama-3.3-70b-versatile,hi,healthcare,"इन परीक्षणों के परिणामों के आधार पर, डॉक्टर टीबी का निदान कर सकते हैं और उचित उपचार की सिफारिश कर सकते हैं।",0.5432,0.0015,,,
+healthcare_hi_06_llama-3.3-70b-versatile_1,healthcare_hi_06,llama-3.3-70b-versatile,hi,healthcare,"2. **संरचना:** बैक्टीरिया जीवित कोशिकाएं होती हैं, जबकि वायरस जीवित कोशिकाओं के भीतर प्रोटीन और जेनेटिक पदार्थ के कण होते हैं।",0.6001,0.0603,,,
+healthcare_hi_07_llama-3.3-70b-versatile_5,healthcare_hi_07,llama-3.3-70b-versatile,hi,healthcare,"इन सभी कारणों से, उच्च रक्तचाप को नियंत्रित करना और हृदय प्रणाली की सेहत को बनाए रखना बहुत महत्वपूर्ण है।",0.736,0.0004,,,
+history_en_02_llama-3.3-70b-versatile_2,history_en_02,llama-3.3-70b-versatile,en,history,2 Militarism Build up of military forces and arms races.,0.3954,0.728,,,
+history_en_02_llama-3.3-70b-versatile_3,history_en_02,llama-3.3-70b-versatile,en,history,3 Nationalism Rise of patriotic sentiment and ethnic tensions.,0.4188,0.2372,,,
+history_en_04_llama-3.3-70b-versatile_0,history_en_04,llama-3.3-70b-versatile,en,history,Babur founded the Mughal Empire in 1526.,0.4439,0.0004,,,
+history_en_07_llama-3.3-70b-versatile_6,history_en_07,llama-3.3-70b-versatile,en,history,Shivaji Maharaj legacy includes the establishment of a robust administrative system promotion of Hindu culture and the development of a strong military.,0.4828,0.0029,,,
+history_hi_01_llama-3.3-70b-versatile_0,history_hi_01,llama-3.3-70b-versatile,hi,history,जवाहरलाल नेहरू भारत के पहले प्रधानमंत्री थे।,0.7463,0.9956,,,
+history_hi_05_llama-3.3-70b-versatile_0,history_hi_05,llama-3.3-70b-versatile,hi,history,"दांडी मार्च, जिसे नमक सत्याग्रह भी कहा जाता है, एक महत्वपूर्ण घटना थी जो 12 मार्च 1930 से 6 अप्रैल 1930 तक हुई थी।",0.6834,0.0076,,,
+history_hi_05_llama-3.3-70b-versatile_7,history_hi_05,llama-3.3-70b-versatile,hi,history,"इस प्रकार, दांडी मार्च एक महत्वपूर्ण घटना थी जिसने भारतीय स्वतंत्रता संग्राम को गति प्रदान की और दुनिया को अहिंसक विरोध की शक्ति को दिखाया।",0.64,0.0095,,,
+science_en_01_llama-3.3-70b-versatile_3,science_en_01,llama-3.3-70b-versatile,en,science,Water transported to the leaves.,0.334,0.0053,,,
+science_en_01_llama-3.3-70b-versatile_7,science_en_01,llama-3.3-70b-versatile,en,science,4 Light dependent reactions Light energy is used to convert water and carbon dioxide into ATP adenosine triphosphate and NADPH nicotinamide adenine dinucleotide phosphate.,0.5557,0.0216,,,
+science_en_04_llama-3.3-70b-versatile_4,science_en_04,llama-3.3-70b-versatile,en,science,Develop immune cells T cells and B cells that remember the pathogen 4.,0.5516,0.0098,,,
+science_en_04_llama-3.3-70b-versatile_6,science_en_04,llama-3.3-70b-versatile,en,science,4 helps protect the body against future infections.,0.5579,0.0676,,,
+science_en_05_llama-3.3-70b-versatile_1,science_en_05,llama-3.3-70b-versatile,en,science,They have distinct meanings : 1.,0.3427,0.1124,,,
+science_en_06_llama-3.3-70b-versatile_2,science_en_06,llama-3.3-70b-versatile,en,science,Greenhouse gases Burning fossil fuels and other human activities release greenhouse gases like carbon dioxide CO2 methane CH4 and water vapor H2O into the atmosphere.,0.6541,0.0071,,,
+science_en_09_llama-3.3-70b-versatile_2,science_en_09,llama-3.3-70b-versatile,en,science,2 Pass on genetic traits DNA is responsible for transmitting genetic information from one generation to the next.,0.3757,0.5239,,,
+science_hi_02_llama-3.3-70b-versatile_0,science_hi_02,llama-3.3-70b-versatile,hi,science,"पृथ्वी पर मौसम बदलने के कई कारण हैं, जिनमें से कुछ प्रमुख कारण हैं:
+
+सूरज की किरणों का पृथ्वी पर पड़ने का कोण
+पृथ्वी की घूर्णन गति और इसके अक्ष का झुकाव
+महासागरों और वायुमंडल में गर्मी का संचार
+वायुमंडलीय दबाव और तापमान में परिवर्तन
+जलवायु परिवर्तन और मानव गतिविधियों का प्रभाव
+
+इन कारणों से पृथ्वी पर मौसम में परिवर्तन होता है, जैसे कि तापमान में बदलाव, वर्षा की मात्रा में परिवर्तन, और हवा की दिशा में बदलाव।",0.666,0.0036,,,
+science_hi_05_llama-3.3-70b-versatile_4,science_hi_05,llama-3.3-70b-versatile,hi,science,भार: भार किसी वस्तु पर गुरुत्वाकर्षण के कारण लगने वाले बल को मापता है।,0.6357,0.1948,,,
+science_hi_09_llama-3.3-70b-versatile_1,science_hi_09,llama-3.3-70b-versatile,hi,science,"यह जीव के विकास, वृद्धि और कार्य को नियंत्रित करने वाले जीनों को ले जाता है।",0.536,0.1218,,,
+science_hi_09_llama-3.3-70b-versatile_2,science_hi_09,llama-3.3-70b-versatile,hi,science,"डीएनए जीव की विशेषताओं, जैसे कि रंग, आकार और कार्य, को निर्धारित करने में मदद करता है।",0.4826,0.0013,,,
+sports_en_01_llama-3.3-70b-versatile_0,sports_en_01,llama-3.3-70b-versatile,en,sports,The first Cricket World Cup was held in 1975 in England.,0.5308,0.0004,,,
+sports_en_06_llama-3.3-70b-versatile_8,sports_en_06,llama-3.3-70b-versatile,en,sports,Eliminator 3rd ranked team vs. 4th ranked team.,0.3289,0.0087,,,
+sports_en_08_llama-3.3-70b-versatile_2,sports_en_08,llama-3.3-70b-versatile,en,sports,Identifying national team talent 1 serves as a platform for selecting players for the Indian national cricket team.,0.3732,0.0043,,,
+sports_en_09_llama-3.3-70b-versatile_1,sports_en_09,llama-3.3-70b-versatile,en,sports,The current points system is as follows 1st place 25 points 2nd place 18 points 3rd place 15 points 4th place 12 points 5th place 10 points 6th place 8 points 7th place 6 points 8th place 4 points 9th place 2 points 10th place 1 point Only the top 10 finishers score points.,0.2802,0.0262,,,
+sports_en_09_llama-3.3-70b-versatile_2,sports_en_09,llama-3.3-70b-versatile,en,sports,The driver with the most points at the end of the season is crowned the World Drivers Champion.,0.2924,0.0015,,,
+sports_hi_02_llama-3.3-70b-versatile_2,sports_hi_02,llama-3.3-70b-versatile,hi,sports,"३) रन-आउट के लिए, फील्डर को गेंद को विकेट पर मारने से पहले गेंद को अपने हाथ में रखना होता है।",0.6412,0.011,,,
+sports_hi_06_llama-3.3-70b-versatile_0,sports_hi_06,llama-3.3-70b-versatile,hi,sports,"इंडियन प्रीमियर लीग (आईपीएल) का प्रारूप इस प्रकार है:
+
+1. **लीग चरण**: आठ टीमें एक दूसरे के साथ दो बार मैच खेलती हैं, जिससे कुल 56 मैच होते हैं।",0.5154,0.0065,,,
+sports_hi_06_llama-3.3-70b-versatile_4,sports_hi_06,llama-3.3-70b-versatile,hi,sports,* **एलिमिनेटर**: तीसरे और चौथे स्थान पर रहने वाली टीमें एक दूसरे के साथ मैच खेलती हैं।,0.4899,0.0019,,,
+sports_hi_06_llama-3.3-70b-versatile_8,sports_hi_06,llama-3.3-70b-versatile,hi,sports,3. **फाइनल**: क्वालिफायर 1 की जीतने वाली टीम और क्वालिफायर 2 की जीतने वाली टीम एक दूसरे के साथ मैच खेलती हैं।,0.4462,0.0041,,,
+sports_hi_09_llama-3.3-70b-versatile_11,sports_hi_09,llama-3.3-70b-versatile,hi,sports,"यह अंक प्रणाली पूरे सीज़न में लागू होती है, और जो ड्राइवर सबसे अधिक अंक हासिल करता है, वह विश्व चैंपियन बनता है।",0.3134,0.0003,,,

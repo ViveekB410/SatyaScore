@@ -1,0 +1,542 @@
+﻿claim_id,language,domain,source_question,claim_text,full_response,verdict,evidence_url,notes
+government_en_04_llama-3.3-70b-versatile_10,en,Government,How does a bill become a law in the Indian Parliament?,Bill is voted on in Referral to Committee final form.,"In the Indian Parliament, a bill becomes a law through the following steps:
+
+1. **Introduction**: A bill is introduced in either the Lok Sabha (Lower House) or the Rajya Sabha (Upper House) by a minister or a member.
+2. **First Reading**: The bill is read and discussed in the house where it was introduced.
+3. **Referral to Committee**: The bill is referred to a parliamentary committee for examination and scrutiny.
+4. **Report by Committee**: The committee submits its report to the house.
+5. **Second Reading**: The bill is debated and voted on in the house.
+6. **Amendments**: Amendments to the bill can be proposed and voted on.
+7. **Third Reading**: The bill is read again and voted on in its final form.
+8. **Passage in the Other House**: The bill is sent to the other house (if it was introduced in the Lok Sabha, it goes to the Rajya Sabha, and vice versa) for passage.
+9. **Presidential Assent**: If the bill is passed by both houses, it is sent to the President of India for assent.
+10. **Signing into Law**: The President signs the bill, and it becomes an Act of Parliament, or a law.
+
+Note: If the President returns the bill to the Parliament for reconsideration, it is sent back to the houses for revision and voting. If the Parliament passes the bill again with or without amendments, it is sent back to the President, who must give assent.",,,
+science_en_06_llama-3.3-70b-versatile_5,en,Science,How does the greenhouse effect contribute to climate change?,Climate change The increased temperature causes melting of polar ice caps sea level rise more extreme weather events and altered ecosystems ultimately contributing to climate change.,"The greenhouse effect contributes to climate change by trapping heat in the Earth's atmosphere, leading to global warming. Here's how:
+
+1. **Greenhouse gases**: Burning fossil fuels and other human activities release greenhouse gases like carbon dioxide (CO2), methane (CH4), and water vapor (H2O) into the atmosphere.
+2. **Heat trapping**: These gases trap heat from the sun, preventing it from escaping back into space.
+3. **Temperature increase**: The trapped heat warms the Earth's surface and atmosphere, leading to rising global temperatures.
+4. **Climate change**: The increased temperature causes melting of polar ice caps, sea-level rise, more extreme weather events, and altered ecosystems, ultimately contributing to climate change.
+
+The main greenhouse gases responsible for climate change are:
+
+* CO2 (65% of the warming)
+* CH4 (20% of the warming)
+* H2O (5-10% of the warming)
+
+Human activities, such as burning fossil fuels, deforestation, and land-use changes, have increased the concentration of these gases in the atmosphere, amplifying the natural greenhouse effect and driving climate change.",,,
+healthcare_hi_08_llama-3.3-70b-versatile_4,hi,Healthcare,मानव शरीर में इंसुलिन की भूमिका क्या है?,"वजन प्रबंधन में मदद: इंसुलिन वजन प्रबंधन में भी मदद करता है, क्योंकि यह ग्लूकोज को कोशिकाओं में पहुंचाने में मदद करता है, जो ऊर्जा के रूप में उपयोग किया जाता है या भंडारित किया जाता है।","मानव शरीर में इंसुलिन एक महत्वपूर्ण हार्मोन है जो ग्लूकोज के स्तर को नियंत्रित करने में मदद करता है। इसकी मुख्य भूमिका है:
+
+ग्लूकोज को कोशिकाओं में पहुंचाना: इंसुलिन ग्लूकोज को कोशिकाओं में प्रवेश करने में मदद करता है, जहां यह ऊर्जा के रूप में उपयोग किया जाता है या भंडारित किया जाता है।
+
+ग्लूकोज के स्तर को नियंत्रित करना: इंसुलिन रक्त में ग्लूकोज के स्तर को नियंत्रित करने में मदद करता है, जो शरीर के लिए आवश्यक है। यदि ग्लूकोज का स्तर बहुत अधिक हो जाता है, तो इंसुलिन इसके स्तर को कम करने में मदद करता है।
+
+वजन प्रबंधन में मदद: इंसुलिन वजन प्रबंधन में भी मदद करता है, क्योंकि यह ग्लूकोज को कोशिकाओं में पहुंचाने में मदद करता है, जो ऊर्जा के रूप में उपयोग किया जाता है या भंडारित किया जाता है।",,,
+science_en_06_llama-3.3-70b-versatile_6,en,Science,How does the greenhouse effect contribute to climate change?,The main greenhouse gases responsible for climate change are CO2 65 of the warming CH4 20 of the warming H2O 5 10 of the warming Human activities such as burning fossil fuels deforestation and land use changes have increased the concentration of these gases in the atmosphere amplifying the natural greenhouse effect and driving climate change.,"The greenhouse effect contributes to climate change by trapping heat in the Earth's atmosphere, leading to global warming. Here's how:
+
+1. **Greenhouse gases**: Burning fossil fuels and other human activities release greenhouse gases like carbon dioxide (CO2), methane (CH4), and water vapor (H2O) into the atmosphere.
+2. **Heat trapping**: These gases trap heat from the sun, preventing it from escaping back into space.
+3. **Temperature increase**: The trapped heat warms the Earth's surface and atmosphere, leading to rising global temperatures.
+4. **Climate change**: The increased temperature causes melting of polar ice caps, sea-level rise, more extreme weather events, and altered ecosystems, ultimately contributing to climate change.
+
+The main greenhouse gases responsible for climate change are:
+
+* CO2 (65% of the warming)
+* CH4 (20% of the warming)
+* H2O (5-10% of the warming)
+
+Human activities, such as burning fossil fuels, deforestation, and land-use changes, have increased the concentration of these gases in the atmosphere, amplifying the natural greenhouse effect and driving climate change.",,,
+history_en_05_llama-3.3-70b-versatile_6,en,History,What was the significance of the Dandi March?,International Attention The Dandi March garnered international attention putting pressure on the British government to reconsider British policies in India.,"The Dandi March, also known as the Salt March, was a significant event in Indian history. It was a 24-day march led by Mahatma Gandhi from March 12 to April 6, 1930, from Ahmedabad to the coastal village of Dandi. The march was a protest against the British salt tax, which prohibited Indians from producing or selling salt, forcing them to buy expensive salt from the British. 
+
+The significance of the Dandi March was:
+
+1. **Civil Disobedience**: It marked the beginning of the Civil Disobedience Movement in India, where Indians defied British laws through non-violent means.
+2. **National Unity**: The march drew widespread attention and participation, uniting Indians across the country against British rule.
+3. **Economic Independence**: The march highlighted the need for economic independence and self-sufficiency, as Indians sought to break free from British economic exploitation.
+4. **International Attention**: The Dandi March garnered international attention, putting pressure on the British government to reconsider its policies in India.
+
+The Dandi March was a pivotal moment in India's struggle for independence, demonstrating the power of non-violent resistance and paving the way for future movements.",,,
+healthcare_hi_04_llama-3.3-70b-versatile_3,hi,Healthcare,तपेदिक (टीबी) का निदान आमतौर पर कैसे किया जाता है?,४) स्पुतम स्मीयर माइक्रोस्कोपी: यह परीक्षण थूक में टीबी के जीवाणु की जांच करता है।,"तपेदिक (टीबी) का निदान आमतौर पर निम्नलिखित तरीकों से किया जाता है:
+
+१) छाती का एक्स-रे: यह टीबी के संदेह में सबसे पहले किया जाने वाला परीक्षण है, जो फेफड़ों में सूजन या घावों की जांच करता है।
+२) म्यूकोबैक्टीरिया की जांच: यह परीक्षण थूक या अन्य शरीर के तरल पदार्थों में टीबी के जीवाणु की जांच करता है।
+३) मांसलता परीक्षण: यह परीक्षण शरीर की प्रतिरक्षा प्रणाली की प्रतिक्रिया को मापता है और यह जांचता है कि व्यक्ति टीबी से संक्रमित है या नहीं।
+४) स्पुतम स्मीयर माइक्रोस्कोपी: यह परीक्षण थूक में टीबी के जीवाणु की जांच करता है।
+५) जेनएक्सपért परीक्षण: यह परीक्षण थूक में टीबी के जीवाणु की जांच करता है और यह जांचता है कि व्यक्ति टीबी से संक्रमित है या नहीं।
+
+इन परीक्षणों के परिणामों के आधार पर, डॉक्टर टीबी का निदान कर सकते हैं और उचित उपचार की सिफारिश कर सकते हैं।",,,
+government_hi_09_llama-3.3-70b-versatile_1,hi,Government,अनुच्छेद 370 का महत्व क्या था?,"इसका महत्व निम्नलिखित था:
+     जम्मू और कश्मीर राज्य को स्वायत्तता प्रदान करना
+    राज्य के नागरिकों के लिए अलग नागरिकता कानून
+    राज्य में भारतीय संसद के दोनों सदनों के लिए अलग चुनाव प्रणाली
+    राज्य में केंद्र सरकार की शक्तियों को सीमित करना
+    राज्य के मामलों में न्यायपालिका की भूमिका को सीमित करना","अनुच्छेद 370 भारतीय संविधान का एक अनुच्छेद था जो जम्मू और कश्मीर राज्य को विशेष दर्जा प्रदान करता था। इसका महत्व निम्नलिखित था:
+
+*   जम्मू और कश्मीर राज्य को स्वायत्तता प्रदान करना
+*   राज्य के नागरिकों के लिए अलग नागरिकता कानून
+*   राज्य में भारतीय संसद के दोनों सदनों के लिए अलग चुनाव प्रणाली
+*   राज्य में केंद्र सरकार की शक्तियों को सीमित करना
+*   राज्य के मामलों में न्यायपालिका की भूमिका को सीमित करना",,,
+history_en_02_llama-3.3-70b-versatile_5,en,History,What were the main causes of the First World War?,These factors created an unstable environment making war increasingly likely.,"The main causes of the First World War were:
+
+1. **Imperialism**: Competition for colonies and resources.
+2. **Militarism**: Build-up of military forces and arms races.
+3. **Nationalism**: Rise of patriotic sentiment and ethnic tensions.
+4. **Alliance System**: Complex network of alliances between European powers (e.g., Triple Entente and Triple Alliance).
+5. **Assassination of Archduke Franz Ferdinand**: Triggering event that sparked the war.
+
+These factors created an unstable environment, making war increasingly likely.",,,
+sports_hi_09_llama-3.3-70b-versatile_5,hi,Sports,फॉर्मूला 1 में अंक प्रणाली कैसे काम करती है?,पांचवें स्थान पर आने वाले ड्राइवर को 10 अंक मिलते हैं।,"फॉर्मूला 1 में अंक प्रणाली इस प्रकार काम करती है:
+
+1. प्रत्येक रेस में पहले 10 ड्राइवरों को अंक दिए जाते हैं।
+2. पहले स्थान पर आने वाले ड्राइवर को 25 अंक मिलते हैं।
+3. दूसरे स्थान पर आने वाले ड्राइवर को 18 अंक मिलते हैं।
+4. तीसरे स्थान पर आने वाले ड्राइवर को 15 अंक मिलते हैं।
+5. चौथे स्थान पर आने वाले ड्राइवर को 12 अंक मिलते हैं।
+6. पांचवें स्थान पर आने वाले ड्राइवर को 10 अंक मिलते हैं।
+7. छठे स्थान पर आने वाले ड्राइवर को 8 अंक मिलते हैं।
+8. सातवें स्थान पर आने वाले ड्राइवर को 6 अंक मिलते हैं।
+9. आठवें स्थान पर आने वाले ड्राइवर को 4 अंक मिलते हैं।
+10. नौवें स्थान पर आने वाले ड्राइवर को 2 अंक मिलते हैं।
+11. दसवें स्थान पर आने वाले ड्राइवर को 1 अंक मिलता है।
+
+यह अंक प्रणाली पूरे सीज़न में लागू होती है, और जो ड्राइवर सबसे अधिक अंक हासिल करता है, वह विश्व चैंपियन बनता है。",,,
+government_en_07_llama-3.3-70b-versatile_4,en,Government,What is the function of the Reserve Bank of India?,Banking Regulation Supervising and regulating commercial banks.,"The Reserve Bank of India (RBI) is the central bank of India, and its primary functions include:
+
+1. Monetary Policy: Regulating money supply and interest rates.
+2. Currency Management: Managing the supply of currency and coins.
+3. Banking Regulation: Supervising and regulating commercial banks.
+4. Lender of Last Resort: Providing liquidity to banks during financial crises.
+5. Foreign Exchange Management: Regulating foreign exchange transactions.
+6. Government Banker: Managing the government's accounts and providing banking services.
+
+Overall, the RBI aims to maintain price stability, promote economic growth, and ensure financial stability in India.",,,
+sports_hi_02_llama-3.3-70b-versatile_2,hi,Sports,क्रिकेट में रन-आउट के नियम क्या हैं?,"३) रन-आउट के लिए, फील्डर को गेंद को विकेट पर मारने से पहले गेंद को अपने हाथ में रखना होता है।","क्रिकेट में रन-आउट के नियम इस प्रकार हैं:
+
+१) रन-आउट तब होता है जब बल्लेबाज क्रीज से बाहर निकलता है और कोई फील्डर गेंद को पकड़कर विकेट पर मार देता है, जिससे विकेट गिर जाता है।
+
+२) रन-आउट तब भी हो सकता है जब बल्लेबाज रन लेने के दौरान क्रीज से बाहर निकलता है और कोई फील्डर गेंद को पकड़कर विकेट पर मार देता है।
+
+३) रन-आउट के लिए, फील्डर को गेंद को विकेट पर मारने से पहले गेंद को अपने हाथ में रखना होता है।
+
+४) यदि फील्डर ने गेंद को विकेट पर मार दिया है और बल्लेबाज क्रीज से बाहर है, तो अम्पायर रन-आउट का संकेत देता है और बल्लेबाज आउट हो जाता है।
+
+५) रन-आउट के नियमों का पालन करने के लिए, अम्पायर यह सुनिश्चित करते हैं कि फील्डर ने गेंद को विकेट पर मारने से पहले गेंद को अपने हाथ में रखा है और बल्लेबाज क्रीज से बाहर है।",,,
+sports_en_02_llama-3.3-70b-versatile_2,en,Sports,What are the rules for a run-out in cricket?,The batsman must be outside their crease.,"In cricket, a run-out occurs when a batsman is dismissed by a fielder hitting the stumps while the batsman is outside their crease. The rules for a run-out are:
+
+1. The batsman must be outside their crease.
+2. The fielder must be in possession of the ball.
+3. The fielder must hit the stumps, either directly or by throwing the ball, before the batsman can make their ground.
+4. The batsman is given out if the stumps are hit and the bails are knocked off, even if the batsman has not touched the ball.
+5. If the fielder throws the ball to the wicketkeeper or another fielder, who then hits the stumps, it is still considered a run-out.
+6. The batsman can be run-out at either end of the pitch, whether they are the striker or the non-striker.
+
+If these conditions are met, the umpire will raise their arm and signal the batsman is out, and the batsman must leave the field.",,,
+healthcare_hi_05_llama-3.3-70b-versatile_0,hi,Healthcare,भारत के सार्वभौमिक टीकाकरण कार्यक्रम में कौन से टीके शामिल हैं?,"भारत के सार्वभौमिक टीकाकरण कार्यक्रम में निम्नलिखित टीके शामिल हैं:
+    बीसीजी (बेसिलस कैलमेट-गुएरिन) - टीबी के लिए
+   ओपीवी (ओरल पोलियो वायरस) - पोलियो के लिए
+   हेपेटाइटिस बी - हेपेटाइटिस बी के लिए
+   डीपीटी (डिप्थीरिया, पेट्यूसिस, टेटनस) - डिप्थीरिया, पेट्यूसिस, और टेटनस के लिए
+   एचआईबी (हीमोफिलस इन्फ्लुएंजा टाइप बी) - हीमोफिलस इन्फ्लुएंजा टाइप बी के लिए
+   रोटावायरस - रोटावायरस के लिए
+   पीसीवी (प्न्यूमोकोकल कंजुगेट) - न्यूमोकोकल रोग के लिए
+   रूबेला, मम्प्स, और खसरा (एमएमआर) - रूबेला, मम्प्स, और खसरा के लिए
+   जापानी एन्सेफलाइटिस - जापानी एन्सेफलाइटिस के लिए
+    टेटनस और डिप्थीरिया (टीडी) - टेटनस और डिप्थीरिया के लिए
+    एचपीवी (ह्यूमन पैपिलोमावायरस) - ह्यूमन पैपिलोमावायरस के लिए
+
+यह सूची समय-समय पर अपडेट होती रहती है और नए टीकों को जोड़ा जा सकता है।","भारत के सार्वभौमिक टीकाकरण कार्यक्रम में निम्नलिखित टीके शामिल हैं:
+
+1. बीसीजी (बेसिलस कैलमेट-गुएरिन) - टीबी के लिए
+2. ओपीवी (ओरल पोलियो वायरस) - पोलियो के लिए
+3. हेपेटाइटिस बी - हेपेटाइटिस बी के लिए
+4. डीपीटी (डिप्थीरिया, पेट्यूसिस, टेटनस) - डिप्थीरिया, पेट्यूसिस, और टेटनस के लिए
+5. एचआईबी (हीमोफिलस इन्फ्लुएंजा टाइप बी) - हीमोफिलस इन्फ्लुएंजा टाइप बी के लिए
+6. रोटावायरस - रोटावायरस के लिए
+7. पीसीवी (प्न्यूमोकोकल कंजुगेट) - न्यूमोकोकल रोग के लिए
+8. रूबेला, मम्प्स, और खसरा (एमएमआर) - रूबेला, मम्प्स, और खसरा के लिए
+9. जापानी एन्सेफलाइटिस - जापानी एन्सेफलाइटिस के लिए
+10. टेटनस और डिप्थीरिया (टीडी) - टेटनस और डिप्थीरिया के लिए
+11. एचपीवी (ह्यूमन पैपिलोमावायरस) - ह्यूमन पैपिलोमावायरस के लिए
+
+यह सूची समय-समय पर अपडेट होती रहती है और नए टीकों को जोड़ा जा सकता है।",,,
+government_hi_05_llama-3.3-70b-versatile_4,hi,Government,लोकसभा और राज्यसभा में क्या अंतर है?,"विशेष शक्तियाँ  : राज्यसभा को कुछ विशेष शक्तियाँ प्रदान की गई हैं, जैसे कि राष्ट्रीय महत्व के मामलों पर विचार करना और राष्ट्रीय नीतियों का निर्धारण करना।","लोकसभा और राज्यसभा में मुख्य अंतर यह है:
+
+1.  **चयन प्रक्रिया**: लोकसभा के सदस्य सीधे जनता द्वारा चुने जाते हैं, जबकि राज्यसभा के सदस्य राज्यों की विधानसभाओं द्वारा चुने जाते हैं।
+2.  **कार्यकाल**: लोकसभा के सदस्यों का कार्यकाल 5 वर्ष है, जबकि राज्यसभा के सदस्यों का कार्यकाल 6 वर्ष है।
+3.  **सदस्य संख्या**: लोकसभा में 543 सदस्य हैं, जबकि राज्यसभा में 245 सदस्य हैं।
+4.  **विधायी शक्तियाँ**: दोनों सदनों की विधायी शक्तियाँ लगभग समान हैं, लेकिन लोकसभा को वित्तीय विधेयकों को प्रस्तुत करने का विशेषाधिकार है।
+5.  **विशेष शक्तियाँ**: राज्यसभा को कुछ विशेष शक्तियाँ प्रदान की गई हैं, जैसे कि राष्ट्रीय महत्व के मामलों पर विचार करना और राष्ट्रीय नीतियों का निर्धारण करना।",,,
+sports_en_02_llama-3.3-70b-versatile_8,en,Sports,What are the rules for a run-out in cricket?,Will signal the batsman is out.,"In cricket, a run-out occurs when a batsman is dismissed by a fielder hitting the stumps while the batsman is outside their crease. The rules for a run-out are:
+
+1. The batsman must be outside their crease.
+2. The fielder must be in possession of the ball.
+3. The fielder must hit the stumps, either directly or by throwing the ball, before the batsman can make their ground.
+4. The batsman is given out if the stumps are hit and the bails are knocked off, even if the batsman has not touched the ball.
+5. If the fielder throws the ball to the wicketkeeper or another fielder, who then hits the stumps, it is still considered a run-out.
+6. The batsman can be run-out at either end of the pitch, whether they are the striker or the non-striker.
+
+If these conditions are met, the umpire will raise their arm and signal the batsman is out, and the batsman must leave the field.",,,
+healthcare_en_02_llama-3.3-70b-versatile_0,en,Healthcare,What is the recommended dosage frequency for a standard paracetamol tablet?,The recommended dosage frequency for a standard paracetamol tablet 500 mg is every 4 6 hours not exceeding 4 grams 8 tablets in 24 hours.,"The recommended dosage frequency for a standard paracetamol tablet (500mg) is every 4-6 hours, not exceeding 4 grams (8 tablets) in 24 hours.",,,
+government_en_01_llama-3.3-70b-versatile_3,en,Government,What are the fundamental rights guaranteed by the Indian Constitution?,Right against Exploitation Articles 23 24.,"The Indian Constitution guarantees the following six fundamental rights:
+
+1. Right to Equality (Articles 14-18)
+2. Right to Freedom (Articles 19-22)
+3. Right against Exploitation (Articles 23-24)
+4. Right to Freedom of Religion (Articles 25-28)
+5. Right to Cultural and Educational Rights (Articles 29-30)
+6. Right to Constitutional Remedies (Article 32)
+
+These rights are enshrined in Part III of the Indian Constitution and are enforceable by the courts.",,,
+government_en_04_llama-3.3-70b-versatile_2,en,Government,How does a bill become a law in the Indian Parliament?,Discussed in the house where First was introduced.,"In the Indian Parliament, a bill becomes a law through the following steps:
+
+1. **Introduction**: A bill is introduced in either the Lok Sabha (Lower House) or the Rajya Sabha (Upper House) by a minister or a member.
+2. **First Reading**: The bill is read and discussed in the house where it was introduced.
+3. **Referral to Committee**: The bill is referred to a parliamentary committee for examination and scrutiny.
+4. **Report by Committee**: The committee submits its report to the house.
+5. **Second Reading**: The bill is debated and voted on in the house.
+6. **Amendments**: Amendments to the bill can be proposed and voted on.
+7. **Third Reading**: The bill is read again and voted on in its final form.
+8. **Passage in the Other House**: The bill is sent to the other house (if it was introduced in the Lok Sabha, it goes to the Rajya Sabha, and vice versa) for passage.
+9. **Presidential Assent**: If the bill is passed by both houses, it is sent to the President of India for assent.
+10. **Signing into Law**: The President signs the bill, and it becomes an Act of Parliament, or a law.
+
+Note: If the President returns the bill to the Parliament for reconsideration, it is sent back to the houses for revision and voting. If the Parliament passes the bill again with or without amendments, it is sent back to the President, who must give assent.",,,
+history_hi_07_llama-3.3-70b-versatile_2,hi,History,छत्रपति शिवाजी महाराज कौन थे?,वह एक महान सैन्य नेता और राजनेता थे जिन्होंने अपने जीवनकाल में कई युद्ध लड़े और अपने राज्य की सीमाओं का विस्तार किया।,छत्रपति शिवाजी महाराज भारत के एक महान योद्धा और मराठा साम्राज्य के संस्थापक थे। उन्होंने 17वीं शताब्दी में महाराष्ट्र क्षेत्र में एक शक्तिशाली और स्वतंत्र राज्य की स्थापना की। वह एक महान सैन्य नेता और राजनेता थे जिन्होंने अपने जीवनकाल में कई युद्ध लड़े और अपने राज्य की सीमाओं का विस्तार किया। उन्हें भारतीय इतिहास में एक महान नायक के रूप में याद किया जाता है और उनकी वीरता और नेतृत्व क्षमता के लिए सम्मानित किया जाता है।,,,
+science_en_06_llama-3.3-70b-versatile_0,en,Science,How does the greenhouse effect contribute to climate change?,The greenhouse effect contributes to climate change by trapping heat in the Earth's atmosphere leading to global warming.,"The greenhouse effect contributes to climate change by trapping heat in the Earth's atmosphere, leading to global warming. Here's how:
+
+1. **Greenhouse gases**: Burning fossil fuels and other human activities release greenhouse gases like carbon dioxide (CO2), methane (CH4), and water vapor (H2O) into the atmosphere.
+2. **Heat trapping**: These gases trap heat from the sun, preventing it from escaping back into space.
+3. **Temperature increase**: The trapped heat warms the Earth's surface and atmosphere, leading to rising global temperatures.
+4. **Climate change**: The increased temperature causes melting of polar ice caps, sea-level rise, more extreme weather events, and altered ecosystems, ultimately contributing to climate change.
+
+The main greenhouse gases responsible for climate change are:
+
+* CO2 (65% of the warming)
+* CH4 (20% of the warming)
+* H2O (5-10% of the warming)
+
+Human activities, such as burning fossil fuels, deforestation, and land-use changes, have increased the concentration of these gases in the atmosphere, amplifying the natural greenhouse effect and driving climate change.",,,
+sports_hi_06_llama-3.3-70b-versatile_8,hi,Sports,इंडियन प्रीमियर लीग का प्रारूप क्या है?,फाइनल  : क्वालिफायर 1 की जीतने वाली टीम और क्वालिफायर 2 की जीतने वाली टीम एक दूसरे के साथ मैच खेलती हैं।,"इंडियन प्रीमियर लीग (आईपीएल) का प्रारूप इस प्रकार है:
+
+1. **लीग चरण**: आठ टीमें एक दूसरे के साथ दो बार मैच खेलती हैं, जिससे कुल 56 मैच होते हैं।
+2. **प्लेऑफ**: लीग चरण के बाद, शीर्ष चार टीमें प्लेऑफ में प्रवेश करती हैं।
+ * **क्वालिफायर 1**: पहले और दूसरे स्थान पर रहने वाली टीमें एक दूसरे के साथ मैच खेलती हैं। जीतने वाली टीम सीधे फाइनल में पहुंचती है।
+ * **एलिमिनेटर**: तीसरे और चौथे स्थान पर रहने वाली टीमें एक दूसरे के साथ मैच खेलती हैं। हारने वाली टीम बाहर हो जाती है।
+ * **क्वालिफायर 2**: क्वालिफायर 1 की हारने वाली टीम और एलिमिनेटर की जीतने वाली टीम एक दूसरे के साथ मैच खेलती हैं। जीतने वाली टीम फाइनल में पहुंचती है।
+3. **फाइनल**: क्वालिफायर 1 की जीतने वाली टीम और क्वालिफायर 2 की जीतने वाली टीम एक दूसरे के साथ मैच खेलती हैं। जीतने वाली टीम आईपीएल की विजेता बनती है।",,,
+government_hi_03_llama-3.3-70b-versatile_2,hi,Government,भारत के चुनाव आयोग की भूमिका क्या है?,राजनीतिक दलों को मान्यता देना और उनकी गतिविधियों की निगरानी करना।,"भारत के चुनाव आयोग की भूमिका भारत में निष्पक्ष और स्वतंत्र चुनाव कराने की है। यह आयोग संविधान के अनुच्छेद 324 के तहत स्थापित किया गया है और इसके मुख्य कार्य हैं:
+
+चुनावों का संचालन और प्रबंधन करना।
+राजनीतिक दलों को मान्यता देना और उनकी गतिविधियों की निगरानी करना।
+चुनावी प्रक्रिया को निष्पक्ष और पारदर्शी बनाने के लिए नियमों और दिशानिर्देशों का निर्माण करना।
+चुनावों में होने वाली अनियमितताओं और शिकायतों की जांच करना और कार्रवाई करना।
+चुनावी प्रक्रिया में पारदर्शिता और जवाबदेही सुनिश्चित करने के लिए डेटा और जानकारी का संग्रह और विश्लेषण करना।
+चुनाव आयोग का मुख्य उद्देश्य भारतीय लोकतंत्र को मजबूत बनाने और नागरिकों को अपने नेताओं का चयन करने का अवसर प्रदान करना है।",,,
+healthcare_hi_07_llama-3.3-70b-versatile_0,hi,Healthcare,उच्च रक्तचाप हृदय प्रणाली को कैसे प्रभावित करता है?,"उच्च रक्तचाप हृदय प्रणाली को कई तरह से प्रभावित कर सकता है:
+      हृदय की मांसपेशियों पर दबाव  : उच्च रक्तचाप हृदय की मांसपेशियों पर अधिक दबाव डालता है, जिससे हृदय की कार्यक्षमता कम हो सकती है।","उच्च रक्तचाप हृदय प्रणाली को कई तरह से प्रभावित कर सकता है:
+
+१. **हृदय की मांसपेशियों पर दबाव**: उच्च रक्तचाप हृदय की मांसपेशियों पर अधिक दबाव डालता है, जिससे हृदय की कार्यक्षमता कम हो सकती है।
+२. **धमनियों की सख्ती**: उच्च रक्तचाप से धमनियाँ सख्त हो जाती हैं, जिससे उनमें रक्त का प्रवाह कम हो जाता है।
+३. **हृदय की विफलता**: लंबे समय तक उच्च रक्तचाप से हृदय की विफलता हो सकती है, जिससे हृदय रक्त को प्रभावी ढंग से पंप नहीं कर पाता है।
+४. **धमनियों में प्लेक का निर्माण**: उच्च रक्तचाप से धमनियों में प्लेक का निर्माण हो सकता है, जिससे हृदय रोग का खतरा बढ़ जाता है।
+५. **हृदय के वाल्वों पर दबाव**: उच्च रक्तचाप से हृदय के वाल्वों पर दबाव पड़ सकता है, जिससे वाल्वों की कार्यक्षमता कम हो सकती है।
+
+इन सभी कारणों से, उच्च रक्तचाप को नियंत्रित करना और हृदय प्रणाली की सेहत को बनाए रखना बहुत महत्वपूर्ण है।",,,
+healthcare_en_01_llama-3.3-70b-versatile_12,en,Healthcare,How does the human immune system respond to a viral infection?,This response helps to control and eventually clear the viral infection.,"The human immune system responds to a viral infection through a multi-step process:
+
+1. **Recognition**: The immune system recognizes viral particles or infected cells through pattern recognition receptors (PRRs).
+2. **Activation of innate immunity**: Innate immune cells, such as macrophages and dendritic cells, are activated to produce cytokines and chemokines, which recruit other immune cells to the site of infection.
+3. **Production of interferons**: Infected cells produce interferons, which inhibit viral replication and activate nearby immune cells.
+4. **Activation of adaptive immunity**: Adaptive immune cells, such as T cells and B cells, are activated to recognize and respond to viral antigens.
+5. **T cell response**: Cytotoxic T cells (CD8+ T cells) recognize and kill infected cells, while helper T cells (CD4+ T cells) coordinate the immune response.
+6. **B cell response**: B cells produce antibodies to neutralize viral particles and prevent further infection.
+7. **Clearance of the virus**: The immune system works to eliminate the virus from the body through a combination of cell-mediated and humoral immunity.
+
+This response helps to control and eventually clear the viral infection, and also provides long-term immunity against future infections.",,,
+healthcare_en_06_llama-3.3-70b-versatile_6,en,Healthcare,What are the main differences between bacterial and viral infections?,Symptoms While some symptoms may overlap often cause more systemic symptoms like fever and fatigue whereas bacterial infections may cause more localized symptoms.,"The main differences between bacterial and viral infections are:
+
+1. **Cause**: Bacterial infections are caused by bacteria, while viral infections are caused by viruses.
+2. **Treatment**: Bacterial infections are typically treated with antibiotics, while viral infections are treated with antiviral medications or supportive care.
+3. **Contagion**: Both can be contagious, but viral infections tend to be more easily spread.
+4. **Incubation period**: Viral infections often have a shorter incubation period than bacterial infections.
+5. **Symptoms**: While some symptoms may overlap, viral infections often cause more systemic symptoms like fever and fatigue, whereas bacterial infections may cause more localized symptoms.
+6. **Duration**: Viral infections often resolve on their own, while bacterial infections may require treatment to clear the infection.
+
+These differences are crucial for proper diagnosis and treatment.",,,
+healthcare_en_03_llama-3.3-70b-versatile_1,en,Healthcare,What causes Type 2 diabetes?,Impaired insulin secretion The pancreas is unable to produce enough insulin to meet the body's needs.,"Type 2 diabetes is caused by a combination of factors, including:
+
+1. **Insulin resistance**: The body's cells become less responsive to insulin, a hormone that regulates blood sugar levels.
+2. **Impaired insulin secretion**: The pancreas is unable to produce enough insulin to meet the body's needs.
+3. **Genetics**: Family history and genetic predisposition play a significant role.
+4. **Obesity**: Excess body fat, particularly around the abdominal area, contributes to insulin resistance.
+5. **Physical inactivity**: Lack of regular exercise can lead to insulin resistance.
+6. **Unhealthy diet**: Consuming high amounts of sugar, saturated fats, and refined carbohydrates can contribute to insulin resistance.
+7. **Age**: Risk increases with age, especially after 45.
+8. **Other medical conditions**: Certain conditions, such as high blood pressure, high cholesterol, and polycystic ovary syndrome (PCOS), can increase the risk of developing type 2 diabetes.
+
+These factors can lead to high blood sugar levels, which can damage organs and tissues over time if left untreated.",,,
+healthcare_en_04_llama-3.3-70b-versatile_1,en,Healthcare,How is tuberculosis typically diagnosed?,Chest X ray To look for abnormalities in the lungs.,"Tuberculosis (TB) is typically diagnosed using a combination of the following methods:
+
+1. **Symptom evaluation**: Medical history and physical examination to identify symptoms such as cough, fever, weight loss, and night sweats.
+2. **Chest X-ray**: To look for abnormalities in the lungs.
+3. **Sputum tests**: 
+   - **Smear microscopy**: To detect TB bacteria in sputum.
+   - **Culture**: To grow TB bacteria in a laboratory.
+   - **Nucleic acid amplification tests (NAATs)**: To detect genetic material of TB bacteria.
+4. **Mantoux test (Tuberculin skin test)**: To detect the body's immune response to TB bacteria.
+5. **Interferon-gamma release assays (IGRAs)**: Blood tests to detect the body's immune response to TB bacteria.
+
+In some cases, additional tests such as computed tomography (CT) scans, bronchoscopy, or biopsy may be used to confirm the diagnosis.",,,
+science_hi_01_llama-3.3-70b-versatile_5,hi,Science,प्रकाश संश्लेषण कैसे काम करता है?,"प्रकाश-स्वतंत्र चरण:
+इस चरण में, पौधे कार्बन डाइऑक्साइड और पानी का उपयोग करके ग्लूकोज और ऑक्सीजन बनाते हैं।","प्रकाश संश्लेषण एक जटिल प्रक्रिया है जिसमें पौधे और कुछ अन्य जीव सूर्य की ऊर्जा का उपयोग करके कार्बन डाइऑक्साइड और पानी से ग्लूकोज और ऑक्सीजन बनाते हैं। यह प्रक्रिया वायुमंडल में ऑक्सीजन की मात्रा को बढ़ाने और पृथ्वी पर जीवन को बनाए रखने में महत्वपूर्ण भूमिका निभाती है।
+
+प्रकाश संश्लेषण की प्रक्रिया में दो मुख्य चरण होते हैं: प्रकाश-निर्भर चरण और प्रकाश-स्वतंत्र चरण।
+
+प्रकाश-निर्भर चरण:
+इस चरण में, पौधे के पत्तों में मौजूद क्लोरोफिल नामक वर्णक सूर्य की ऊर्जा को अवशोषित करता है और इसे रासायनिक ऊर्जा में परिवर्तित करता है। यह ऊर्जा तब एटीपी (एडेनोसिन ट्राइफॉस्फेट) और एनएडीपी (निकोटिनamide एडेनिन डाइन्यूक्लियोटाइड फॉस्फेट) नामक अणुओं में संग्रहीत की जाती है, जो ऊर्जा के भंडार के रूप में कार्य करते हैं।
+
+प्रकाश-स्वतंत्र चरण:
+इस चरण में, पौधे कार्बन डाइऑक्साइड और पानी का उपयोग करके ग्लूकोज और ऑक्सीजन बनाते हैं। यह प्रक्रिया कैलविन चक्र नामक एक जटिल रासायनिक प्रतिक्रिया द्वारा होती है, जिसमें विभिन्न एंजाइम और सह-एंजाइम शामिल होते हैं।
+
+प्रकाश संश्लेषण की समीकरण है:
+६ सीओ२ + ६ एच२ओ + प्रकाश ऊर्जा → सी६एच₁₂ओ६ (ग्लूकोज) + ६ ओ२
+
+इस प्रकार, प्रकाश संश्लेषण एक महत्वपूर्ण प्रक्रिया है जो पृथ्वी पर जीवन को बनाए रखने में मदद करती है।",,,
+healthcare_hi_08_llama-3.3-70b-versatile_0,hi,Healthcare,मानव शरीर में इंसुलिन की भूमिका क्या है?,मानव शरीर में इंसुलिन एक महत्वपूर्ण हार्मोन है जो ग्लूकोज के स्तर को नियंत्रित करने में मदद करता है।,"मानव शरीर में इंसुलिन एक महत्वपूर्ण हार्मोन है जो ग्लूकोज के स्तर को नियंत्रित करने में मदद करता है। इसकी मुख्य भूमिका है:
+
+ग्लूकोज को कोशिकाओं में पहुंचाना: इंसुलिन ग्लूकोज को कोशिकाओं में प्रवेश करने में मदद करता है, जहां यह ऊर्जा के रूप में उपयोग किया जाता है या भंडारित किया जाता है।
+
+ग्लूकोज के स्तर को नियंत्रित करना: इंसुलिन रक्त में ग्लूकोज के स्तर को नियंत्रित करने में मदद करता है, जो शरीर के लिए आवश्यक है। यदि ग्लूकोज का स्तर बहुत अधिक हो जाता है, तो इंसुलिन इसके स्तर को कम करने में मदद करता है।
+
+वजन प्रबंधन में मदद: इंसुलिन वजन प्रबंधन में भी मदद करता है, क्योंकि यह ग्लूकोज को कोशिकाओं में पहुंचाने में मदद करता है, जो ऊर्जा के रूप में उपयोग किया जाता है या भंडारित किया जाता है।",,,
+healthcare_hi_06_llama-3.3-70b-versatile_1,hi,Healthcare,बैक्टीरियल और वायरल संक्रमण में मुख्य अंतर क्या हैं?,"संरचना:   बैक्टीरिया जीवित कोशिकाएं होती हैं, जबकि वायरस जीवित कोशिकाओं के भीतर प्रोटीन और जेनेटिक पदार्थ के कण होते हैं।","बैक्टीरियल और वायरल संक्रमण में मुख्य अंतर हैं:
+
+1. **कारण:** बैक्टीरियल संक्रमण बैक्टीरिया के कारण होता है, जबकि वायरल संक्रमण वायरस के कारण होता है।
+2. **संरचना:** बैक्टीरिया जीवित कोशिकाएं होती हैं, जबकि वायरस जीवित कोशिकाओं के भीतर प्रोटीन और जेनेटिक पदार्थ के कण होते हैं।
+3. **प्रजनन:** बैक्टीरिया अपने आप प्रजनन कर सकते हैं, जबकि वायरस को जीवित कोशिकाओं की आवश्यकता होती है ताकि वे प्रजनन कर सकें।
+4. **उपचार:** बैक्टीरियल संक्रमण का इलाज आमतौर पर एंटीबायोटिक्स से किया जा सकता है, जबकि वायरल संक्रमण के लिए एंटीवायरल दवाएं या अन्य उपचारों की आवश्यकता होती है।
+5. **लक्षण:** बैक्टीरियल और वायरल संक्रमण के लक्षण अलग-अलग हो सकते हैं, लेकिन कुछ सामान्य लक्षणों में बुखार, दर्द, और थकान शामिल हो सकते हैं।
+
+इन अंतरों को समझने से संक्रमण के कारण का पता लगाने और उचित उपचार प्रदान करने में मदद मिलती है।",,,
+government_en_07_llama-3.3-70b-versatile_6,en,Government,What is the function of the Reserve Bank of India?,Foreign Exchange Management Regulating foreign exchange transactions.,"The Reserve Bank of India (RBI) is the central bank of India, and its primary functions include:
+
+1. Monetary Policy: Regulating money supply and interest rates.
+2. Currency Management: Managing the supply of currency and coins.
+3. Banking Regulation: Supervising and regulating commercial banks.
+4. Lender of Last Resort: Providing liquidity to banks during financial crises.
+5. Foreign Exchange Management: Regulating foreign exchange transactions.
+6. Government Banker: Managing the government's accounts and providing banking services.
+
+Overall, the RBI aims to maintain price stability, promote economic growth, and ensure financial stability in India.",,,
+history_en_05_llama-3.3-70b-versatile_4,en,History,What was the significance of the Dandi March?,National Unity The march drew widespread attention and participation uniting Indians across the country against British rule.,"The Dandi March, also known as the Salt March, was a significant event in Indian history. It was a 24-day march led by Mahatma Gandhi from March 12 to April 6, 1930, from Ahmedabad to the coastal village of Dandi. The march was a protest against the British salt tax, which prohibited Indians from producing or selling salt, forcing them to buy expensive salt from the British. 
+
+The significance of the Dandi March was:
+
+1. **Civil Disobedience**: It marked the beginning of the Civil Disobedience Movement in India, where Indians defied British laws through non-violent means.
+2. **National Unity**: The march drew widespread attention and participation, uniting Indians across the country against British rule.
+3. **Economic Independence**: The march highlighted the need for economic independence and self-sufficiency, as Indians sought to break free from British economic exploitation.
+4. **International Attention**: The Dandi March garnered international attention, putting pressure on the British government to reconsider its policies in India.
+
+The Dandi March was a pivotal moment in India's struggle for independence, demonstrating the power of non-violent resistance and paving the way for future movements.",,,
+government_hi_00_llama-3.3-70b-versatile_6,hi,Government,भारत के राष्ट्रपति का चुनाव कैसे होता है?,"चुनाव  : निर्वाचक मंडल द्वारा मतदान किया जाता है, और उम्मीदवार जो सबसे अधिक मत प्राप्त करता है, वह राष्ट्रपति चुना जाता है।","भारत के राष्ट्रपति का चुनाव एक जटिल प्रक्रिया है, जिसमें संसद और राज्य विधानमंडलों के सदस्य भाग लेते हैं। यहाँ इस प्रक्रिया का संक्षिप्त विवरण है:
+
+1. **चुनाव आयोग की भूमिका**: चुनाव आयोग राष्ट्रपति चुनाव की प्रक्रिया को नियंत्रित और संचालित करता है।
+2. **निर्वाचक मंडल**: राष्ट्रपति का चुनाव एक निर्वाचक मंडल द्वारा किया जाता है, जिसमें संसद के दोनों सदनों (लोकसभा और राज्यसभा) के सदस्य और राज्य विधानमंडलों के सदस्य शामिल होते हैं।
+3. **चुनाव प्रणाली**: राष्ट्रपति चुनाव में एकल संक्रमणीय मत प्रणाली का उपयोग किया जाता है, जिसमें प्रत्येक सदस्य को अपनी वरीयता के अनुसार उम्मीदवारों को मत देने का अधिकार होता है।
+4. **उम्मीदवारी**: कोई भी नागरिक, जो 35 वर्ष से अधिक आयु का है और लोकसभा के सदस्य बनने के लिए योग्य है, राष्ट्रपति पद के लिए उम्मीदवार बन सकता है।
+5. **नामांकन**: उम्मीदवारों को अपने नामांकन पत्र जमा करने होते हैं, जिन्हें चुनाव आयोग द्वारा जांचा जाता है।
+6. **चुनाव**: निर्वाचक मंडल द्वारा मतदान किया जाता है, और उम्मीदवार जो सबसे अधिक मत प्राप्त करता है, वह राष्ट्रपति चुना जाता है।
+7. **परिणाम**: चुनाव आयोग परिणामों की घोषणा करता है, और नवनिर्वाचित राष्ट्रपति को शपथ दिलाई जाती है।
+
+यह प्रक्रिया भारतीय संविधान के अनुच्छेद 55 में वर्णित है, और यह सुनिश्चित करती है कि राष्ट्रपति का चुनाव निष्पक्ष और पारदर्शी तरीके से हो।",,,
+science_hi_08_llama-3.3-70b-versatile_0,hi,Science,ब्लैक होल कैसे बनते हैं?,ब्लैक होल एक ऐसा खगोलीय वस्तु है जो एक तारे के गुरुत्वाकर्षण के कारण उसके पतन के बाद बनता है।,"ब्लैक होल एक ऐसा खगोलीय वस्तु है जो एक तारे के गुरुत्वाकर्षण के कारण उसके पतन के बाद बनता है। जब एक तारा अपने जीवनकाल के अंत में पहुँच जाता है और उसका ईंधन समाप्त हो जाता है, तो वह अपने गुरुत्वाकर्षण के कारण सिकुड़ने लगता है। यदि तारे का द्रव्यमान पर्याप्त रूप से अधिक होता है, तो यह सिकुड़ना एक बिंदु पर पहुँच जाता है जहाँ गुरुत्वाकर्षण इतना मजबूत होता है कि यह प्रकाश को भी अपनी ओर खींच लेता है, और यह एक ब्लैक होल बन जाता है।",,,
+government_hi_04_llama-3.3-70b-versatile_0,hi,Government,भारतीय संसद में एक विधेयक कानून कैसे बनता है?,"भारतीय संसद में एक विधेयक कानून बनने की प्रक्रिया निम्नलिखित है:
+      विधेयक का प्रस्तुतीकरण  : कोई भी सांसद या मंत्री लोकसभा या राज्यसभा में विधेयक प्रस्तुत कर सकता है।","भारतीय संसद में एक विधेयक कानून बनने की प्रक्रिया निम्नलिखित है:
+
+1. **विधेयक का प्रस्तुतीकरण**: कोई भी सांसद या मंत्री लोकसभा या राज्यसभा में विधेयक प्रस्तुत कर सकता है।
+2. **पहली पढ़ाई**: विधेयक को पहली बार पढ़ा जाता है और इसके उद्देश्यों पर चर्चा की जाती है।
+3. **दूसरी पढ़ाई**: विधेयक को दूसरी बार पढ़ा जाता है और इसके प्रावधानों पर विस्तार से चर्चा की जाती है।
+4. **समिति में भेजा जाना**: विधेयक को एक समिति में भेजा जाता है, जो इसके प्रावधानों की जांच करती है और सुझाव देती है।
+5. **समिति की रिपोर्ट**: समिति अपनी रिपोर्ट प्रस्तुत करती है, जिसमें विधेयक में संशोधनों के सुझाव होते हैं।
+6. **तीसरी पढ़ाई**: विधेयक को तीसरी बार पढ़ा जाता है और इसके प्रावधानों पर अंतिम चर्चा की जाती है।
+7. **मतदान**: विधेयक पर मतदान किया जाता है, और यदि यह पारित हो जाता है, तो यह दूसरे सदन में भेजा जाता है।
+8. **राष्ट्रपति की मंजूरी**: दोनों सदनों द्वारा पारित विधेयक को राष्ट्रपति के पास मंजूरी के लिए भेजा जाता है।
+9. **कानून बनना**: राष्ट्रपति की मंजूरी मिलने के बाद, विधेयक कानून बन जाता है और देश में लागू हो जाता है।",,,
+government_en_09_llama-3.3-70b-versatile_3,en,Government,What is the significance of Article 370?,Protection of state laws Indian protected the state's laws and regulations from being altered or repealed by the Indian Parliament without the state's consent.,"Article 370 of the Indian Constitution granted special autonomous status to the state of Jammu and Kashmir, allowing it to have its own constitution, flag, and laws, except for matters related to defense, foreign affairs, and communications. The significance of Article 370 includes:
+
+1. **Autonomy**: It provided Jammu and Kashmir with a significant degree of autonomy, allowing the state to make its own laws on various matters.
+2. **Special status**: It recognized the unique history, culture, and geography of Jammu and Kashmir, setting it apart from other Indian states.
+3. **Protection of state laws**: It protected the state's laws and regulations from being altered or repealed by the Indian Parliament without the state's consent.
+4. **Restrictions on non-residents**: It restricted non-residents from purchasing land or property in Jammu and Kashmir, aiming to preserve the state's distinct cultural and demographic identity.
+
+However, on August 5, 2019, the Indian government abrogated Article 370, effectively revoking Jammu and Kashmir's special status and dividing the state into two union territories: Jammu and Kashmir, and Ladakh.",,,
+sports_hi_01_llama-3.3-70b-versatile_2,hi,Sports,पहला क्रिकेट विश्व कप कब आयोजित हुआ था?,वेस्टइंडीज ने पहला क्रिकेट विश्व कप जीता था।,पहला क्रिकेट विश्व कप 1975 में आयोजित हुआ था। यह इंग्लैंड में आयोजित किया गया था और इसमें 8 टीमों ने भाग लिया था। वेस्टइंडीज ने पहला क्रिकेट विश्व कप जीता था।,,,
+government_en_08_llama-3.3-70b-versatile_8,en,Government,How is a state Governor appointed?,"Governor is typically the President, on the advice of the Prime Minister or the Council of Ministers.","A state Governor is typically elected through a direct vote by the people of the state, although the specific process may vary. Here are the general steps:
+
+1. **Candidate nomination**: Candidates from various political parties or as independents file their nominations to contest the election.
+2. **Election campaign**: Candidates participate in debates, rallies, and other campaigns to win the support of voters.
+3. **Voting**: Eligible voters cast their ballots on election day.
+4. **Counting and results**: Votes are counted, and the candidate with the most votes is declared the winner.
+5. **Oath of office**: The elected Governor takes an oath of office, marking the beginning of their term.
+
+In some countries, like India, the Governor is appointed by the central government, typically the President, on the advice of the Prime Minister or the Council of Ministers. However, in many countries and states, the Governor is directly elected by the people.",,,
+history_en_02_llama-3.3-70b-versatile_2,en,History,What were the main causes of the First World War?,Nationalism Rise of patriotic sentiment and ethnic tensions.,"The main causes of the First World War were:
+
+1. **Imperialism**: Competition for colonies and resources.
+2. **Militarism**: Build-up of military forces and arms races.
+3. **Nationalism**: Rise of patriotic sentiment and ethnic tensions.
+4. **Alliance System**: Complex network of alliances between European powers (e.g., Triple Entente and Triple Alliance).
+5. **Assassination of Archduke Franz Ferdinand**: Triggering event that sparked the war.
+
+These factors created an unstable environment, making war increasingly likely.",,,
+government_en_04_llama-3.3-70b-versatile_8,en,Government,How does a bill become a law in the Indian Parliament?,Amendments can voted on.,"In the Indian Parliament, a bill becomes a law through the following steps:
+
+1. **Introduction**: A bill is introduced in either the Lok Sabha (Lower House) or the Rajya Sabha (Upper House) by a minister or a member.
+2. **First Reading**: The bill is read and discussed in the house where it was introduced.
+3. **Referral to Committee**: The bill is referred to a parliamentary committee for examination and scrutiny.
+4. **Report by Committee**: The committee submits its report to the house.
+5. **Second Reading**: The bill is debated and voted on in the house.
+6. **Amendments**: Amendments to the bill can be proposed and voted on.
+7. **Third Reading**: The bill is read again and voted on in its final form.
+8. **Passage in the Other House**: The bill is sent to the other house (if it was introduced in the Lok Sabha, it goes to the Rajya Sabha, and vice versa) for passage.
+9. **Presidential Assent**: If the bill is passed by both houses, it is sent to the President of India for assent.
+10. **Signing into Law**: The President signs the bill, and it becomes an Act of Parliament, or a law.
+
+Note: If the President returns the bill to the Parliament for reconsideration, it is sent back to the houses for revision and voting. If the Parliament passes the bill again with or without amendments, it is sent back to the President, who must give assent.",,,
+healthcare_hi_07_llama-3.3-70b-versatile_5,hi,Healthcare,उच्च रक्तचाप हृदय प्रणाली को कैसे प्रभावित करता है?,"इन सभी कारणों से, उच्च रक्तचाप को नियंत्रित करना और हृदय प्रणाली की सेहत को बनाए रखना बहुत महत्वपूर्ण है।","उच्च रक्तचाप हृदय प्रणाली को कई तरह से प्रभावित कर सकता है:
+
+१. **हृदय की मांसपेशियों पर दबाव**: उच्च रक्तचाप हृदय की मांसपेशियों पर अधिक दबाव डालता है, जिससे हृदय की कार्यक्षमता कम हो सकती है।
+२. **धमनियों की सख्ती**: उच्च रक्तचाप से धमनियाँ सख्त हो जाती हैं, जिससे उनमें रक्त का प्रवाह कम हो जाता है।
+३. **हृदय की विफलता**: लंबे समय तक उच्च रक्तचाप से हृदय की विफलता हो सकती है, जिससे हृदय रक्त को प्रभावी ढंग से पंप नहीं कर पाता है।
+४. **धमनियों में प्लेक का निर्माण**: उच्च रक्तचाप से धमनियों में प्लेक का निर्माण हो सकता है, जिससे हृदय रोग का खतरा बढ़ जाता है।
+५. **हृदय के वाल्वों पर दबाव**: उच्च रक्तचाप से हृदय के वाल्वों पर दबाव पड़ सकता है, जिससे वाल्वों की कार्यक्षमता कम हो सकती है।
+
+इन सभी कारणों से, उच्च रक्तचाप को नियंत्रित करना और हृदय प्रणाली की सेहत को बनाए रखना बहुत महत्वपूर्ण है।",,,
+government_hi_05_llama-3.3-70b-versatile_3,hi,Government,लोकसभा और राज्यसभा में क्या अंतर है?,"विधायी शक्तियाँ  : दोनों सदनों की विधायी शक्तियाँ लगभग समान हैं, लेकिन लोकसभा को वित्तीय विधेयकों को प्रस्तुत करने का विशेषाधिकार है।","लोकसभा और राज्यसभा में मुख्य अंतर यह है:
+
+1.  **चयन प्रक्रिया**: लोकसभा के सदस्य सीधे जनता द्वारा चुने जाते हैं, जबकि राज्यसभा के सदस्य राज्यों की विधानसभाओं द्वारा चुने जाते हैं।
+2.  **कार्यकाल**: लोकसभा के सदस्यों का कार्यकाल 5 वर्ष है, जबकि राज्यसभा के सदस्यों का कार्यकाल 6 वर्ष है।
+3.  **सदस्य संख्या**: लोकसभा में 543 सदस्य हैं, जबकि राज्यसभा में 245 सदस्य हैं।
+4.  **विधायी शक्तियाँ**: दोनों सदनों की विधायी शक्तियाँ लगभग समान हैं, लेकिन लोकसभा को वित्तीय विधेयकों को प्रस्तुत करने का विशेषाधिकार है।
+5.  **विशेष शक्तियाँ**: राज्यसभा को कुछ विशेष शक्तियाँ प्रदान की गई हैं, जैसे कि राष्ट्रीय महत्व के मामलों पर विचार करना और राष्ट्रीय नीतियों का निर्धारण करना।",,,
+healthcare_hi_09_llama-3.3-70b-versatile_0,hi,Healthcare,दैनिक जल सेवन पर WHO के दिशानिर्देश क्या हैं?,"विश्व स्वास्थ्य संगठन (WHO) के अनुसार, दैनिक जल सेवन के लिए कोई निश्चित मानक नहीं है, लेकिन यह सिफारिश की जाती है कि वयस्कों को प्रतिदिन कम से कम 2 लीटर पानी पीना चाहिए।","विश्व स्वास्थ्य संगठन (WHO) के अनुसार, दैनिक जल सेवन के लिए कोई निश्चित मानक नहीं है, लेकिन यह सिफारिश की जाती है कि वयस्कों को प्रतिदिन कम से कम 2 लीटर पानी पीना चाहिए।",,,
+government_en_08_llama-3.3-70b-versatile_10,en,Government,How is a state Governor appointed?,However in many countries and states the Governor is directly elected by the people.,"A state Governor is typically elected through a direct vote by the people of the state, although the specific process may vary. Here are the general steps:
+
+1. **Candidate nomination**: Candidates from various political parties or as independents file their nominations to contest the election.
+2. **Election campaign**: Candidates participate in debates, rallies, and other campaigns to win the support of voters.
+3. **Voting**: Eligible voters cast their ballots on election day.
+4. **Counting and results**: Votes are counted, and the candidate with the most votes is declared the winner.
+5. **Oath of office**: The elected Governor takes an oath of office, marking the beginning of their term.
+
+In some countries, like India, the Governor is appointed by the central government, typically the President, on the advice of the Prime Minister or the Council of Ministers. However, in many countries and states, the Governor is directly elected by the people.",,,
+history_hi_05_llama-3.3-70b-versatile_7,hi,History,दांडी मार्च का महत्व क्या था?,"इस प्रकार, दांडी मार्च एक महत्वपूर्ण घटना थी जिसने भारतीय स्वतंत्रता संग्राम को गति प्रदान की और दुनिया को अहिंसक विरोध की शक्ति को दिखाया।","दांडी मार्च, जिसे नमक सत्याग्रह भी कहा जाता है, एक महत्वपूर्ण घटना थी जो 12 मार्च 1930 से 6 अप्रैल 1930 तक हुई थी। इस मार्च का नेतृत्व महात्मा गांधी ने किया था और इसका उद्देश्य ब्रिटिश सरकार द्वारा लगाए गए नमक कर के खिलाफ विरोध करना था।
+
+दांडी मार्च का महत्व इस प्रकार है:
+
+1. **नमक कर के खिलाफ विरोध**: दांडी मार्च नमक कर के खिलाफ विरोध करने के लिए आयोजित किया गया था, जो भारतीयों पर एक अन्यायपूर्ण कर था।
+2. **स्वदेशी और आत्मनिर्भरता**: इस मार्च ने स्वदेशी और आत्मनिर्भरता की भावना को बढ़ावा दिया और लोगों को अपने देश के उत्पादों का समर्थन करने के लिए प्रेरित किया।
+3. **अहिंसक विरोध**: दांडी मार्च ने अहिंसक विरोध की शक्ति को प्रदर्शित किया और दुनिया को दिखाया कि बिना हिंसा के भी बड़े परिवर्तन लाए जा सकते हैं।
+4. **भारतीय स्वतंत्रता संग्राम**: दांडी मार्च भारतीय स्वतंत्रता संग्राम के लिए एक महत्वपूर्ण मील का पत्थर था और इसने भारतीयों को स्वतंत्रता के लिए लड़ने के लिए प्रेरित किया।
+5. **महात्मा गांधी की नेतृत्व**: दांडी मार्च ने महात्मा गांधी की नेतृत्व क्षमता को प्रदर्शित किया और उन्हें विश्व स्तर पर एक प्रमुख नेता के रूप में स्थापित किया।
+
+इस प्रकार, दांडी मार्च एक महत्वपूर्ण घटना थी जिसने भारतीय स्वतंत्रता संग्राम को गति प्रदान की और दुनिया को अहिंसक विरोध की शक्ति को दिखाया।",,,
+government_en_05_llama-3.3-70b-versatile_2,en,Government,What is the difference between the Lok Sabha and Rajya Sabha?,The main differences are Membership Lok Sabha has 543 elected members while Rajya Sabha has 245 members with 233 elected and 12 nominated by the President.,"The Lok Sabha (House of the People) and Rajya Sabha (Council of States) are the two houses of the Parliament of India. The main differences are:
+
+1. **Membership**: Lok Sabha has 543 elected members, while Rajya Sabha has 245 members, with 233 elected and 12 nominated by the President.
+2. **Term**: Lok Sabha members are elected for a term of 5 years, while Rajya Sabha members have a term of 6 years, with one-third of the members retiring every 2 years.
+3. **Election**: Lok Sabha members are directly elected by the people, while Rajya Sabha members are elected by the elected members of the State Legislative Assemblies.
+4. **Representation**: Lok Sabha represents the people of India, while Rajya Sabha represents the interests of the states.
+5. **Powers**: Both houses have equal powers in matters of legislation, except in cases of money bills, where Lok Sabha has more power.",,,
+history_en_02_llama-3.3-70b-versatile_1,en,History,What were the main causes of the First World War?,Militarism Build up of military forces and arms races.,"The main causes of the First World War were:
+
+1. **Imperialism**: Competition for colonies and resources.
+2. **Militarism**: Build-up of military forces and arms races.
+3. **Nationalism**: Rise of patriotic sentiment and ethnic tensions.
+4. **Alliance System**: Complex network of alliances between European powers (e.g., Triple Entente and Triple Alliance).
+5. **Assassination of Archduke Franz Ferdinand**: Triggering event that sparked the war.
+
+These factors created an unstable environment, making war increasingly likely.",,,
+healthcare_en_01_llama-3.3-70b-versatile_6,en,Healthcare,How does the human immune system respond to a viral infection?,Cells is CD8 + T cells.,"The human immune system responds to a viral infection through a multi-step process:
+
+1. **Recognition**: The immune system recognizes viral particles or infected cells through pattern recognition receptors (PRRs).
+2. **Activation of innate immunity**: Innate immune cells, such as macrophages and dendritic cells, are activated to produce cytokines and chemokines, which recruit other immune cells to the site of infection.
+3. **Production of interferons**: Infected cells produce interferons, which inhibit viral replication and activate nearby immune cells.
+4. **Activation of adaptive immunity**: Adaptive immune cells, such as T cells and B cells, are activated to recognize and respond to viral antigens.
+5. **T cell response**: Cytotoxic T cells (CD8+ T cells) recognize and kill infected cells, while helper T cells (CD4+ T cells) coordinate the immune response.
+6. **B cell response**: B cells produce antibodies to neutralize viral particles and prevent further infection.
+7. **Clearance of the virus**: The immune system works to eliminate the virus from the body through a combination of cell-mediated and humoral immunity.
+
+This response helps to control and eventually clear the viral infection, and also provides long-term immunity against future infections.",,,
+government_hi_03_llama-3.3-70b-versatile_6,hi,Government,भारत के चुनाव आयोग की भूमिका क्या है?,चुनाव आयोग का मुख्य उद्देश्य भारतीय लोकतंत्र को मजबूत बनाने और नागरिकों को अपने नेताओं का चयन करने का अवसर प्रदान करना है।,"भारत के चुनाव आयोग की भूमिका भारत में निष्पक्ष और स्वतंत्र चुनाव कराने की है। यह आयोग संविधान के अनुच्छेद 324 के तहत स्थापित किया गया है और इसके मुख्य कार्य हैं:
+
+चुनावों का संचालन और प्रबंधन करना।
+राजनीतिक दलों को मान्यता देना और उनकी गतिविधियों की निगरानी करना।
+चुनावी प्रक्रिया को निष्पक्ष और पारदर्शी बनाने के लिए नियमों और दिशानिर्देशों का निर्माण करना।
+चुनावों में होने वाली अनियमितताओं और शिकायतों की जांच करना और कार्रवाई करना।
+चुनावी प्रक्रिया में पारदर्शिता और जवाबदेही सुनिश्चित करने के लिए डेटा और जानकारी का संग्रह और विश्लेषण करना।
+चुनाव आयोग का मुख्य उद्देश्य भारतीय लोकतंत्र को मजबूत बनाने और नागरिकों को अपने नेताओं का चयन करने का अवसर प्रदान करना है।",,,
+science_en_06_llama-3.3-70b-versatile_1,en,Science,How does the greenhouse effect contribute to climate change?,"Burning fossil fuels and other human activities release greenhouse gases like carbon dioxide ( CO2 ), methane ( CH4 ), and water vapor ( H2O ) into the atmosphere.","The greenhouse effect contributes to climate change by trapping heat in the Earth's atmosphere, leading to global warming. Here's how:
+
+1. **Greenhouse gases**: Burning fossil fuels and other human activities release greenhouse gases like carbon dioxide (CO2), methane (CH4), and water vapor (H2O) into the atmosphere.
+2. **Heat trapping**: These gases trap heat from the sun, preventing it from escaping back into space.
+3. **Temperature increase**: The trapped heat warms the Earth's surface and atmosphere, leading to rising global temperatures.
+4. **Climate change**: The increased temperature causes melting of polar ice caps, sea-level rise, more extreme weather events, and altered ecosystems, ultimately contributing to climate change.
+
+The main greenhouse gases responsible for climate change are:
+
+* CO2 (65% of the warming)
+* CH4 (20% of the warming)
+* H2O (5-10% of the warming)
+
+Human activities, such as burning fossil fuels, deforestation, and land-use changes, have increased the concentration of these gases in the atmosphere, amplifying the natural greenhouse effect and driving climate change.",,,
+healthcare_en_09_llama-3.3-70b-versatile_0,en,Healthcare,What are the WHO's guidelines on daily water intake?,Organization is WHO.,"The World Health Organization (WHO) recommends a daily water intake of at least 2 liters (67.6 ounces) for adults in a temperate climate. However, individual needs may vary depending on factors such as age, sex, weight, activity level, and climate.",,,
+government_hi_00_llama-3.3-70b-versatile_5,hi,Government,भारत के राष्ट्रपति का चुनाव कैसे होता है?,"नामांकन  : उम्मीदवारों को अपने नामांकन पत्र जमा करने होते हैं, जिन्हें चुनाव आयोग द्वारा जांचा जाता है।","भारत के राष्ट्रपति का चुनाव एक जटिल प्रक्रिया है, जिसमें संसद और राज्य विधानमंडलों के सदस्य भाग लेते हैं। यहाँ इस प्रक्रिया का संक्षिप्त विवरण है:
+
+1. **चुनाव आयोग की भूमिका**: चुनाव आयोग राष्ट्रपति चुनाव की प्रक्रिया को नियंत्रित और संचालित करता है।
+2. **निर्वाचक मंडल**: राष्ट्रपति का चुनाव एक निर्वाचक मंडल द्वारा किया जाता है, जिसमें संसद के दोनों सदनों (लोकसभा और राज्यसभा) के सदस्य और राज्य विधानमंडलों के सदस्य शामिल होते हैं।
+3. **चुनाव प्रणाली**: राष्ट्रपति चुनाव में एकल संक्रमणीय मत प्रणाली का उपयोग किया जाता है, जिसमें प्रत्येक सदस्य को अपनी वरीयता के अनुसार उम्मीदवारों को मत देने का अधिकार होता है।
+4. **उम्मीदवारी**: कोई भी नागरिक, जो 35 वर्ष से अधिक आयु का है और लोकसभा के सदस्य बनने के लिए योग्य है, राष्ट्रपति पद के लिए उम्मीदवार बन सकता है।
+5. **नामांकन**: उम्मीदवारों को अपने नामांकन पत्र जमा करने होते हैं, जिन्हें चुनाव आयोग द्वारा जांचा जाता है।
+6. **चुनाव**: निर्वाचक मंडल द्वारा मतदान किया जाता है, और उम्मीदवार जो सबसे अधिक मत प्राप्त करता है, वह राष्ट्रपति चुना जाता है।
+7. **परिणाम**: चुनाव आयोग परिणामों की घोषणा करता है, और नवनिर्वाचित राष्ट्रपति को शपथ दिलाई जाती है।
+
+यह प्रक्रिया भारतीय संविधान के अनुच्छेद 55 में वर्णित है, और यह सुनिश्चित करती है कि राष्ट्रपति का चुनाव निष्पक्ष और पारदर्शी तरीके से हो।",,,
+government_en_08_llama-3.3-70b-versatile_6,en,Government,How is a state Governor appointed?,Counting and results Votes are counted.,"A state Governor is typically elected through a direct vote by the people of the state, although the specific process may vary. Here are the general steps:
+
+1. **Candidate nomination**: Candidates from various political parties or as independents file their nominations to contest the election.
+2. **Election campaign**: Candidates participate in debates, rallies, and other campaigns to win the support of voters.
+3. **Voting**: Eligible voters cast their ballots on election day.
+4. **Counting and results**: Votes are counted, and the candidate with the most votes is declared the winner.
+5. **Oath of office**: The elected Governor takes an oath of office, marking the beginning of their term.
+
+In some countries, like India, the Governor is appointed by the central government, typically the President, on the advice of the Prime Minister or the Council of Ministers. However, in many countries and states, the Governor is directly elected by the people.",,,
+history_en_02_llama-3.3-70b-versatile_4,en,History,What were the main causes of the First World War?,Assassination of Archduke Franz Ferdinand Triggering event that sparked the war.,"The main causes of the First World War were:
+
+1. **Imperialism**: Competition for colonies and resources.
+2. **Militarism**: Build-up of military forces and arms races.
+3. **Nationalism**: Rise of patriotic sentiment and ethnic tensions.
+4. **Alliance System**: Complex network of alliances between European powers (e.g., Triple Entente and Triple Alliance).
+5. **Assassination of Archduke Franz Ferdinand**: Triggering event that sparked the war.
+
+These factors created an unstable environment, making war increasingly likely.",,,
+science_hi_01_llama-3.3-70b-versatile_7,hi,Science,प्रकाश संश्लेषण कैसे काम करता है?,"प्रकाश संश्लेषण की समीकरण है:
+६ सीओ२ + ६ एच२ओ + प्रकाश ऊर्जा → सी६एच₁₂ओ६ (ग्लूकोज) + ६ ओ२
+
+इस प्रकार, प्रकाश संश्लेषण एक महत्वपूर्ण प्रक्रिया है जो पृथ्वी पर जीवन को बनाए रखने में मदद करती है।","प्रकाश संश्लेषण एक जटिल प्रक्रिया है जिसमें पौधे और कुछ अन्य जीव सूर्य की ऊर्जा का उपयोग करके कार्बन डाइऑक्साइड और पानी से ग्लूकोज और ऑक्सीजन बनाते हैं। यह प्रक्रिया वायुमंडल में ऑक्सीजन की मात्रा को बढ़ाने और पृथ्वी पर जीवन को बनाए रखने में महत्वपूर्ण भूमिका निभाती है।
+
+प्रकाश संश्लेषण की प्रक्रिया में दो मुख्य चरण होते हैं: प्रकाश-निर्भर चरण और प्रकाश-स्वतंत्र चरण।
+
+प्रकाश-निर्भर चरण:
+इस चरण में, पौधे के पत्तों में मौजूद क्लोरोफिल नामक वर्णक सूर्य की ऊर्जा को अवशोषित करता है और इसे रासायनिक ऊर्जा में परिवर्तित करता है। यह ऊर्जा तब एटीपी (एडेनोसिन ट्राइफॉस्फेट) और एनएडीपी (निकोटिनamide एडेनिन डाइन्यूक्लियोटाइड फॉस्फेट) नामक अणुओं में संग्रहीत की जाती है, जो ऊर्जा के भंडार के रूप में कार्य करते हैं।
+
+प्रकाश-स्वतंत्र चरण:
+इस चरण में, पौधे कार्बन डाइऑक्साइड और पानी का उपयोग करके ग्लूकोज और ऑक्सीजन बनाते हैं। यह प्रक्रिया कैलविन चक्र नामक एक जटिल रासायनिक प्रतिक्रिया द्वारा होती है, जिसमें विभिन्न एंजाइम और सह-एंजाइम शामिल होते हैं।
+
+प्रकाश संश्लेषण की समीकरण है:
+६ सीओ२ + ६ एच२ओ + प्रकाश ऊर्जा → सी६एच₁₂ओ६ (ग्लूकोज) + ६ ओ२
+
+इस प्रकार, प्रकाश संश्लेषण एक महत्वपूर्ण प्रक्रिया है जो पृथ्वी पर जीवन को बनाए रखने में मदद करती है।",,,
+sports_hi_04_llama-3.3-70b-versatile_1,hi,Sports,फुटबॉल में ऑफसाइड नियम क्या है?,इस नियम का उद्देश्य यह सुनिश्चित करना है कि खिलाड़ी अनुचित लाभ न उठाएं और खेल को निष्पक्ष बनाए रखें।,"फुटबॉल में ऑफसाइड नियम यह है कि जब कोई खिलाड़ी विरोधी टीम के गोल की ओर बढ़ रहा होता है और गेंद को प्राप्त करने से पहले वह विरोधी टीम के दूसरे आखिरी खिलाड़ी से आगे होता है, तो उसे ऑफसाइड घोषित किया जाता है। इस नियम का उद्देश्य यह सुनिश्चित करना है कि खिलाड़ी अनुचित लाभ न उठाएं और खेल को निष्पक्ष बनाए रखें।",,,

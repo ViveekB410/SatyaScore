@@ -1,0 +1,198 @@
+{
+  "no_semsim": {
+    "en": {
+      "Full (S+N+KG)": {
+        "accuracy": 0.4444,
+        "macro_f1": 0.3988,
+        "hallu_f1": 0.6786,
+        "verif_f1": 0.3929,
+        "n_scored": 72
+      },
+      "SemSim only": {
+        "accuracy": 0.2639,
+        "macro_f1": 0.199,
+        "hallu_f1": 0.0,
+        "verif_f1": 0.4638,
+        "n_scored": 72
+      },
+      "NLI only": {
+        "accuracy": 0.4444,
+        "macro_f1": 0.3988,
+        "hallu_f1": 0.6786,
+        "verif_f1": 0.3929,
+        "n_scored": 72
+      },
+      "SemSim + NLI": {
+        "accuracy": 0.4444,
+        "macro_f1": 0.3988,
+        "hallu_f1": 0.6786,
+        "verif_f1": 0.3929,
+        "n_scored": 72
+      },
+      "NLI + KG": {
+        "accuracy": 0.4444,
+        "macro_f1": 0.3988,
+        "hallu_f1": 0.6786,
+        "verif_f1": 0.3929,
+        "n_scored": 72
+      },
+      "SemSim + KG": {
+        "accuracy": 0.2639,
+        "macro_f1": 0.199,
+        "hallu_f1": 0.0,
+        "verif_f1": 0.4638,
+        "n_scored": 72
+      },
+      "always_verified_baseline": {
+        "accuracy": 0.5417,
+        "macro_f1": 0.2342
+      }
+    },
+    "hi": {
+      "Full (S+N+KG)": {
+        "accuracy": 0.2821,
+        "macro_f1": 0.2461,
+        "hallu_f1": 0.2,
+        "verif_f1": 0.3902,
+        "n_scored": 39
+      },
+      "SemSim only": {
+        "accuracy": 0.4103,
+        "macro_f1": 0.269,
+        "hallu_f1": 0.0,
+        "verif_f1": 0.5106,
+        "n_scored": 39
+      },
+      "NLI only": {
+        "accuracy": 0.2821,
+        "macro_f1": 0.2461,
+        "hallu_f1": 0.2,
+        "verif_f1": 0.3902,
+        "n_scored": 39
+      },
+      "SemSim + NLI": {
+        "accuracy": 0.2821,
+        "macro_f1": 0.2461,
+        "hallu_f1": 0.2,
+        "verif_f1": 0.3902,
+        "n_scored": 39
+      },
+      "NLI + KG": {
+        "accuracy": 0.2821,
+        "macro_f1": 0.2461,
+        "hallu_f1": 0.2,
+        "verif_f1": 0.3902,
+        "n_scored": 39
+      },
+      "SemSim + KG": {
+        "accuracy": 0.4103,
+        "macro_f1": 0.269,
+        "hallu_f1": 0.0,
+        "verif_f1": 0.5106,
+        "n_scored": 39
+      },
+      "always_verified_baseline": {
+        "accuracy": 0.75,
+        "macro_f1": 0.2857
+      }
+    }
+  },
+  "with_semsim": {
+    "en": {
+      "Full (S+N+KG)": {
+        "accuracy": 0.3611,
+        "macro_f1": 0.3572,
+        "hallu_f1": 0.5957,
+        "verif_f1": 0.3396,
+        "n_scored": 72
+      },
+      "SemSim only": {
+        "accuracy": 0.2639,
+        "macro_f1": 0.199,
+        "hallu_f1": 0.0,
+        "verif_f1": 0.4638,
+        "n_scored": 72
+      },
+      "NLI only": {
+        "accuracy": 0.4444,
+        "macro_f1": 0.3988,
+        "hallu_f1": 0.6786,
+        "verif_f1": 0.3929,
+        "n_scored": 72
+      },
+      "SemSim + NLI": {
+        "accuracy": 0.3611,
+        "macro_f1": 0.3572,
+        "hallu_f1": 0.5957,
+        "verif_f1": 0.3396,
+        "n_scored": 72
+      },
+      "NLI + KG": {
+        "accuracy": 0.4444,
+        "macro_f1": 0.3988,
+        "hallu_f1": 0.6786,
+        "verif_f1": 0.3929,
+        "n_scored": 72
+      },
+      "SemSim + KG": {
+        "accuracy": 0.2639,
+        "macro_f1": 0.199,
+        "hallu_f1": 0.0,
+        "verif_f1": 0.4638,
+        "n_scored": 72
+      },
+      "always_verified_baseline": {
+        "accuracy": 0.5417,
+        "macro_f1": 0.2342
+      }
+    },
+    "hi": {
+      "Full (S+N+KG)": {
+        "accuracy": 0.3333,
+        "macro_f1": 0.2182,
+        "hallu_f1": 0.0,
+        "verif_f1": 0.4545,
+        "n_scored": 39
+      },
+      "SemSim only": {
+        "accuracy": 0.4103,
+        "macro_f1": 0.269,
+        "hallu_f1": 0.0,
+        "verif_f1": 0.5106,
+        "n_scored": 39
+      },
+      "NLI only": {
+        "accuracy": 0.2821,
+        "macro_f1": 0.2461,
+        "hallu_f1": 0.2,
+        "verif_f1": 0.3902,
+        "n_scored": 39
+      },
+      "SemSim + NLI": {
+        "accuracy": 0.3333,
+        "macro_f1": 0.2182,
+        "hallu_f1": 0.0,
+        "verif_f1": 0.4545,
+        "n_scored": 39
+      },
+      "NLI + KG": {
+        "accuracy": 0.2821,
+        "macro_f1": 0.2461,
+        "hallu_f1": 0.2,
+        "verif_f1": 0.3902,
+        "n_scored": 39
+      },
+      "SemSim + KG": {
+        "accuracy": 0.4103,
+        "macro_f1": 0.269,
+        "hallu_f1": 0.0,
+        "verif_f1": 0.5106,
+        "n_scored": 39
+      },
+      "always_verified_baseline": {
+        "accuracy": 0.75,
+        "macro_f1": 0.2857
+      }
+    }
+  }
+}

@@ -1,0 +1,762 @@
+
+===== PAGE 1 =====
+SatyaScore PRD v2.4
+PRODUCT REQUIREMENTS DOCUMENT
+SatyaScore: Multilingual Hallucination Detection & Scoring Framework
+Table of Contents
+1. Executive Summary
+2. Problem Statement & Motivation
+3. Positioning Against Prior Art
+4. Project Overview
+5. Goals & Success Metrics
+6. Stakeholders & Team Roles
+7. System Architecture
+8. Core Functional Requirements
+9. Non-Functional Requirements
+10. Technology Stack (with Concrete Hardware Specs)
+11. Dataset Strategy
+12. Development Roadmap (4 Months / ~17 Weeks)
+13. Research Paper Strategy
+14. Patent Strategy
+15. Risk Assessment & Mitigation
+16. Ethical & Responsible-AI Considerations
+17. Appendix: Key Reference Papers (Updated — Now 27 Papers Across 5 Categories)
+PRODUCT REQUIREMENTS DOCUMENT
+SatyaScore: Multilingual Hallucination Detection & Scoring Framework
+Real-Time LLM Trustworthiness Verification for English, Hindi (core) and Marathi (tiered
+stretch goal)
+Final Year Capstone Project | B.Tech Artificial Intelligence & Data Science PRMIT&R Badnera￾Amravati | Guide: Dr. S. R. Gupta Version 2.4 | Revised July 2026 (supersedes v2.3) — Project
+renamed to SatyaScore Team Size: 4 Members | Timeline: 4 Months (~17 weeks) Targets: IEEE
+Access / ACL-adjacent Publication + Indian Provisional Patent
+What changed in v2.0: After a full literature survey (22+ papers across foundational hallucination detection, the Mu￾SHROOM shared task ecosystem, SHROOM-CAP, cross-lingual embeddings, and fact-verification/RAG research), the
+project’s novelty claim was sharpened. v1.0 claimed to be “the first” multilingual hallucination system for Indian
+languages. That claim doesn’t hold — Mu-SHROOM (SemEval-2025 Task 3) already benchmarks Hindi at scale across 14
+languages, and SHROOM-CAP (2025) extends this to 9 languages including 5 Indic ones. v2.0 repositioned novelty around
+Marathi coverage, knowledge-graph-grounded verification, and graded claim-level scoring combined together.
+What changed in v2.1: Given the 6-month timeline, building and annotating a full 3,000+ claim Marathi dataset from
+scratch alongside everything else the project requires was judged infeasible. Marathi has been moved from a core
+deliverable to a future-work / stretch goal. The committed core scope is now English + Hindi only. The novelty
+claim shifts accordingly: it now rests primarily on knowledge-graph fusion (semantic + NLI + KG combined into
+one graded score) and claim-level granularity, rather than on being the only system to cover Marathi. This is still a
+genuinely defensible contribution — no reviewed system (Mu-SHROOM, SHROOM-CAP, or any foundational work)
+combines all three signals at claim level for any Indian language, Hindi included. Marathi is retained in the document as
+an explicitly flagged extension path, since the architecture is designed to generalize to it later with minimal rework.
+What changed in v2.2: A deeper search surfaced closer prior art than previously known: MultiHal (Lavrinovics et al.,
+2025), FactKG (Kim et al., 2023), and KGR (Guan et al., 2024) all touch knowledge-graph-grounded hallucination
+verification. None cover Hindi, and none fuse semantic+NLI+KG into one deployable claim-level score with a real-time API
+— so the core novelty claim survives — but it must now be stated more precisely and must explicitly address these three
+works rather than claiming KG-grounding as untouched territory. A new reference category (Category E) was added in
+Section 17 to reflect this.
+What changed in v2.3 (this version, after strict internal review): Confirmed timeline is a full 4 months (~17
+===== PAGE 2 =====
+weeks), not under 4. Marathi is reinstated as a lighter, tiered “stretch core” goal — a smaller dataset (800–1,200
+claims) explicitly ranked below the English/Hindi deliverables and the ablation study in priority, not full parity. This
+version also fixes several internal inconsistencies caught in a strict critical review: (a) corrected Month-based
+patent/paper deadlines that didn’t match the compressed weekly roadmap, (b) added MultiHal/FactKG/KGR visibility to
+the Executive Summary instead of burying it in Section 3, (c) added a KG-only baseline derived from FactKG’s approach
+so the closest prior art is actually benchmarked against, not just cited, (d) rebalanced the roadmap so annotation runs in
+parallel with pipeline development instead of being crammed into one phase, (e) added a risk entry for the ablation study
+itself showing a null result, (f) specified the actual weight-learning mechanism (softmax-constrained, not plain logistic
+regression), (g) re-scoped the FAISS index size question for a trilingual (not 5-language) corpus, (h) rebalanced team roles
+to un-overload Member 4, (i) added a compute cost acknowledgment.
+What changed in v2.4 (this version): Project renamed from “MultiHallu-Score” to SatyaScore throughout the
+document. No technical, scope, or timeline changes — this is a naming update only. The underlying algorithm retains its
+name, CMHSA (Composite Multilingual Hallucination Scoring Algorithm).
+Table of Contents
+1. Executive Summary
+2. Problem Statement & Motivation
+3. Positioning Against Prior Art
+4. Project Overview
+5. Goals & Success Metrics
+6. Stakeholders & Team Roles
+7. System Architecture
+8. Core Functional Requirements
+9. Non-Functional Requirements
+10. Technology Stack (with Concrete Hardware Specs)
+11. Dataset Strategy
+12. Development Roadmap (4 Months / ~17 Weeks)
+13. Research Paper Strategy
+14. Patent Strategy
+15. Risk Assessment & Mitigation (incl. 15.1 Marathi Tiered Stretch-Goal Plan)
+16. Ethical & Responsible-AI Considerations
+17. Appendix: Key Reference Papers (Updated)
+1. Executive Summary
+Large Language Models (LLMs) such as GPT-4, Gemini, and Llama are increasingly deployed in critical domains
+including healthcare, law, education, and governance. A persistent and dangerous failure mode of these models
+is hallucination — the generation of plausible but factually incorrect or fabricated content, delivered with high
+confidence.
+This project proposes the design, development, and evaluation of SatyaScore, a claim-level Hallucination
+Detection and Scoring Framework with English and Hindi as core, committed languages, and Marathi as a
+tiered stretch goal (a smaller ~800–1,200 claim dataset, explicitly ranked below the core deliverables — see
+Section 15). The system decomposes LLM-generated text into atomic factual claims, verifies each claim against
+a structured knowledge base, and produces a graded (continuous) hallucination confidence score at the
+individual-claim level — rather than a binary label or an approximate error span.
+The core technical contribution is the Composite Multilingual Hallucination Scoring Algorithm (CMHSA),
+which fuses three independent verification signals — cross-lingual semantic similarity, natural language
+inference (NLI) entailment, and knowledge-graph consistency verification (Wikidata) — into a single interpretable
+score. This is, to the best of current literature, the first system to combine all three signal types at the claim level
+for Hindi or English, a combination absent from Mu-SHROOM (similarity/entailment/voting only, no KG), SHROOM￾CAP (binary labels, no KG evidence, no graded score), and more recent knowledge-graph-grounded work —
+MultiHal, FactKG, and KGR — none of which fuse all three signals into one deployable, claim-level score for
+Hindi (see Section 3 and Section 17 Category E for full differentiation). This dual-purpose project targets both a
+Provisional Indian Patent application and a research paper submission to a peer-reviewed NLP venue (IEEE
+Access, or an ACL-affiliated workshop track appropriate for a student capstone).
+===== PAGE 3 =====
+2. Problem Statement & Motivation
+2.1 The Hallucination Problem
+Hallucination in LLMs refers to the generation of confident, syntactically fluent, yet factually incorrect or entirely
+fabricated content. Reported hallucination rates vary widely (roughly 15%–40% of factual queries) depending on
+domain, model, and language — and rates are generally worse for lower-resource languages such as Hindi and
+Marathi, where training data is comparatively sparse.
+Current, still-unresolved challenges in hallucination detection include: - No production-ready, real-time
+hallucination detector exists that is both claim-level and knowledge-graph-grounded, for English or Hindi. -
+Existing multilingual systems either mark approximate error locations (span-level, Mu-SHROOM) or apply a
+binary correct/incorrect label (SHROOM-CAP) — neither produces a graded, decision-support-ready confidence
+score. - No existing system combines semantic similarity, NLI entailment, and structured knowledge-graph
+verification into one fused score at the claim level, for any Indian language including Hindi. - Marathi — spoken
+by 80+ million people — has zero coverage in any major multilingual hallucination benchmark to date; this
+project addresses it at a smaller, tiered scale (Section 15) rather than full parity with Hindi/English, given the
+timeline.
+2.2 Why This Matters
+India has 500M+ smartphone users consuming information in regional languages via LLM-powered apps.
+Government services, healthcare advisory, and legal information delivered via AI chatbots can cause
+serious harm if hallucinated content goes undetected.
+No Indian patent currently exists for a claim-level, knowledge-graph-grounded LLM hallucination scoring
+system for Hindi — a genuine IP opportunity remains open around the KG-fusion approach itself,
+independent of language coverage.
+3. Positioning Against Prior Art
+This section replaces the v1.0 “Research Gap” table, which is now outdated in light of the full literature survey.
+Dimension Foundational Work
+(FEVER, FActScore,
+SelfCheckGPT,
+TruthfulQA, HaluEval,
+TRUE)
+Mu-SHROOM
+(SemEval-2025)
+SHROOM-CAP (2025) SatyaScore (This
+Project)
+Language Coverage English only 14 languages incl. Hindi 9 languages incl. 5 Indic English + Hindi
+(Marathi: future work)
+Detection Granularity Whole response / single
+fact
+Span-level (exact error
+location)
+Whole document, binary Claim-level, graded
+score
+Verification Signals One signal only
+(similarity OR entailment
+OR consistency)
+Similarity, entailment, or
+LLM-ensemble voting
+Not clearly evidenced Semantic + NLI +
+Knowledge Graph,
+fused
+Knowledge Graph
+Grounding
+No No Not evident Yes (Wikidata
+SPARQL)
+Score Type Binary or single-signal
+score
+Span labels Binary (yes/no) Continuous [0,1] + 3-
+tier verdict
+Domain General/biographical General AI-generated
+answers
+Scientific publications
+only
+General-domain
+(healthcare,
+governance,
+education)
+Resulting novelty claim (defensible): SatyaScore is the first system to combine claim-level decomposition
+and three-signal fused scoring — including knowledge-graph verification — in a single general-domain framework
+for Hindi (or English). It does not claim to be the first multilingual or first Indic-language hallucination detector —
+those claims belong to Mu-SHROOM and SHROOM-CAP respectively, and must be cited and credited as such in
+the paper and patent filing. It also does not claim Marathi coverage in this project cycle; that is explicitly future
+work (Section 15).
+Practical implication for the team: the annotator-agreement findings from Mu-SHROOM (experts struggled to
+===== PAGE 4 =====
+agree even on span boundaries) suggest running a small pilot annotation round (50–100 claims) before
+committing to the target Cohen’s κ ≥ 0.70, to calibrate expectations early.
+Additional closest prior art (added after further search, see Section 17 Category E): MultiHal
+(Lavrinovics et al., 2025) evaluates semantic similarity, NLI, and hallucination detection improvements from
+knowledge-graph grounding — but as separate evaluation metrics over 5 European languages (no Hindi), not as
+one fused claim-level score, and not as a deployable system. FactKG (Kim et al., 2023) and KGR (Guan et al.,
+2024) perform KG-based verification and claim-extraction-plus-verification respectively, but neither fuses
+NLI+semantic+KG into a single score, and neither covers Hindi. SatyaScore remains distinct from all three by
+combining claim-level decomposition, a single fused three-signal score, a real-time API, and Hindi coverage —
+together, in one system.
+4. Project Overview
+4.1 Project Identity
+Project Name: SatyaScore: Bilingual Hallucination Detection & Scoring Framework
+Type: AI/NLP Research System with API and Web Demo
+Domain: Natural Language Processing / LLM Safety / Trustworthy AI
+Novel Contribution: Composite Multilingual Hallucination Scoring Algorithm (CMHSA) — first fusion of
+semantic similarity + NLI + knowledge-graph verification at claim level, for Hindi and English
+Target Languages: English, Hindi (core, committed scope); Marathi (tiered stretch goal — smaller
+dataset, lower priority, see Section 15)
+Marathi status (v2.3): Reinstated as a scoped-down stretch deliverable — approximately 800–1,200
+annotated claims (versus 3,000 for English/Hindi), explicitly ranked below the core English/Hindi goals and
+the ablation study in priority. If Weeks 8–11 fall behind schedule, Marathi work is the first thing cut back
+further toward pure future-work status, without renegotiation. The architecture (XLM-R/MuRIL embeddings,
+CMHSA formula) already supports Marathi natively, which is what makes this tiered approach realistic
+rather than aspirational.
+Tamil status: Out of scope. Noted only as a longer-term extension possibility beyond this capstone.
+Team Size: 4 members
+Duration: 4 months (~17 weeks) — revised from original 6-month plan
+Publication Target: IEEE Access, or a student/workshop track affiliated with ACL/EMNLP/NAACL
+Patent Target: Indian Provisional Patent — Indian Patent Office (Form 2)
+4.2 What the System Does
+Given any LLM-generated text in English or Hindi (Marathi planned as future extension), the system: 1. Extracts
+atomic factual claims from the text (Claim Extractor module). 2. Embeds each claim using cross-lingual
+multilingual embeddings (XLM-R primary, MuRIL fallback for Hindi). 3. Retrieves top-k relevant knowledge
+passages from a multilingual FAISS vector store, plus Wikidata SPARQL triples. 4. Computes a composite
+hallucination score per claim using NLI + semantic similarity + KG grounding (CMHSA). 5. Returns a structured
+JSON report with per-claim verdicts: Verified / Uncertain / Hallucinated. 6. Visualises results on an interactive
+Streamlit dashboard with claim-level highlighting.
+4.3 Dual Purpose
+Research Paper Patent Application
+New hallucination benchmark dataset in Hindi + English with
+3,000+ claim-level annotations, combining semantic + NLI + KG
+labels not present together in any existing dataset
+Novel Composite Multilingual Hallucination Scoring Algorithm
+(CMHSA) fusing three verification signals, explicitly including
+knowledge-graph grounding
+Evaluation against 5 baselines (SelfCheckGPT, FActScore-style,
+TRUE-style NLI scorer, a FactKG-style KG-only verifier, and a
+MultiHal-style separate-metrics reporter) showing statistically
+significant improvement (p < 0.05)
+Real-time claim-level scoring pipeline with cross-lingual
+knowledge-graph retrieval
+Ablation study isolating the individual contribution of semantic,
+NLI, and KG components — proving KG grounding adds value
+beyond semantic+NLI alone
+Multilingual extensibility framework, demonstrated concretely
+via the tiered Marathi dataset rather than only claimed in theory
+5. Goals & Success Metrics
+===== PAGE 5 =====
+5.1 Primary Goals
+Achieve F1 score ≥ 0.78 (English), ≥ 0.72 (Hindi) on claim-level hallucination detection.
+Create and publicly release a benchmark dataset of ≥ 3,000 annotated claim-level examples across English
+and Hindi.
+(Tiered stretch goal, ranked below the above) Build a smaller Marathi dataset of ≥ 800 annotated
+claims (target 1,200) and report CMHSA performance on it — explicitly a secondary result, not equal-weight
+with English/Hindi.
+Demonstrate statistically significant improvement over at least 3 of 5 baselines (p < 0.05) — see updated
+baseline list in Section 4.3.
+Run an ablation study proving the knowledge-graph component contributes measurable improvement over
+semantic+NLI alone — this is the single most important experiment for both the paper and the patent,
+since it is the crux of the novelty claim.
+Prepare a Provisional Indian Patent draft by Week 14.
+Submit a full research paper draft for faculty review by Week 14, with external submission to follow shortly
+after.
+5.2 Success Metrics Table
+Metric Minimum Target Stretch Target
+Hallucination Detection F1 (English) 0.78 0.85
+Hallucination Detection F1 (Hindi) 0.72 0.80
+Hallucination Detection F1 (Marathi,
+stretch)
+0.60 0.70
+Dataset Size — English + Hindi (annotated
+claims)
+3,000 5,000
+Dataset Size — Marathi (stretch,
+annotated claims)
+800 1,200
+Inter-Annotator Agreement (Cohen’s κ) 0.65 (revised down from 0.70, based on
+Mu-SHROOM’s documented annotator
+disagreement even at span level)
+0.75
+API Response Latency (per claim) < 500ms < 200ms
+Baseline Models Outperformed 3 of 5 5 of 5
+KG-Ablation Improvement (F1 delta
+vs. semantic+NLI only)
+≥ +0.03 ≥ +0.06
+Paper Submission (draft ready for faculty
+review)
+Week 14 Week 12
+6. Stakeholders & Team Roles
+6.1 Team Structure
+Member Role Title Primary Responsibilities Secondary
+Member 1 ML / Model Lead Cross-lingual embeddings (XLM￾R/MuRIL), CMHSA scoring
+algorithm and weight-learning,
+model training & the 5-baseline
+comparison
+Experiment tracking (W&B)
+Member 2 Data & Annotation Lead Dataset collection, English/Hindi
+annotation pipeline
+management, inter-annotator
+agreement (IAA), coordinating
+the Marathi stretch-dataset
+annotator
+Wikidata SPARQL connector,
+KG_conf coverage testing
+Member 3 Backend / Systems Engineer FastAPI endpoint, FAISS
+retrieval, ablation-mode API
+toggle, deployment (Docker),
+GitHub CI/CD
+Streamlit dashboard build
+(handed off from Member 4,
+see note below)
+Member 4 Research & Documentation
+Lead
+Literature review (all 5
+categories
+Presentation & poster design
+===== PAGE 6 =====
+incl. MultiHal/FactKG/KGR
+differentiation), paper writing,
+patent draft, synopsis/report
+writing
+v2.3 rebalancing note: In v2.2, Member 4 carried both the writing workload (literature review, paper, patent) and the
+Streamlit dashboard build — two quite different skill sets under time pressure. The dashboard has been moved to
+Member 3 (Backend/Systems), who is already building the API it depends on, so Member 4 can focus fully on the writing￾heavy deliverables that carry real risk if rushed (patent claim precision, prior-art differentiation).
+6.2 External Stakeholders
+Faculty Mentor (Dr. S. R. Gupta) — Technical guidance, paper co-authorship, patent co-filing support.
+Industry Mentor (if applicable) — Real-world use case validation, deployment feedback.
+Annotators — 2–3 domain experts fluent in Hindi (core) for dataset labelling and inter-annotator
+agreement, plus at least 1 Marathi-fluent annotator recruited within the first 2–3 weeks specifically to
+support the tiered Marathi stretch dataset. Recruiting this Marathi annotator early is a Phase 1 priority, not
+a later add-on.
+Target Users — Developers, researchers, and organisations deploying LLMs in critical domains.
+6.3 Weekly Cadence
+Every Monday — Team sync (30 min): blockers, task status, next steps.
+Every Friday — Progress log commit to shared Notion workspace.
+Monthly — Full demo to faculty mentor with a written progress report.
+7. System Architecture
+7.1 High-Level Pipeline
+Stage Module What It Does Output
+① Claim Extractor Parses LLM-generated text
+using dependency parsing and
+coreference resolution to
+isolate atomic verifiable claims
+List of atomic claims
+② Cross-lingual Embedder Encodes each claim using XLM￾R / MuRIL to obtain language￾agnostic dense vector
+representations
+Claim embedding vectors
+③ Knowledge Retriever Performs ANN search over
+multilingual FAISS index
+(Wikipedia + Wikidata) to fetch
+top-k supporting passages
+Top-k evidence passages
+④ CMHSA Scorer Computes composite score:
+HalluScore = α·SemSim + β·NLI
++ γ·KG_conf using trained, per￾language weights
+Per-claim HalluScore (0–1)
+⑤ Output & Visualiser Structures results into JSON
+report and renders interactive
+claim-level dashboard with
+colour-coded verdicts
+Dashboard + API JSON
+7.2 The CMHSA Scoring Formula (Patent Core)
+HalluScore(c) = α · SemSim(c, E) + β · NLI_prob(c, E) + γ · KG_conf(c, G)
+Where: - SemSim(c, E) — Cosine similarity between claim embedding and top-k evidence embeddings (0–1). -
+NLI_prob(c, E) — Entailment probability from a fine-tuned DeBERTa-v3 NLI model, extended to Hindi via
+IndicXNLI fine-tuning (0–1). - KG_conf(c, G) — Knowledge-graph confidence from Wikidata SPARQL triple
+verification (0–1). Wikidata’s Hindi-language entity and label coverage is narrower than English; the team should
+budget time to test fallback behaviour (e.g., matching against English-labelled entities when a Hindi label is
+missing) and document this limitation explicitly. (This same gap is expected to be more severe for Marathi,
+reinforcing the decision to treat it as future work.) - α, β, γ — Language-specific trained weights, learned via a
+===== PAGE 7 =====
+softmax-constrained linear model (parameterized so α + β + γ = 1 by construction) fit on annotated training
+data by minimizing cross-entropy against gold verdict labels — not plain unconstrained logistic regression, which
+does not naturally enforce this constraint. - Threshold: Score < 0.35 = Hallucinated | 0.35–0.65 = Uncertain | >
+0.65 = Verified.
+7.3 Architecture Diagram (Textual)
+[User Input: LLM Text in EN/HI/MR]
+|
+v
+[① Claim Extractor] --> Atomic Claims List
+|
+v
+[② Cross-lingual Embedder: XLM-R / MuRIL]
+|
++----+----+
+v v
+[FAISS Index] [Wikidata SPARQL]
+(Wikipedia) (KG Triples)
++----+----+
+v
+[④ CMHSA Scorer: α·Sem + β·NLI + γ·KG]
+|
+v
+[⑤ Output: JSON + Streamlit Dashboard]
+✅ Verified | ⚠ Uncertain | ❌ Hallucinated
+8. Core Functional Requirements
+FR-01: Claim Extraction Module - SHALL accept plain text input in English or Hindi (up to 2,000 words). -
+SHALL use dependency parsing (spaCy + IndicNLP) to extract atomic factual claims. - SHALL resolve
+coreferences before extraction (e.g., replace pronouns with entity names). - SHALL output a structured list of
+claims with character-level span offsets in the original text. - SHALL handle a minimum of 50 claims per
+document without performance degradation.
+FR-02: Cross-Lingual Embedder - SHALL embed claims using XLM-R-large as the primary model (768-dim
+vectors). - SHALL use MuRIL as a fallback model for Hindi-specific inputs, particularly transliterated (Latin-script)
+text. - SHALL support batch embedding of up to 128 claims per forward pass. - SHALL normalise embeddings to
+unit vectors before similarity computation.
+FR-03: Multilingual Knowledge Retriever - SHALL maintain a FAISS IVF index of multilingual Wikipedia
+passages, sized appropriately per language rather than a single blanket target — English Wikipedia alone can
+supply several million passages, but Hindi and Marathi Wikipedia are considerably smaller, so the realistic
+combined target is expected to be lower (to be confirmed during Phase 1 corpus profiling) rather than assumed
+at 5 million. - SHALL retrieve top-10 candidate passages per claim within 100ms. - SHALL query the Wikidata
+SPARQL API for entity-linked triple verification, with an explicit fallback to English-labelled entities when a Hindi
+label is unavailable. - SHALL support index updates without a full rebuild (incremental indexing). - SHALL cache
+SPARQL query results with a 24-hour TTL to reduce API calls.
+FR-04: CMHSA Scoring Engine (Core) - SHALL compute three sub-scores per claim: SemSim, NLI_prob,
+KG_conf. - SHALL apply language-specific weights (α, β, γ) learned during training. - SHALL output a final
+HalluScore in [0.0, 1.0] with a confidence interval. - SHALL classify claims into three verdict tiers: Verified
+(>0.65), Uncertain (0.35–0.65), Hallucinated (<0.35). - SHALL support custom threshold configuration via API
+parameters. - SHALL support an ablation mode (toggle individual signals on/off) to reproduce the paper’s
+ablation study directly from the API.
+FR-05: REST API (FastAPI) - SHALL expose a POST /detect endpoint accepting JSON with fields: text (str),
+language (str), threshold (float, optional). - SHALL return JSON with: claims (list), scores (list), verdicts (list),
+overall_score (float), processing_time_ms (int). - SHALL include API key authentication and rate limiting (100
+req/min per key). - SHALL provide Swagger/OpenAPI documentation at /docs. - SHALL return HTTP 422 with a
+===== PAGE 8 =====
+descriptive error for invalid inputs.
+FR-06: Web Demo Dashboard - SHALL provide a Streamlit-based web interface accessible at localhost:8501. -
+SHALL highlight hallucinated claims in RED, uncertain in AMBER, verified in GREEN within the original text. -
+SHALL display a bar chart of HalluScore distributions across all claims. - SHALL allow users to export results as
+CSV or JSON. - SHALL support file upload (.txt, .pdf) in addition to text pasting.
+FR-07: Benchmark Dataset - SHALL contain ≥ 3,000 claim-level examples across English and Hindi. - SHALL
+be balanced: ~40% Hallucinated, ~30% Uncertain, ~30% Verified. - SHALL include inter-annotator agreement
+scores (target κ ≥ 0.65, stretch ≥ 0.75). - SHALL be released publicly on HuggingFace Datasets under CC-BY-4.0
+license, with an explicit data card describing the combined semantic+NLI+KG annotation scheme.
+9. Non-Functional Requirements
+Category Requirement Target
+Performance End-to-end latency per document (10
+claims)
+< 3 seconds on GPU
+Performance FAISS retrieval latency per claim < 100ms
+Scalability Concurrent API requests supported ≥ 20 simultaneous
+Accuracy F1 score on English benchmark ≥ 0.78
+Accuracy F1 score on Hindi benchmark ≥ 0.72
+Reliability API uptime during demo period ≥ 99%
+Reproducibility All experiments reproducible with fixed
+random seeds
+100% deterministic
+Documentation GitHub README with setup, usage, and API
+docs
+Complete
+Code Quality Test coverage for core modules ≥ 70%
+Portability Docker container for one-command
+deployment
+Required
+10. Technology Stack (with Concrete Hardware Specs)
+Layer Component Technology / Library Purpose
+Language Runtime Python 3.10+ Primary development language
+ML Framework Deep Learning PyTorch 2.0 Model training & inference
+NLP Models Cross-lingual Embedder XLM-R-large (HuggingFace) Multilingual claim embedding
+NLP Models Indian Language Model MuRIL (Google) Hindi specialisation
+NLP Models NLI Scorer DeBERTa-v3-large fine-tuned on
+MNLI + IndicXNLI
+Entailment probability
+NLP Models Claim Extractor spaCy 3.x + IndicNLP Dependency parsing, NER
+Retrieval Vector Store FAISS (IVF flat index) ANN similarity search
+Knowledge Graph Fact Verification Wikidata SPARQL API Entity triple lookup
+Backend API Server FastAPI + Uvicorn REST API & serving
+Frontend Demo Dashboard Streamlit Interactive web UI
+Experiment Tracking Logging Weights & Biases (W&B) Metrics, curves, artefacts
+Data Versioning Dataset Management DVC + Git LFS Reproducible data pipelines
+Containerisation Deployment Docker + Docker Compose One-command setup
+Version Control Code GitHub (private → public post￾patent)
+Source control & CI
+10.1 Concrete Hardware Requirements (New in v2.0)
+For training / fine-tuning (NLI model, weight learning): - GPU: minimum 1× NVIDIA T4 (16GB VRAM) —
+available via Google Colab Pro+; recommended 1× NVIDIA A100 (40GB) or V100 (16–32GB) via AWS EC2
+g4dn.xlarge/p3.2xlarge for faster fine-tuning of DeBERTa-v3-large. - RAM: ≥ 32GB system RAM recommended for
+FAISS index construction over 5M+ passages. - Storage: ≥ 100GB free disk space (Wikipedia dump +
+embeddings + FAISS index + model checkpoints; the FAISS IVF index alone over 5M 768-dim vectors is roughly
+15–20GB).
+For inference / API serving (demo/deployment): - CPU-only inference is feasible for the API layer (FastAPI +
+===== PAGE 9 =====
+FAISS search) at reduced throughput; GPU recommended for real-time NLI scoring to meet the <500ms latency
+target. - Minimum: 1× NVIDIA T4 or equivalent, 16GB RAM, 4 vCPUs for the demo deployment.
+For annotation team: - Standard laptops/desktops sufficient; annotation interface should be a lightweight web
+tool (e.g., Label Studio) requiring no GPU.
+11. Dataset Strategy
+11.1 Existing Datasets (Baseline & Training)
+Dataset Language Size Use in This Project
+TruthfulQA English 817 questions Baseline benchmark evaluation
+HaluEval English 10,000 examples Hallucination classifier pre￾training
+FActScore Benchmark English ~500 biographies Fine-grained scoring
+comparison
+IndicQA Hindi, Bengali ~6,000 QA pairs Indian language factual queries
+IndicXNLI Hindi + 10 Indian languages Translated XNLI scale Fine-tuning NLI_prob
+component for Hindi
+Mu-SHROOM (SemEval-2025) 14 languages incl. Hindi Shared-task scale Cross-comparison baseline;
+NOT used as sole novelty claim
+Multilingual Wikipedia 100+ languages Billions of tokens FAISS knowledge base
+FEVER English 185,445 claims Fact verification pre-training
+XQuAD Hindi + 10 others 1,190 paragraphs Cross-lingual QA evaluation
+MahaSQuAD / IndicSQuAD Marathi SQuAD-scale Accelerates Marathi query
+generation for the tiered stretch
+dataset (Section 15.1)
+L3Cube-MahaCorpus Marathi ~24.8M sentences Seeds the Marathi portion of
+the FAISS index
+11.2 Your Original Dataset (Research Contribution)
+Creating this dataset is the most important research contribution. Without it, the claim-level, KG-grounded
+novelty claim is unsubstantiated.
+Step 1 — Query Generation: Create 1,500+ factual questions in English and Hindi covering Healthcare,
+History, Science, Government, and Sports domains. (Tiered stretch, Phase 4): an additional 400-600
+Marathi questions, substantially accelerated by drawing from MahaSQuAD/IndicSQuAD rather than writing
+from scratch.
+Step 2 — LLM Response Generation: Feed queries to GPT-4, Llama 3, and Gemini. Each generates a
+multi-sentence response = potential hallucinations.
+Step 3 — Claim Decomposition: Use the Claim Extractor module to decompose responses into atomic
+claims (~3,000+ claims total).
+Step 4 — Expert Annotation: 2–3 annotators label each claim as Verified / Uncertain / Hallucinated, with
+an evidence URL.
+Step 5 — Pilot Round (New in v2.0): Before full-scale annotation, run a 50–100 claim pilot batch
+specifically to test annotator agreement and refine guidelines — informed directly by Mu-SHROOM’s
+documented annotator disagreement on span boundaries.
+Step 6 — IAA Calculation: Compute Cohen’s Kappa between annotator pairs. Resolve disagreements by
+majority vote or adjudication.
+Step 7 — Dataset Release: Upload to HuggingFace Datasets under CC-BY-4.0, with a data card and
+paper citation, explicitly noting the combined semantic+NLI+KG claim-level annotation scheme as the
+dataset’s key distinguishing feature.
+11.3 Annotation Guidelines Summary
+Verified: Claim is factually accurate and confirmed by ≥ 2 independent sources.
+Hallucinated: Claim contains specific false or fabricated information contradicted by sources.
+Uncertain: Claim cannot be confirmed or denied due to ambiguity, opinion, or lack of sources.
+===== PAGE 10 =====
+12. Development Roadmap (4 Months / ~17 Weeks)
+Timeline (v2.3): Confirmed as a full 4 months (~17 weeks). Critically, annotation now runs in parallel with pipeline
+development starting in Phase 2, rather than being crammed entirely into one later phase — this was flagged as the
+most fragile part of the v2.2 roadmap during strict review, since stacking full annotation + baselines + ablation into a
+single 4-week phase was unrealistic. Marathi’s tiered stretch dataset is explicitly sequenced after the English/Hindi
+dataset is on track, so it never competes with the core deliverables for time.
+Phase Weeks Key Deliverables Owner
+Phase 1 — Foundation Weeks 1–3 Literature review finalized
+(incl. MultiHal/FactKG/KGR
+differentiation), GitHub repo set
+up, baseline cosine-similarity
+system running, claim extractor
+(English) built, dev environment
+configured, Marathi-fluent
+annotator recruited
+All Members
+Phase 2 — Core Build +
+Annotation Start
+Weeks 4–8 XLM-R + MuRIL embedder
+integrated, FAISS index built
+(sized per Phase 1 corpus
+profiling), NLI scorer connected
+(DeBERTa-v3 + IndicXNLI fine￾tune), CMHSA v1 formula
+implemented with softmax￾constrained weight learning,
+pilot annotation (50–100
+claims) run and guidelines
+refined, full-scale
+English/Hindi annotation
+begins in parallel
+M1 + M2 + M3
+Phase 3 — Dataset Completion
+& Experiments
+Weeks 9–12 English/Hindi annotation
+completed (3,000 claims), end￾to-end pipeline complete, 5-
+baseline comparison
+implemented (prioritize FactKG￾style and TRUE-style first if
+time-constrained), ablation
+study run (semantic
+vs. semantic+NLI vs. full
+CMHSA — non-negotiable core
+experiment), IAA calculated
+M1 + M2
+Phase 4 — Marathi Stretch Tier Weeks 12–13 (only if Phase 3 is
+on schedule)
+Marathi dataset annotation
+(800–1,200 claims) using
+guidelines refined from the
+Hindi pilot, CMHSA run on
+Marathi subset, results reported
+as a clearly-labeled
+secondary/stretch result
+M2 (Marathi annotator) + M1
+Phase 5 — Paper Writing &
+Patent Draft
+Weeks 13–15 Full paper draft, related-work
+section differentiating from Mu￾SHROOM/SHROOM￾CAP/MultiHal/FactKG/KGR,
+provisional patent draft
+prepared, faculty mentor
+review
+M4 + All
+Phase 6 — Final Polish &
+Submission
+Weeks 16–17 API hardened, dashboard polish
+(Member 3), Docker
+deployment, paper submitted,
+dataset(s) released on
+HuggingFace, final report and
+viva/demo preparation
+All Members
+If time runs short, drop in this order: (1) Marathi stretch tier entirely — reverts cleanly to pure future-work
+status, no core deliverable lost, (2) stretch dataset size beyond 3,000 for English/Hindi, (3) 5th baseline
+comparison (keep at minimum 3), (4) Docker containerization polish, (5) dashboard CSV/PDF export niceties.
+Never drop: the ablation study — it is the single experiment your entire novelty claim depends on.
+===== PAGE 11 =====
+13. Research Paper Strategy
+Target venue: IEEE Access (open access, faster turnaround, receptive to applied NLP systems) or a
+workshop track affiliated with ACL/EMNLP/NAACL suited to student capstone submissions.
+Related-work framing: Must explicitly position against Mu-SHROOM, SHROOM-CAP, MultiHal, FactKG, and
+KGR as the closest prior art – crediting their contributions while clearly stating the paper’s defensible
+novelty (claim-level, single-fused semantic+NLI+KG score, with a real-time API, for Hindi as the core
+language and Marathi as a demonstrated tiered extension).
+Core experiment: The ablation study (semantic-only vs. semantic+NLI vs. full CMHSA) is the paper’s
+central empirical claim and should be prioritized over any other experiment if time runs short.
+14. Patent Strategy
+Target: Indian Provisional Patent Application (Form 2), Indian Patent Office.
+Patentable core: The specific fusion mechanism of CMHSA (the weighted combination of semantic
+similarity, NLI entailment, and knowledge-graph confidence into a single claim-level score, with language￾specific learned weights) — not the individual components (XLM-R, MuRIL, DeBERTa, Wikidata are all pre￾existing, non-patentable building blocks).
+Recommendation: Keep the exact weight-learning methodology and threshold-calibration approach as
+the confidential “specific implementation” detail in the provisional filing, while the research paper can
+describe the general architecture more openly.
+15. Risk Assessment & Mitigation
+Risk Likelihood Impact Mitigation
+Wikidata’s Hindi entity/label
+coverage is sparser than
+English, reducing reliable
+KG_conf scores
+Medium Medium-High (affects core
+novelty signal)
+Test fallback-to-English-label
+matching early (Month 2);
+document coverage gaps
+transparently as a limitation
+rather than hiding them
+Inter-annotator agreement falls
+below target κ
+Medium Medium Run pilot annotation round first
+(Month 2); refine guidelines
+before full-scale annotation
+3,000-claim dataset proves too
+small for robust results
+Low-Medium Medium Follow SHROOM-CAP’s
+precedent of combining
+multiple existing datasets if
+native data proves insufficient
+Team underestimates compute
+needs for DeBERTa-v3-large
+fine-tuning
+Medium Medium Reserve AWS/Colab Pro+
+credits early; have a smaller￾model (DeBERTa-v3-base)
+fallback plan
+Novelty claim challenged by
+reviewers/patent examiner due
+to Mu-SHROOM/SHROOM-CAP
+overlap
+Medium High Explicit, honest positioning
+(Section 3) prepared in
+advance; ablation study as
+primary evidence of genuine
+contribution
+4-month timeline slippage Medium Medium Bi-weekly faculty check-ins;
+prioritize the ablation study and
+the English/Hindi dataset over
+stretch goals (Marathi tier,
+Tamil, 5,000-claim dataset) if
+behind schedule
+Ablation study shows KG
+grounding does not
+meaningfully improve results
+over semantic+NLI alone
+Medium Critical (undermines core
+novelty claim)
+Pre-register this as a possible
+outcome rather than assuming
+success; if it occurs, report it
+honestly as a scientific finding
+(a well-documented negative
+result is still publishable) and
+shift patent claim emphasis
+toward the fusion methodology
+and real-time claim-level
+architecture itself, rather than
+===== PAGE 12 =====
+KG-specific performance gains
+Marathi annotator not recruited
+in time (Phase 1)
+Medium Low (affects only the stretch
+tier, not core deliverables)
+Marathi tier is explicitly the first
+thing dropped if this slips —
+core English/Hindi deliverables
+are unaffected by design
+AWS/GPU compute costs
+exceed available budget
+Low-Medium Medium Confirm available compute
+budget (department funding,
+personal, or free-tier Colab
+Pro+) during Phase 1;
+DeBERTa-v3-base fallback
+reduces cost if needed
+15.1 Marathi: Tiered Stretch-Goal Plan (Revised in v2.3)
+Marathi is now a committed but explicitly lower-priority tier, not a core deliverable and not pure future￾work — the distinction matters: unlike v2.1/v2.2, the team will attempt real annotation and evaluation this cycle,
+sequenced so it never displaces the English/Hindi core goals or the ablation study.
+Reusable components: XLM-R already covers Marathi out of the box; MuRIL was explicitly pre-trained on
+Marathi among its 17 languages, so the embedding layer needs no architectural change.
+Reusable text/QA resources: L3Cube-MahaCorpus (≈24.8M Marathi sentences) can seed the Marathi
+portion of the FAISS index; MahaSQuAD and IndicSQuAD provide existing Marathi factual QA pairs that can
+accelerate query generation instead of writing 500+ Marathi questions from scratch; IndicXNLI already
+includes Marathi entailment data for NLI_prob fine-tuning.
+Scope for this cycle: 800–1,200 annotated claims (vs. 3,000 for English/Hindi), using annotation
+guidelines already refined from the Hindi pilot round (Phase 2) rather than developing separate guidelines
+from zero. One dedicated Marathi-fluent annotator, recruited in Phase 1.
+What happens if time runs short: Per Section 12’s drop order, the Marathi tier is the first thing cut back
+— reverting cleanly to pure future-work status (as described in earlier PRD versions) with zero impact on
+core deliverables. This is a deliberate design choice, not a risk being hidden.
+Recommended framing for the synopsis and paper: Present Marathi results as a clearly-labeled
+secondary/stretch finding — e.g., “a smaller-scale Marathi evaluation, included as a lower-priority
+extension” — rather than claiming full parity with the English/Hindi benchmark. This is both intellectually
+honest and strengthens the “extensibility” argument in the patent filing (Section 14), since it demonstrates
+the architecture generalizing in practice, not just in theory.
+16. Ethical & Responsible-AI Considerations
+Domain sensitivity: Since target use cases include healthcare and government-advisory content, the
+team should avoid using real, potentially sensitive medical or legal queries during dataset construction
+without appropriate care; synthetic/generic factual queries are preferred over queries mimicking real
+patient or citizen scenarios.
+Dataset bias: Annotators’ own linguistic and regional backgrounds may influence what counts as
+“common knowledge” in Hindi-language contexts — guidelines should be reviewed for cultural neutrality.
+Transparency in limitations: Any published paper or patent filing should transparently state the KG
+coverage gap between English and Hindi (and the likely larger gap for Marathi), and should clearly label
+Marathi results as a smaller-scale, lower-priority tier rather than implying full parity with the English/Hindi
+benchmark.
+Dual-use consideration: A hallucination detector could in principle be used to identify weaknesses in a
+competitor’s LLM for adversarial purposes; the team should frame the tool’s intended use as
+defensive/auditing, consistent with its healthcare/governance motivation.
+17. Appendix: Key Reference Papers (Updated — Now 27 Papers Across 5
+Categories)
+A. Foundational Hallucination Detection: FEVER (Thorne et al., 2018), FActScore (Min et al., 2023),
+SelfCheckGPT (Manakul et al., 2023), TruthfulQA (Lin et al., 2022), HaluEval (Li et al., 2023), TRUE (Honovich et
+al., 2022), Huang et al. survey (2024/25), Hu et al. Knowledge-Centric Detection (2024), ANAH (Ji et al., 2024),
+Mishra et al. Fine-grained Editing (2024), Su et al. Internal-States Detection (2024).
+===== PAGE 13 =====
+B. Multilingual Hallucination Detection (closest language-coverage prior art): Mu-SHROOM / SemEval￾2025 Task 3 (Vázquez et al., 2025) and system papers (MSA, HausaNLP, Hallucination Detectives); SHROOM-CAP
+(2025).
+C. Cross-lingual Embeddings & Indic Models: XLM-R (Conneau et al., 2020), MuRIL (Khanuja et al., 2021),
+IndicBERT (Kakwani et al., 2020), IndicSBERT (Deode et al., 2023), IndicXNLI (Aggarwal et al., 2022).
+D. Fact Verification / RAG: FEVER (Thorne et al., 2018), Retrieval-Augmented Generation (Lewis et al., 2020),
+TRUE (Honovich et al., 2022).
+E. Knowledge-Graph-Grounded Hallucination Detection (NEW — most critical category, tests the
+core novelty claim directly): - MultiHal (Lavrinovics et al., 2025) — MultiHal: Multilingual Dataset for
+Knowledge-Graph Grounded Evaluation of LLM Hallucinations, arXiv 2505.14101. Closest prior art identified
+to date. Multilingual (Spanish, French, Italian, Portuguese, German — no Hindi), Wikidata-grounded, reports
+semantic similarity + NLI + hallucination-detection improvements from KG-RAG as separate evaluation metrics.
+Critical distinction: MultiHal is an evaluation benchmark measuring these signals separately; SatyaScore
+fuses them into one deployable, claim-level confidence score with a real-time API, and covers Hindi,
+which MultiHal does not. - Agrawal et al. (2024) — Can Knowledge Graphs Reduce Hallucinations in LLMs?: A
+Survey, NAACL 2024. Direct survey on this exact research question. - Kim et al. (2023) — FactKG: Fact
+Verification via Reasoning on Knowledge Graphs, ACL 2023. Close architectural cousin (KG-based reasoning for
+verification); no fusion with NLI/semantic signals, no Hindi coverage. - Guan et al. (2024) — KGR —
+hallucination detection via dedicated claim extraction, fact selection, and verification modules. Structurally close
+to SatyaScore’s pipeline shape; requires explicit differentiation in the Literature Survey (see note below), not just
+a citation. - Lavrinovics et al. (2025) — Knowledge Graphs, Large Language Models, and Hallucinations: An
+NLP Perspective, Journal of Web Semantics. Broader survey, useful for framing the Literature Survey’s opening
+context on KG+LLM hallucination research.
+Note for Literature Survey drafting: Category E papers must be addressed head-on, not folded in passively. MultiHal,
+FactKG, and KGR are collectively the closest work to SatyaScore found in this review. The differentiation to state
+explicitly, each time one of these is cited: SatyaScore is the first to combine claim-level decomposition + a single fused
+(not separately-reported) semantic+NLI+KG score + a real-time deployable API + Hindi-language coverage, in one
+general-domain system. No reviewed paper — including this new category — combines all four of these together.
+End of PRD v2.3. This document is the authoritative project reference going forward and should be updated as
+findings evolve — particularly after the Month 2 Wikidata-Hindi-coverage test and the Month 2 pilot annotation
+round, both of which may require further scope adjustments. Marathi extension should be revisited only after
+core English/Hindi goals (Section 5) are secured. Category E (KG-grounded hallucination detection) was added
+after discovering MultiHal, FactKG, and KGR as closer prior art than previously known — the novelty claim in
+Section 3 remains valid but must now explicitly differentiate from these three works wherever it is stated, in the
+synopsis, paper, and patent filing alike.PAGES: 13

@@ -1,0 +1,17 @@
+.venv/
+_archive/
+.git/
+.pytest_cache/
+__pycache__/
+**/__pycache__/
+*.pyc
+iaa/
+figures/
+results/
+tests/
+# large/irrelevant data — the API only needs corpus_*.json/npy + weights_*.json (copied explicitly)
+*.csv
+raw_responses.json
+evidence_corpus_cache.json
+prd_extracted.txt
+*.ipynb

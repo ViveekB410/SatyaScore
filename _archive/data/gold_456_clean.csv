@@ -1,0 +1,1 @@
+claim_id,source_query_id,domain,language,source_llm,claim_text,sem_sim,nli_prob,kg_conf,gold_verdict,ai_verdict,gold_reasoning,evidence_url,review_notes,gold_source

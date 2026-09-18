@@ -28,6 +28,7 @@ from collections import defaultdict
 from typing import Literal
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from starlette.middleware.cors import CORSMiddleware
 
@@ -78,6 +79,9 @@ class DetectRequest(BaseModel):
     )
     active_signals: list[Literal["semsim", "nli", "kg"]] | None = Field(
         None, description="Ablation mode: restrict scoring to these signals only"
+    )
+    include_timings: bool = Field(
+        False, description="If true, include per-stage timings_ms in the response (default off)"
     )
 
 
@@ -295,6 +299,20 @@ def load_starter_corpus():
         print("[api] WARNING: corpus failed to load — /detect will return 503.")
 
 
+@app.on_event("startup")
+def _warmup_models() -> None:
+    """Task 3: force the NLI model + embedder to load at startup so the first
+    /detect request doesn't pay the lazy ~500MB load. Registered after the
+    corpus-loading hook, so it runs once the corpus is ready."""
+    import time as _t
+    t0 = _t.perf_counter()
+    _nli_scorer._ensure_loaded()
+    print(f"[api] NLI model warmed ({_nli_scorer.device}) in {_t.perf_counter()-t0:.1f}s", flush=True)
+    t1 = _t.perf_counter()
+    _embedder.embed(["_warmup"], ["warmup"], ["en"])
+    print(f"[api] embedder warmed ({_embedder.device}) in {_t.perf_counter()-t1:.1f}s", flush=True)
+
+
 @app.post("/detect", response_model=DetectResponse)
 def detect(request: DetectRequest, api_key: str = Depends(require_api_key)) -> DetectResponse:
     if _retriever._index is None or len(_retriever) == 0:
@@ -330,11 +348,15 @@ def detect(request: DetectRequest, api_key: str = Depends(require_api_key)) -> D
         for text, score in zip(result.claims, result.scores)
     ]
 
-    return DetectResponse(
+    response = DetectResponse(
         claims=claims,
         overall_score=result.overall_score,
         processing_time_ms=result.processing_time_ms,
     )
+    if request.include_timings:
+        # Opt-in only, so the default response is byte-identical for existing consumers.
+        return JSONResponse(content={**response.model_dump(), "timings_ms": result.timings_ms})
+    return response
 
 
 @app.get("/health")

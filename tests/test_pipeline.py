@@ -160,3 +160,32 @@ def test_empty_extraction_raises_value_error():
     pipeline = DetectionPipeline(embedder=embedder, retriever=retriever, scorer=_real_scorer())
     with pytest.raises(ValueError):
         pipeline.run("", language="en")
+
+
+def test_cross_claim_nli_is_a_single_batched_call():
+    # Task 1: NLI must run ONCE per request over all claims' pairs, not once per claim.
+    nli_scorer = MagicMock()
+    r = MagicMock()
+    r.entailment_prob = 0.8
+    r.contradiction_prob = 0.1
+    nli_scorer.score_batch.return_value = [r, r]  # 2 claims x 1 passage = 2 pairs
+
+    claim_extractor = MagicMock()
+    c0, c1 = MagicMock(), MagicMock()
+    c0.text, c1.text = "The sky is blue.", "Grass is green."
+    claim_extractor.extract.return_value = [c0, c1]
+
+    pipeline = DetectionPipeline(
+        embedder=_mock_embedder(2),
+        retriever=_mock_retriever(score=0.9),
+        scorer=_real_scorer(),
+        claim_extractor=claim_extractor,
+        nli_scorer=nli_scorer,
+    )
+    result = pipeline.run("The sky is blue. Grass is green.", language="en")
+
+    assert len(result.scores) == 2
+    nli_scorer.score_batch.assert_called_once()  # exactly ONE batched NLI call for the document
+    _, kwargs = nli_scorer.score_batch.call_args
+    assert len(kwargs["premises"]) == 2  # the single call carried pairs from BOTH claims
+    assert "total" in result.timings_ms and result.timings_ms["total"] >= 0  # Task 2 timings present

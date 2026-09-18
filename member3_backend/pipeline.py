@@ -36,7 +36,8 @@ from __future__ import annotations
 
 import re
 import time
-from dataclasses import dataclass
+from collections import defaultdict
+from dataclasses import dataclass, field
 from typing import Literal
 
 from member1_model.cmhsa import CMHSAScorer, ClaimScore, ClaimSubScores, Verdict
@@ -91,6 +92,8 @@ class PipelineResult:
     sub_scores: list[ClaimSubScores]  # raw per-signal values, e.g. for dataset export
     overall_score: float
     processing_time_ms: float
+    # Per-stage timings (ms): claim_extraction, embedding, retrieval, nli, kg, fusion, total.
+    timings_ms: dict[str, float] = field(default_factory=dict)
 
 
 class DetectionPipeline:
@@ -127,89 +130,97 @@ class DetectionPipeline:
         SemSim-only, {"semsim", "nli"} to test without KG, etc. Defaults to
         every signal this pipeline instance is actually configured with.
         """
-        start = time.perf_counter()
+        timings = {k: 0.0 for k in
+                   ("claim_extraction", "embedding", "retrieval", "nli", "kg", "fusion", "total")}
+        t_start = time.perf_counter()
 
+        t = time.perf_counter()
         claim_texts = self._extract_claims(text, language)
+        timings["claim_extraction"] = (time.perf_counter() - t) * 1000
         if not claim_texts:
             raise ValueError("No claims could be extracted from the input text")
 
         claim_ids = [f"claim_{i}" for i in range(len(claim_texts))]
         languages = [language] * len(claim_texts)
 
+        t = time.perf_counter()
         embedding_result = self.embedder.embed(claim_ids, claim_texts, languages)
+        timings["embedding"] = (time.perf_counter() - t) * 1000
 
         enabled = active_signals or self._default_enabled_signals()
 
-        sub_scores_list = []
+        # --- Phase A: retrieval + relevance + SemSim + KG (per claim); collect NLI pairs ---
+        # NLI is deliberately NOT called in this loop. We gather every
+        # (claim, passage) pair across ALL claims first, then run ONE batched NLI
+        # pass over the whole document in Phase B. This turns a 10-claim request
+        # from 10 forward passes into 1 -- the dominant latency win -- without
+        # changing any score (each pair is still scored independently).
+        per_claim: list[dict] = []
+        nli_pairs: list[tuple[int, str, str, str]] = []  # (claim_idx, claim_id, premise, hypothesis)
         for i, claim_id in enumerate(claim_ids):
             claim_text = claim_texts[i]
-            query_vector = embedding_result.vectors[i]
-            retrieval = self.retriever.retrieve(claim_id, query_vector, top_k=self.nli_top_k)
+            t = time.perf_counter()
+            retrieval = self.retriever.retrieve(claim_id, embedding_result.vectors[i], top_k=self.nli_top_k)
+            timings["retrieval"] += (time.perf_counter() - t) * 1000
 
             relevant_passages = [p for p in retrieval.passages if p.score >= MIN_RELEVANCE_THRESHOLD]
-            relevant_evidence_found = bool(relevant_passages)
 
             sem_sim = None
-            if "semsim" in enabled and relevant_evidence_found:
+            if "semsim" in enabled and relevant_passages:
                 # SemSim still uses only the single best match -- it's
                 # measuring "how close is the nearest relevant evidence",
                 # which is inherently a top-1 question, unlike NLI below.
                 sem_sim = max(0.0, min(1.0, relevant_passages[0].score))
 
-            nli_prob = None
-            if "nli" in enabled and self.nli_scorer and relevant_passages:
-                nli_results = self.nli_scorer.score_batch(
-                    claim_ids=[claim_id] * len(relevant_passages),
-                    premises=[p.text for p in relevant_passages],
-                    hypotheses=[claim_text] * len(relevant_passages),
-                )
-                # CRITICAL: nli_prob must reflect BOTH directions of
-                # evidence, not just entailment. A confidently-contradicted
-                # claim (e.g. entailment=0.11, contradiction=0.83 -- exactly
-                # the real "IPL has 8 teams" hallucination in this project)
-                # and a claim the evidence simply doesn't address (neutral)
-                # both produce LOW raw entailment_prob -- but only one of
-                # them is an actual lie. Discarding contradiction_prob
-                # entirely (the previous version of this code) meant CMHSA
-                # never got to see the model's strongest, most decisive
-                # signal. Net score below: 1.0 = strongly entailed,
-                # 0.0 = strongly contradicted, 0.5 = neutral/unaddressed.
-                #
-                # We also pick whichever passage gives the MOST DECISIVE
-                # net score (furthest from neutral 0.5), not whichever
-                # passage happens to maximize raw entailment -- naive
-                # max(entailment) is vulnerable to a false claim getting
-                # spuriously high entailment from just one of several
-                # loosely-matching passages, inflating false positives
-                # specifically on the Hallucinated class (confirmed via
-                # diagnose_nli_signal.py showing Hallucinated claims had
-                # HIGHER mean nli_prob than Verified under the old scheme).
-                net_scores = [0.5 + 0.5 * (r.entailment_prob - r.contradiction_prob) for r in nli_results]
-                nli_prob = max(net_scores, key=lambda s: abs(s - 0.5))
-
             kg_conf = None
             if "kg" in enabled and self.entity_linker and self.wikidata:
+                t = time.perf_counter()
                 kg_conf = self._try_kg_verification(claim_id, claim_text, language)
+                timings["kg"] += (time.perf_counter() - t) * 1000
 
-            sub_scores_list.append(
-                ClaimSubScores(claim_id=claim_id, sem_sim=sem_sim, nli_prob=nli_prob, kg_conf=kg_conf)
+            per_claim.append({"sem_sim": sem_sim, "nli_prob": None, "kg_conf": kg_conf})
+            if "nli" in enabled and self.nli_scorer and relevant_passages:
+                for p in relevant_passages:
+                    nli_pairs.append((i, claim_id, p.text, claim_text))
+
+        # --- Phase B: a SINGLE batched NLI call over every claim's pairs, then regroup ---
+        if nli_pairs:
+            t = time.perf_counter()
+            nli_results = self.nli_scorer.score_batch(
+                claim_ids=[cid for (_, cid, _, _) in nli_pairs],
+                premises=[prem for (_, _, prem, _) in nli_pairs],
+                hypotheses=[hyp for (_, _, _, hyp) in nli_pairs],
             )
+            timings["nli"] = (time.perf_counter() - t) * 1000
 
+            grouped: dict[int, list] = defaultdict(list)
+            for (idx, _, _, _), res in zip(nli_pairs, nli_results):
+                grouped[idx].append(res)
+            for idx, results in grouped.items():
+                # CRITICAL (unchanged): nli_prob reflects BOTH directions of
+                # evidence. Net score: 1.0 = strongly entailed, 0.0 = strongly
+                # contradicted, 0.5 = neutral/unaddressed. We pick the MOST
+                # DECISIVE passage (furthest from 0.5), not max entailment --
+                # this and the formula are identical to the pre-batching code.
+                net_scores = [0.5 + 0.5 * (r.entailment_prob - r.contradiction_prob) for r in results]
+                per_claim[idx]["nli_prob"] = max(net_scores, key=lambda s: abs(s - 0.5))
+
+        # --- Phase C: assemble sub-scores (original claim order) + fuse ---
+        sub_scores_list = [
+            ClaimSubScores(claim_id=claim_ids[i], sem_sim=per_claim[i]["sem_sim"],
+                           nli_prob=per_claim[i]["nli_prob"], kg_conf=per_claim[i]["kg_conf"])
+            for i in range(len(claim_ids))
+        ]
+
+        t = time.perf_counter()
         scores = []
         for sub_scores in sub_scores_list:
             try:
                 scores.append(self.scorer.score_claim(sub_scores, language))
             except ValueError:
-                # All signals ended up unavailable for this claim -- most
-                # likely because no sufficiently relevant evidence existed
-                # in the corpus (see MIN_RELEVANCE_THRESHOLD) and KG linking
-                # also didn't resolve. This is a per-claim, expected-in-
-                # production condition, not the programmer-error case
-                # CMHSAScorer.score_claim's raise is meant to catch (e.g.
-                # ablation mode misconfigured with zero signals enabled) --
-                # so we surface it honestly here rather than let one
-                # under-covered claim crash an entire /detect request, and
-                # rather than silently score against irrelevant evidence.
+                # All signals unavailable for this claim -- usually no sufficiently
+                # relevant evidence (MIN_RELEVANCE_THRESHOLD) and KG didn't resolve.
+                # Surface as Uncertain rather than crash the whole /detect request.
                 scores.append(ClaimScore(
                     claim_id=sub_scores.claim_id,
                     hallu_score=0.5,
@@ -218,14 +229,16 @@ class DetectionPipeline:
                     note="insufficient evidence: no sufficiently relevant passage found in the corpus",
                 ))
         overall_score = sum(s.hallu_score for s in scores) / len(scores)
-        processing_time_ms = (time.perf_counter() - start) * 1000
+        timings["fusion"] = (time.perf_counter() - t) * 1000
+        timings["total"] = (time.perf_counter() - t_start) * 1000
 
         return PipelineResult(
             claims=claim_texts,
             scores=scores,
             sub_scores=sub_scores_list,
             overall_score=overall_score,
-            processing_time_ms=processing_time_ms,
+            processing_time_ms=timings["total"],
+            timings_ms=timings,
         )
 
     def _extract_claims(self, text: str, language: Language) -> list[str]:

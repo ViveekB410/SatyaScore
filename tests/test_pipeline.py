@@ -189,3 +189,14 @@ def test_cross_claim_nli_is_a_single_batched_call():
     _, kwargs = nli_scorer.score_batch.call_args
     assert len(kwargs["premises"]) == 2  # the single call carried pairs from BOTH claims
     assert "total" in result.timings_ms and result.timings_ms["total"] >= 0  # Task 2 timings present
+
+
+def test_naive_split_produces_exact_spans():
+    # Task 0: fallback claim splitter must yield exact char spans for highlighting.
+    from member3_backend.pipeline import _naive_split_into_claims
+    text = "The sky is blue. Grass is green."
+    claims = _naive_split_into_claims(text)
+    assert len(claims) == 2
+    for c in claims:
+        assert text[c.start_char:c.end_char] == c.text
+        assert c.extraction_method == "sentence_level"

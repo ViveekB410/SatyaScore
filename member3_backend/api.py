@@ -92,6 +92,9 @@ class ClaimResult(BaseModel):
     verdict: str
     active_signals: list[str]
     note: str | None = None
+    start_char: int          # offset into the original input text (for in-place highlighting)
+    end_char: int
+    extraction_method: str
 
 
 class DetectResponse(BaseModel):
@@ -339,13 +342,16 @@ def detect(request: DetectRequest, api_key: str = Depends(require_api_key)) -> D
     claims = [
         ClaimResult(
             claim_id=score.claim_id,
-            text=text,
+            text=claim.text,
             hallu_score=score.hallu_score,
             verdict=_verdict(score),
             active_signals=score.active_signals,
             note=score.note,
+            start_char=claim.start_char,
+            end_char=claim.end_char,
+            extraction_method=claim.extraction_method,
         )
-        for text, score in zip(result.claims, result.scores)
+        for claim, score in zip(result.claims, result.scores)
     ]
 
     response = DetectResponse(

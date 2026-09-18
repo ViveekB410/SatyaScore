@@ -45,7 +45,7 @@ from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
 from member2_data.entity_linker import EntityLinker
 from member2_data.wikidata_connector import WikidataConnector
-from member3_backend.claim_extractor import ClaimExtractor
+from member3_backend.claim_extractor import ClaimExtractor, ExtractedClaim
 from member3_backend.faiss_retriever import FAISSRetriever
 
 Language = Literal["en", "hi", "mr"]
@@ -80,14 +80,33 @@ MIN_RELEVANCE_THRESHOLD = 0.3
 NLI_EVIDENCE_TOP_K = 3
 
 
-def _naive_split_into_claims(text: str) -> list[str]:
-    """Fallback for languages the real ClaimExtractor doesn't support yet."""
-    return [s.strip() for s in _SENTENCE_SPLIT.split(text) if s.strip()]
+def _naive_split_into_claims(text: str) -> list[ExtractedClaim]:
+    """Fallback for languages the real ClaimExtractor doesn't support yet.
+    Produces ExtractedClaim objects with real character offsets into `text`
+    so the frontend can highlight each claim in place."""
+    claims: list[ExtractedClaim] = []
+    cursor = 0
+    counter = 0
+    for part in _SENTENCE_SPLIT.split(text):
+        s = part.strip()
+        if not s:
+            continue
+        start = text.find(s, cursor)
+        if start == -1:
+            start = cursor
+        end = start + len(s)
+        cursor = end
+        claims.append(ExtractedClaim(
+            claim_id=f"claim_{counter}", text=s, start_char=start, end_char=end,
+            extraction_method="sentence_level",
+        ))
+        counter += 1
+    return claims
 
 
 @dataclass
 class PipelineResult:
-    claims: list[str]
+    claims: list[ExtractedClaim]  # carry spans (start_char/end_char) through to the API
     scores: list[ClaimScore]
     sub_scores: list[ClaimSubScores]  # raw per-signal values, e.g. for dataset export
     overall_score: float
@@ -135,11 +154,12 @@ class DetectionPipeline:
         t_start = time.perf_counter()
 
         t = time.perf_counter()
-        claim_texts = self._extract_claims(text, language)
+        extracted = self._extract_claims(text, language)
         timings["claim_extraction"] = (time.perf_counter() - t) * 1000
-        if not claim_texts:
+        if not extracted:
             raise ValueError("No claims could be extracted from the input text")
 
+        claim_texts = [c.text for c in extracted]
         claim_ids = [f"claim_{i}" for i in range(len(claim_texts))]
         languages = [language] * len(claim_texts)
 
@@ -233,7 +253,7 @@ class DetectionPipeline:
         timings["total"] = (time.perf_counter() - t_start) * 1000
 
         return PipelineResult(
-            claims=claim_texts,
+            claims=extracted,
             scores=scores,
             sub_scores=sub_scores_list,
             overall_score=overall_score,
@@ -241,10 +261,10 @@ class DetectionPipeline:
             timings_ms=timings,
         )
 
-    def _extract_claims(self, text: str, language: Language) -> list[str]:
+    def _extract_claims(self, text: str, language: Language) -> list[ExtractedClaim]:
         if self.claim_extractor is not None:
             try:
-                return [c.text for c in self.claim_extractor.extract(text, language)]
+                return list(self.claim_extractor.extract(text, language))
             except NotImplementedError:
                 pass  # real extractor doesn't support this language yet — fall back
         return _naive_split_into_claims(text)

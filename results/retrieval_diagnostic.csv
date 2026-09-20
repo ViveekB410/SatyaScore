@@ -1,0 +1,113 @@
+claim_id,language,label,source_title,top1_sim,top1_above_threshold,src_rank,src_in_top1,src_in_top3,src_in_top5,src_in_top10,nli_top3_outcomes,nli_frac_neutral
+healthcare_en_06_llama-3.3-70b-versatile_2,en,Hallucinated,Infection,0.6285524368286133,True,3,False,True,True,True,neutral|neutral|neutral,1.0
+healthcare_en_06_llama-3.3-70b-versatile_3,en,Hallucinated,Infection,0.6398430466651917,True,1,True,True,True,True,entailment|entailment|neutral,0.3333333333333333
+healthcare_en_06_llama-3.3-70b-versatile_4,en,Hallucinated,Infection,0.6037319302558899,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+healthcare_en_09_llama-3.3-70b-versatile_1,en,Hallucinated,Daily consumption of drinking water,0.6559768915176392,True,1,True,True,True,True,neutral|neutral|contradiction,0.6666666666666666
+science_en_01_llama-3.3-70b-versatile_7,en,Hallucinated,Photosynthesis,0.6332050561904907,True,1,True,True,True,True,contradiction|contradiction|neutral,0.3333333333333333
+science_en_02_llama-3.3-70b-versatile_1,en,Hallucinated,Season,0.7048299908638,True,1,True,True,True,True,entailment|neutral|entailment,0.3333333333333333
+science_en_03_llama-3.3-70b-versatile_0,en,Hallucinated,Speed of light,0.7170093655586243,True,1,True,True,True,True,neutral|neutral|entailment,0.6666666666666666
+science_en_04_llama-3.3-70b-versatile_0,en,Hallucinated,Vaccine,0.706588864326477,True,1,True,True,True,True,neutral|entailment|neutral,0.6666666666666666
+science_en_04_llama-3.3-70b-versatile_2,en,Hallucinated,,0.5260817408561707,True,,False,False,False,False,neutral|neutral|neutral,1.0
+science_en_05_llama-3.3-70b-versatile_0,en,Hallucinated,,0.28810054063796997,False,,False,False,False,False,neutral|neutral|neutral,1.0
+science_en_05_llama-3.3-70b-versatile_4,en,Hallucinated,Mass versus weight,0.7792019844055176,True,1,True,True,True,True,neutral|entailment|entailment,0.3333333333333333
+science_en_05_llama-3.3-70b-versatile_6,en,Hallucinated,Mass versus weight,0.8281221389770508,True,1,True,True,True,True,entailment|neutral|neutral,0.6666666666666666
+science_en_05_llama-3.3-70b-versatile_7,en,Hallucinated,Mass versus weight,0.7008049488067627,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+science_en_06_llama-3.3-70b-versatile_3,en,Hallucinated,Greenhouse effect,0.6741130352020264,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+science_en_07_llama-3.3-70b-versatile_0,en,Hallucinated,Plate tectonics,0.740970253944397,True,1,True,True,True,True,entailment|neutral|entailment,0.3333333333333333
+science_en_08_llama-3.3-70b-versatile_1,en,Hallucinated,Black hole,0.7426659464836121,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+science_en_09_llama-3.3-70b-versatile_0,en,Hallucinated,DNA,0.7019009590148926,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+science_en_09_llama-3.3-70b-versatile_2,en,Hallucinated,DNA,0.6431550979614258,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+science_en_09_llama-3.3-70b-versatile_3,en,Hallucinated,DNA,0.6175940632820129,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+government_en_00_llama-3.3-70b-versatile_0,en,Hallucinated,President of India,0.6263478994369507,True,,False,False,False,False,contradiction|neutral|neutral,0.6666666666666666
+government_en_01_llama-3.3-70b-versatile_5,en,Hallucinated,Fundamental rights in India,0.7321105003356934,True,1,True,True,True,True,neutral|neutral|contradiction,0.6666666666666666
+government_en_01_llama-3.3-70b-versatile_6,en,Hallucinated,Fundamental rights in India,0.5319714546203613,True,1,True,True,True,True,entailment|entailment|contradiction,0.0
+government_en_03_llama-3.3-70b-versatile_1,en,Hallucinated,Election Commission of India,0.6248693466186523,True,1,True,True,True,True,entailment|neutral|neutral,0.6666666666666666
+government_en_04_llama-3.3-70b-versatile_0,en,Hallucinated,Legislative procedure in India,0.6256144046783447,True,,False,False,False,False,entailment|neutral|neutral,0.6666666666666666
+government_en_04_llama-3.3-70b-versatile_2,en,Hallucinated,Legislative procedure in India,0.38117650151252747,True,,False,False,False,False,neutral|neutral|contradiction,0.6666666666666666
+government_en_04_llama-3.3-70b-versatile_5,en,Hallucinated,Legislative procedure in India,0.533901035785675,True,,False,False,False,False,neutral|neutral|contradiction,0.6666666666666666
+government_en_04_llama-3.3-70b-versatile_8,en,Hallucinated,Legislative procedure in India,0.5698912143707275,True,,False,False,False,False,entailment|neutral|neutral,0.6666666666666666
+government_en_04_llama-3.3-70b-versatile_10,en,Hallucinated,Legislative procedure in India,0.48200494050979614,True,,False,False,False,False,neutral|contradiction|contradiction,0.3333333333333333
+government_en_04_llama-3.3-70b-versatile_12,en,Hallucinated,Legislative procedure in India,0.664061427116394,True,,False,False,False,False,neutral|neutral|neutral,1.0
+government_en_04_llama-3.3-70b-versatile_13,en,Hallucinated,Legislative procedure in India,0.6210469007492065,True,,False,False,False,False,neutral|neutral|neutral,1.0
+government_en_04_llama-3.3-70b-versatile_14,en,Hallucinated,Legislative procedure in India,0.5667997598648071,True,,False,False,False,False,entailment|neutral|neutral,0.6666666666666666
+government_en_04_llama-3.3-70b-versatile_16,en,Hallucinated,Legislative procedure in India,0.6441291570663452,True,,False,False,False,False,contradiction|contradiction|neutral,0.3333333333333333
+government_en_04_llama-3.3-70b-versatile_17,en,Hallucinated,Legislative procedure in India,0.698231041431427,True,,False,False,False,False,neutral|neutral|contradiction,0.6666666666666666
+government_en_05_llama-3.3-70b-versatile_0,en,Hallucinated,Rajya Sabha,0.7037512063980103,True,1,True,True,True,True,contradiction|neutral|neutral,0.6666666666666666
+government_en_05_llama-3.3-70b-versatile_1,en,Hallucinated,Rajya Sabha,0.8358888626098633,True,2,False,True,True,True,entailment|contradiction|entailment,0.0
+government_en_07_llama-3.3-70b-versatile_1,en,Hallucinated,Reserve Bank of India,0.5219705104827881,True,1,True,True,True,True,entailment|neutral|neutral,0.6666666666666666
+government_en_08_llama-3.3-70b-versatile_1,en,Hallucinated,Governor (India),0.5175349712371826,True,,False,False,False,False,neutral|neutral|neutral,1.0
+government_en_08_llama-3.3-70b-versatile_4,en,Hallucinated,Governor (India),0.4462425112724304,True,,False,False,False,False,neutral|neutral|neutral,1.0
+government_en_08_llama-3.3-70b-versatile_7,en,Hallucinated,Governor (India),0.48736560344696045,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+government_en_08_llama-3.3-70b-versatile_8,en,Hallucinated,Governor (India),0.7327280044555664,True,1,True,True,True,True,neutral|entailment|contradiction,0.3333333333333333
+government_en_09_llama-3.3-70b-versatile_4,en,Hallucinated,Article 370,0.5586469769477844,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+government_en_09_llama-3.3-70b-versatile_5,en,Hallucinated,,0.7557651996612549,True,,False,False,False,False,contradiction|contradiction|neutral,0.3333333333333333
+sports_en_02_llama-3.3-70b-versatile_1,en,Hallucinated,Run out,0.6363354921340942,True,1,True,True,True,True,entailment|neutral|entailment,0.3333333333333333
+sports_en_02_llama-3.3-70b-versatile_2,en,Hallucinated,Run out,0.5816432237625122,True,4,False,False,True,True,contradiction|contradiction|contradiction,0.0
+sports_en_02_llama-3.3-70b-versatile_5,en,Hallucinated,Run out,0.7061377167701721,True,1,True,True,True,True,neutral|neutral|contradiction,0.6666666666666666
+sports_en_02_llama-3.3-70b-versatile_10,en,Hallucinated,Run out,0.49276846647262573,True,10,False,False,False,True,entailment|neutral|entailment,0.3333333333333333
+sports_en_06_llama-3.3-70b-versatile_2,en,Hallucinated,2026 Indian Premier League,0.7623758316040039,True,,False,False,False,False,neutral|contradiction|neutral,0.6666666666666666
+healthcare_en_06_llama-3.3-70b-versatile_6,en,Verified,Infection,0.6502571105957031,True,5,False,False,True,True,neutral|neutral|neutral,1.0
+government_en_05_llama-3.3-70b-versatile_2,en,Verified,Rajya Sabha,0.7084934115409851,True,3,False,True,True,True,neutral|neutral|neutral,1.0
+history_en_05_llama-3.3-70b-versatile_4,en,Verified,Dandi March,0.6793489456176758,True,1,True,True,True,True,neutral|neutral|contradiction,0.6666666666666666
+government_en_07_llama-3.3-70b-versatile_4,en,Verified,Reserve Bank of India,0.5874249935150146,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+science_en_06_llama-3.3-70b-versatile_6,en,Verified,Greenhouse effect,0.779009997844696,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+government_en_08_llama-3.3-70b-versatile_6,en,Verified,Governor (India),0.5508167743682861,True,,False,False,False,False,contradiction|contradiction|neutral,0.3333333333333333
+healthcare_en_01_llama-3.3-70b-versatile_12,en,Verified,Immune system,0.6017277240753174,True,2,False,True,True,True,neutral|neutral|neutral,1.0
+healthcare_en_03_llama-3.3-70b-versatile_1,en,Verified,Type 2 diabetes,0.7694419622421265,True,2,False,True,True,True,entailment|entailment|neutral,0.3333333333333333
+healthcare_en_02_llama-3.3-70b-versatile_0,en,Verified,Paracetamol,0.6777836084365845,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+healthcare_en_01_llama-3.3-70b-versatile_6,en,Verified,Immune system,0.4884973466396332,True,2,False,True,True,True,neutral|neutral|neutral,1.0
+history_en_05_llama-3.3-70b-versatile_6,en,Verified,Dandi March,0.5585261583328247,True,1,True,True,True,True,contradiction|neutral|neutral,0.6666666666666666
+science_en_06_llama-3.3-70b-versatile_1,en,Verified,Greenhouse effect,0.6929249167442322,True,1,True,True,True,True,entailment|neutral|neutral,0.6666666666666666
+history_en_02_llama-3.3-70b-versatile_2,en,Verified,World War I,0.5215206742286682,True,3,False,True,True,True,entailment|contradiction|entailment,0.0
+history_en_02_llama-3.3-70b-versatile_1,en,Verified,World War I,0.43385595083236694,True,1,True,True,True,True,contradiction|entailment|entailment,0.0
+government_en_08_llama-3.3-70b-versatile_10,en,Verified,Governor (India),0.6889686584472656,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+healthcare_en_04_llama-3.3-70b-versatile_1,en,Verified,Tuberculosis,0.42938727140426636,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+government_en_07_llama-3.3-70b-versatile_6,en,Verified,Reserve Bank of India,0.6030064821243286,True,1,True,True,True,True,entailment|entailment|neutral,0.3333333333333333
+history_en_02_llama-3.3-70b-versatile_5,en,Verified,World War I,0.5228917002677917,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+science_en_06_llama-3.3-70b-versatile_0,en,Verified,Greenhouse effect,0.7882127165794373,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+history_en_02_llama-3.3-70b-versatile_4,en,Verified,World War I,0.4868750274181366,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+government_en_09_llama-3.3-70b-versatile_3,en,Verified,Article 370,0.5825210809707642,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+government_en_04_llama-3.3-70b-versatile_11,en,Verified,Legislative procedure in India,0.44503623247146606,True,,False,False,False,False,neutral|neutral|neutral,1.0
+government_en_01_llama-3.3-70b-versatile_0,en,Verified,Fundamental rights in India,0.7303240299224854,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+science_en_01_llama-3.3-70b-versatile_2,en,Verified,Photosynthesis,0.6827261447906494,True,1,True,True,True,True,entailment|entailment|entailment,0.0
+history_en_02_llama-3.3-70b-versatile_3,en,Verified,World War I,0.49254560470581055,True,1,True,True,True,True,neutral|neutral|entailment,0.6666666666666666
+science_en_08_llama-3.3-70b-versatile_3,en,Verified,Black hole,0.6959803700447083,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+healthcare_en_03_llama-3.3-70b-versatile_7,en,Verified,Type 2 diabetes,0.5820428729057312,True,1,True,True,True,True,neutral|contradiction|neutral,0.6666666666666666
+government_en_09_llama-3.3-70b-versatile_6,en,Verified,Article 370,0.7339715957641602,True,1,True,True,True,True,neutral|neutral|contradiction,0.6666666666666666
+healthcare_en_08_llama-3.3-70b-versatile_4,en,Verified,Insulin,0.7686700820922852,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+government_en_07_llama-3.3-70b-versatile_2,en,Verified,Reserve Bank of India,0.7314536571502686,True,1,True,True,True,True,neutral|neutral|contradiction,0.6666666666666666
+science_en_07_llama-3.3-70b-versatile_2,en,Verified,Plate tectonics,0.7108703851699829,True,1,True,True,True,True,entailment|entailment|neutral,0.3333333333333333
+sports_en_03_llama-3.3-70b-versatile_0,en,Verified,India men's national field hockey team,0.7905728220939636,True,1,True,True,True,True,entailment|entailment|entailment,0.0
+healthcare_en_03_llama-3.3-70b-versatile_2,en,Verified,Type 2 diabetes,0.5894957184791565,True,,False,False,False,False,neutral|neutral|neutral,1.0
+history_en_08_llama-3.3-70b-versatile_1,en,Verified,Non-cooperation movement,0.5853137969970703,True,,False,False,False,False,contradiction|contradiction|contradiction,0.0
+sports_en_05_llama-3.3-70b-versatile_0,en,Verified,Chess,0.688632071018219,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+healthcare_en_01_llama-3.3-70b-versatile_2,en,Verified,,0.7184303998947144,True,,False,False,False,False,neutral|entailment|neutral,0.6666666666666666
+government_en_09_llama-3.3-70b-versatile_0,en,Verified,Article 370,0.8542905449867249,True,1,True,True,True,True,neutral|entailment|neutral,0.6666666666666666
+government_en_07_llama-3.3-70b-versatile_3,en,Verified,Reserve Bank of India,0.6261515617370605,True,1,True,True,True,True,entailment|entailment|entailment,0.0
+sports_en_02_llama-3.3-70b-versatile_9,en,Verified,Run out,0.5551363825798035,True,8,False,False,False,True,contradiction|entailment|entailment,0.0
+history_en_07_llama-3.3-70b-versatile_1,en,Verified,Shivaji,0.6307124495506287,True,1,True,True,True,True,entailment|neutral|entailment,0.3333333333333333
+science_en_05_llama-3.3-70b-versatile_1,en,Verified,Mass versus weight,0.6651095747947693,True,1,True,True,True,True,entailment|neutral|neutral,0.6666666666666666
+sports_en_02_llama-3.3-70b-versatile_4,en,Verified,Run out,0.7463699579238892,True,4,False,False,True,True,neutral|neutral|neutral,1.0
+healthcare_en_04_llama-3.3-70b-versatile_6,en,Verified,Tuberculosis,0.5730661749839783,True,1,True,True,True,True,neutral|contradiction|contradiction,0.3333333333333333
+government_en_04_llama-3.3-70b-versatile_15,en,Verified,Legislative procedure in India,0.5949018001556396,True,,False,False,False,False,entailment|entailment|contradiction,0.0
+healthcare_en_06_llama-3.3-70b-versatile_0,en,Verified,Infection,0.6833661794662476,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+sports_en_08_llama-3.3-70b-versatile_0,en,Verified,Ranji Trophy,0.6448618173599243,True,1,True,True,True,True,neutral|neutral|entailment,0.6666666666666666
+science_en_01_llama-3.3-70b-versatile_5,en,Verified,Photosynthesis,0.6637455224990845,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+healthcare_hi_08_llama-3.3-70b-versatile_4,hi,Hallucinated,Insulin,0.733216404914856,True,1,True,True,True,True,neutral|entailment|neutral,0.6666666666666666
+science_hi_01_llama-3.3-70b-versatile_5,hi,Hallucinated,Photosynthesis,0.7219505310058594,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+science_hi_01_llama-3.3-70b-versatile_6,hi,Hallucinated,Photosynthesis,0.6126492023468018,True,1,True,True,True,True,entailment|contradiction|neutral,0.3333333333333333
+science_hi_05_llama-3.3-70b-versatile_9,hi,Hallucinated,Mass versus weight,0.7340347766876221,True,1,True,True,True,True,contradiction|entailment|neutral,0.3333333333333333
+science_hi_06_llama-3.3-70b-versatile_2,hi,Hallucinated,Greenhouse effect,0.7721096277236938,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+government_hi_00_llama-3.3-70b-versatile_6,hi,Hallucinated,President of India,0.6023929715156555,True,3,False,True,True,True,neutral|neutral|neutral,1.0
+government_hi_01_llama-3.3-70b-versatile_0,hi,Hallucinated,Fundamental rights in India,0.9037458300590515,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+government_hi_05_llama-3.3-70b-versatile_4,hi,Hallucinated,Rajya Sabha,0.7156381607055664,True,10,False,False,False,True,neutral|neutral|neutral,1.0
+government_hi_06_llama-3.3-70b-versatile_0,hi,Hallucinated,Chief Minister (India),0.6532174944877625,True,2,False,True,True,True,neutral|neutral|neutral,1.0
+sports_hi_04_llama-3.3-70b-versatile_1,hi,Verified,Offside (association football),0.5032896995544434,True,2,False,True,True,True,neutral|neutral|neutral,1.0
+government_hi_05_llama-3.3-70b-versatile_3,hi,Verified,Rajya Sabha,0.6746207475662231,True,3,False,True,True,True,neutral|neutral|neutral,1.0
+sports_hi_01_llama-3.3-70b-versatile_2,hi,Verified,Cricket World Cup,0.8078959584236145,True,1,True,True,True,True,contradiction|contradiction|contradiction,0.0
+history_hi_07_llama-3.3-70b-versatile_2,hi,Verified,Shivaji,0.5829901099205017,True,1,True,True,True,True,neutral|neutral|entailment,0.6666666666666666
+government_hi_00_llama-3.3-70b-versatile_5,hi,Verified,President of India,0.5941038131713867,True,4,False,False,True,True,entailment|neutral|neutral,0.6666666666666666
+healthcare_hi_07_llama-3.3-70b-versatile_5,hi,Verified,Hypertension,0.7831988334655762,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+sports_hi_09_llama-3.3-70b-versatile_5,hi,Verified,Formula One,0.6401124000549316,True,1,True,True,True,True,neutral|neutral|neutral,1.0
+history_hi_05_llama-3.3-70b-versatile_7,hi,Verified,Dandi March,0.6889405250549316,True,1,True,True,True,True,entailment|neutral|entailment,0.3333333333333333
+government_hi_03_llama-3.3-70b-versatile_2,hi,Verified,Election Commission of India,0.5669596195220947,True,1,True,True,True,True,entailment|entailment|entailment,0.0

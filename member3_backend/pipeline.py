@@ -79,6 +79,52 @@ MIN_RELEVANCE_THRESHOLD = 0.3
 # if this pipeline needs to be snappy for a live demo.
 NLI_EVIDENCE_TOP_K = 3
 
+# --- C2-lite: sentence-level NLI premises -----------------------------------
+# The retrieval diagnostic found the claim's source article reaches NLI's top-3
+# for ~73% of claims, yet ~67% of claim-passage NLI pairs land in "neutral":
+# the evidence is arriving, but a whole multi-sentence passage is too long for
+# NLI to use -- the one relevant sentence gets diluted by the surrounding text.
+# So we split each retrieved passage into sentences and send each sentence as
+# its own premise, then keep the most decisive one (the SAME selection rule as
+# before). Cap sentences per passage so a long passage cannot blow up the batch.
+# Gated behind SATYASCORE_SENTENCE_PREMISES (default OFF) so the live API keeps
+# its old behaviour until the A/B comparison justifies turning this on.
+MAX_SENTENCES_PER_PASSAGE = 8
+
+
+def _sentence_premises_enabled() -> bool:
+    """Switch (default OFF). The live API keeps the original whole-passage NLI
+    behaviour until the c2_lite_compare.py A/B run (on GPU) shows sentence-level
+    premises actually improve NLI AUC. Set SATYASCORE_SENTENCE_PREMISES=true to
+    turn C2-lite on -- that is exactly what the comparison does -- without
+    editing code."""
+    import os
+    return os.environ.get("SATYASCORE_SENTENCE_PREMISES", "false").strip().lower() \
+        in ("1", "true", "yes", "on")
+
+
+def passage_to_premises(passage_text: str, sentence_level: bool | None = None) -> list[str]:
+    """Turn one retrieved passage into the NLI premise unit(s) for it.
+
+    sentence_level ON (C2-lite): split into sentences -- reusing the same
+    _SENTENCE_SPLIT already used for Hindi claim extraction, so English and Hindi
+    are handled identically and no new dependency is added -- and cap at
+    MAX_SENTENCES_PER_PASSAGE. sentence_level OFF (the current default): the whole
+    passage as a single premise (the pre-C2-lite behaviour).
+
+    This is the SHARED definition used by both the live pipeline and the
+    c2_lite_compare.py A/B diagnostic, so the diagnostic measures exactly what
+    the pipeline does.
+    """
+    if sentence_level is None:
+        sentence_level = _sentence_premises_enabled()
+    if not sentence_level:
+        return [passage_text]
+    sentences = [s.strip() for s in _SENTENCE_SPLIT.split(passage_text) if s.strip()]
+    if not sentences:  # nothing splittable -- fall back to the whole passage
+        return [passage_text]
+    return sentences[:MAX_SENTENCES_PER_PASSAGE]
+
 
 def _naive_split_into_claims(text: str) -> list[ExtractedClaim]:
     """Fallback for languages the real ClaimExtractor doesn't support yet.
@@ -200,8 +246,15 @@ class DetectionPipeline:
 
             per_claim.append({"sem_sim": sem_sim, "nli_prob": None, "kg_conf": kg_conf})
             if "nli" in enabled and self.nli_scorer and relevant_passages:
+                # C2-lite: each passage becomes one-or-more premise units
+                # (sentences when the switch is on; otherwise the whole passage,
+                # which is the default). They stay in the single flattened
+                # batch below; Phase B still keeps the most decisive unit per
+                # claim, so a claim with many sentence-premises is unchanged in
+                # how its final nli_prob is chosen.
                 for p in relevant_passages:
-                    nli_pairs.append((i, claim_id, p.text, claim_text))
+                    for premise in passage_to_premises(p.text):
+                        nli_pairs.append((i, claim_id, premise, claim_text))
 
         # --- Phase B: a SINGLE batched NLI call over every claim's pairs, then regroup ---
         if nli_pairs:

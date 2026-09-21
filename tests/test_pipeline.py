@@ -200,3 +200,36 @@ def test_naive_split_produces_exact_spans():
     for c in claims:
         assert text[c.start_char:c.end_char] == c.text
         assert c.extraction_method == "sentence_level"
+
+
+def test_passage_to_premises_splits_caps_and_respects_switch():
+    # C2-lite: sentence-level premises (default ON) split; OFF keeps whole passage.
+    from member3_backend.pipeline import passage_to_premises, MAX_SENTENCES_PER_PASSAGE
+    passage = "Paris is the capital of France. It sits on the Seine. It has a metro."
+    assert passage_to_premises(passage, sentence_level=True) == [
+        "Paris is the capital of France.", "It sits on the Seine.", "It has a metro."]
+    # switch off -> the whole passage is one premise (pre-C2-lite behaviour)
+    assert passage_to_premises(passage, sentence_level=False) == [passage]
+    # a Hindi passage splits on the danda too
+    hi = "पेरिस फ्रांस की राजधानी है। यह सेन नदी पर स्थित है।"
+    assert passage_to_premises(hi, sentence_level=True) == [
+        "पेरिस फ्रांस की राजधानी है।", "यह सेन नदी पर स्थित है।"]
+    # long passage is capped
+    long = " ".join(f"Sentence number {i} here." for i in range(20))
+    assert len(passage_to_premises(long, sentence_level=True)) == MAX_SENTENCES_PER_PASSAGE
+    # a single-sentence passage yields exactly one premise (existing tests rely on this)
+    assert passage_to_premises("Evidence text.", sentence_level=True) == ["Evidence text."]
+
+
+def test_sentence_premises_switch_reads_env(monkeypatch):
+    from member3_backend import pipeline as pl
+    # default OFF: with no env set, the live API keeps whole-passage behaviour.
+    monkeypatch.delenv("SATYASCORE_SENTENCE_PREMISES", raising=False)
+    assert pl._sentence_premises_enabled() is False
+    assert pl.passage_to_premises("A. B.") == ["A. B."]
+    monkeypatch.setenv("SATYASCORE_SENTENCE_PREMISES", "false")
+    assert pl._sentence_premises_enabled() is False
+    assert pl.passage_to_premises("A. B.") == ["A. B."]  # default arg -> reads env
+    monkeypatch.setenv("SATYASCORE_SENTENCE_PREMISES", "true")
+    assert pl._sentence_premises_enabled() is True
+    assert pl.passage_to_premises("A. B.") == ["A.", "B."]

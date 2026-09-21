@@ -29,6 +29,16 @@ Language = Literal["en", "hi", "mr"]
 MODEL_NAME = "MoritzLaurer/mDeBERTa-v3-base-mnli-xnli"
 MAX_SEQUENCE_LENGTH = 256
 
+# Max (premise, hypothesis) pairs per forward pass. score_batch flattens ALL
+# pairs across a request into one list; without a cap that becomes a single
+# giant forward pass. A long /detect input (many claims x top-k passages x, with
+# C2-lite, several sentence premises each) can then OOM the GPU -- this is
+# exactly what took down the T4 full run. Chunking bounds peak activation memory
+# to this many pairs at a time. Padding is per-chunk, but the attention mask
+# hides padding, so chunked outputs match an unchunked pass to within float
+# noise (asserted in tests/test_nli_scorer.py). 32 is safe on a T4.
+NLI_BATCH_CHUNK_SIZE = 32
+
 
 @dataclass
 class NLIResult:
@@ -92,31 +102,38 @@ class NLIScorer:
         )
 
     def score_batch(
-        self, claim_ids: list[str], premises: list[str], hypotheses: list[str]
+        self, claim_ids: list[str], premises: list[str], hypotheses: list[str],
+        chunk_size: int = NLI_BATCH_CHUNK_SIZE,
     ) -> list[NLIResult]:
-        """Batched: a SINGLE forward pass over all (premise, hypothesis) pairs,
-        instead of one model call per pair. Same results, ~Nx faster on CPU —
-        this is what keeps the pipeline's top-k NLI check affordable."""
+        """Batched NLI over all (premise, hypothesis) pairs, in fixed-size chunks
+        of `chunk_size` pairs per forward pass (instead of one model call per pair
+        OR one unbounded pass over everything). Chunking keeps the top-k NLI check
+        fast while capping peak GPU memory, so a long request can't OOM. Each
+        chunk is padded independently; the attention mask masks that padding out,
+        so results are identical to an unchunked pass to within float noise."""
         if not claim_ids:
             return []
         self._ensure_loaded()
 
-        inputs = self._tokenizer(
-            premises, hypotheses, return_tensors="pt", truncation=True,
-            max_length=MAX_SEQUENCE_LENGTH, padding=True,
-        ).to(self.device)
-
-        with torch.no_grad():
-            probs = torch.softmax(self._model(**inputs).logits, dim=-1)
-
         label_order = self._model.config.id2label
         idx = {label_order[i].lower(): i for i in range(len(label_order))}
-        results = []
-        for row, cid in zip(probs, claim_ids):
-            results.append(NLIResult(
-                claim_id=cid,
-                entailment_prob=float(row[idx.get("entailment", 0)]),
-                contradiction_prob=float(row[idx.get("contradiction", 2)]),
-                neutral_prob=float(row[idx.get("neutral", 1)]),
-            ))
+
+        results: list[NLIResult] = []
+        for start in range(0, len(claim_ids), chunk_size):
+            end = start + chunk_size
+            inputs = self._tokenizer(
+                premises[start:end], hypotheses[start:end], return_tensors="pt",
+                truncation=True, max_length=MAX_SEQUENCE_LENGTH, padding=True,
+            ).to(self.device)
+
+            with torch.no_grad():
+                probs = torch.softmax(self._model(**inputs).logits, dim=-1)
+
+            for row, cid in zip(probs, claim_ids[start:end]):
+                results.append(NLIResult(
+                    claim_id=cid,
+                    entailment_prob=float(row[idx.get("entailment", 0)]),
+                    contradiction_prob=float(row[idx.get("contradiction", 2)]),
+                    neutral_prob=float(row[idx.get("neutral", 1)]),
+                ))
         return results

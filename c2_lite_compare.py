@@ -180,6 +180,35 @@ def bootstrap_delta_ci(sub: pd.DataFrame, n_boot: int = N_BOOT, seed: int = SEED
     return (point, float(lo), float(hi), len(deltas), n_boot)
 
 
+def _fmt(x) -> str:
+    return f"{x:.3f}" if isinstance(x, float) and x == x else "n/a"
+
+
+def write_off_partial(off_df, off_neutral, off_units, n_claims, n_passages, device) -> Path:
+    """Persist the switch-OFF results the moment they finish, BEFORE the ON pass.
+    The ON pass is the larger, riskier one (it OOMed the T4 before chunking); if it
+    ever fails again, the expensive OFF work is already on disk and not lost. A
+    completed full run supersedes this with results/c2_lite_comparison.md."""
+    en = auc_for(off_df[off_df.language == "en"])
+    hi = auc_for(off_df[off_df.language == "hi"])
+    ov = auc_for(off_df)
+    lines = [
+        "# C2-lite — switch-OFF partial (whole-passage baseline)", "",
+        "_Written as soon as the switch-OFF pass finished, before the switch-ON pass, so "
+        "an ON-run failure cannot lose the OFF work again. A full run supersedes this file "
+        "with `c2_lite_comparison.md`._", "",
+        f"- Claims: {n_claims}, experiment corpus ({n_passages} passages), device: {device}.",
+        f"- NLI premise units scored (off): {off_units}. Neutral rate (off): {_fmt(off_neutral)}.",
+        "", "| Group | NLI AUC (switch OFF) |", "| --- | --- |",
+        f"| EN | {_fmt(en)} |", f"| HI | {_fmt(hi)} |", f"| Overall | {_fmt(ov)} |", "",
+    ]
+    out = ROOT / "results" / "c2_lite_off_partial.md"
+    out.parent.mkdir(exist_ok=True)
+    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    print(f"wrote OFF partial -> {out}", flush=True)
+    return out
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=0, help="cap total claims (quick smoke test)")
@@ -213,6 +242,8 @@ def main() -> None:
 
     print("scoring switch OFF (whole passage)...", flush=True)
     off_df, off_neutral, off_units = score_mode(sel, retrieved, nli, sentence_level=False)
+    # persist OFF immediately -- the ON pass is the one that OOMed before chunking
+    write_off_partial(off_df, off_neutral, off_units, len(sel), len(passages), nli.device)
     print("scoring switch ON (sentence-level)...", flush=True)
     on_df, on_neutral, on_units = score_mode(sel, retrieved, nli, sentence_level=True)
 
@@ -241,8 +272,7 @@ def main() -> None:
         "Overall": bootstrap_delta_ci(paired),
     }
 
-    def fmt(x):
-        return f"{x:.3f}" if isinstance(x, float) and x == x else "n/a"
+    fmt = _fmt
 
     def delta(a, b):
         if a == a and b == b:

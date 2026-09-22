@@ -4,3 +4,7 @@ __pycache__/
 .pytest_cache/
 .idea/
 iaa/iaa_key_DO_NOT_SHARE.csv
+
+# private annotation keys (hold AI/gold verdicts) — never commit (ground rule 5)
+annotation_round2/round2_key_DO_NOT_SHARE.csv
+*_key_DO_NOT_SHARE.csv

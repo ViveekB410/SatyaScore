@@ -14,13 +14,23 @@ import pandas as pd
 from sklearn.metrics import cohen_kappa_score, confusion_matrix
 
 IAA = Path("iaa")
-NORM = {
-    "verified": "Verified", "ok": "Verified", "correct": "Verified", "true": "Verified",
-    "hallucinated": "Hallucinated", "hallucination": "Hallucinated", "false": "Hallucinated",
-    "uncertain": "Uncertain", "unsure": "Uncertain", "unclear": "Uncertain",
-}
 LABELS = ["Verified", "Uncertain", "Hallucinated"]
 TARGET = 0.65
+
+
+def norm(v):
+    """Normalise a free-text verdict to a canonical label. Prefix-based (not an
+    exact dict) so it tolerates typos like 'verfied' -- IDENTICAL to the
+    normaliser in generate_results_summary.py, so the two scripts read the same
+    labels and report the same kappa."""
+    s = str(v).strip().lower()
+    if s.startswith(("verif", "verf")):
+        return "Verified"
+    if s.startswith(("hall", "halu")):
+        return "Hallucinated"
+    if s.startswith(("uncert", "unsure", "unclear")):
+        return "Uncertain"
+    return None
 
 
 def _read(stem: Path):
@@ -33,7 +43,7 @@ def _read(stem: Path):
 
 def load(stem: Path, col):
     df = _read(stem)
-    df[col] = df[col].astype(str).str.strip().str.lower().map(NORM)
+    df[col] = df[col].map(norm)
     return df.set_index("claim_id")[col]
 
 
@@ -57,7 +67,7 @@ def report(name, a, b):
 
 
 def main() -> None:
-    stem_a = IAA / "iaa_annotator_A"
+    stem_a = IAA / "iaa_round1_annotator_A"   # annotator A's FILLED round-1 sheet
     stem_b = IAA / "iaa_annotator_B"
     if not (stem_a.with_suffix(".xlsx").exists() or stem_a.with_suffix(".csv").exists()):
         print("Fill iaa/iaa_annotator_A and _B (.xlsx or .csv) first.")

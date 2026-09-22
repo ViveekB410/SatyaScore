@@ -3,7 +3,7 @@ generate_results_summary.py — one clean RESULTS_SUMMARY.md pulling every headl
 number straight from the artifacts, so the paper/report author doesn't re-derive
 them (and nothing is hand-typed). Reads:
   gold_final.csv, claim_quality.csv, gold_final_scored.csv,
-  iaa/iaa_annotator_A_AAsawari.xlsx + iaa_annotator_B.xlsx,
+  iaa/iaa_round1_annotator_A.xlsx + iaa_annotator_B.xlsx,
   results/ablation_clean_no_semsim.json (+ with_semsim).
 """
 from __future__ import annotations
@@ -28,7 +28,7 @@ def norm(v):
 
 def iaa_block() -> str:
     try:
-        A = pd.read_excel("iaa/iaa_annotator_A_AAsawari.xlsx").set_index("claim_id")["verdict"].map(norm)
+        A = pd.read_excel("iaa/iaa_round1_annotator_A.xlsx").set_index("claim_id")["verdict"].map(norm)
         B = pd.read_excel("iaa/iaa_annotator_B.xlsx").set_index("claim_id")["verdict"].map(norm)
         d = pd.DataFrame({"A": A, "B": B}).dropna()
         k3 = cohen_kappa_score(d.A, d.B, labels=LAB)

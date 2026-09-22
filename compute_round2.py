@@ -20,10 +20,12 @@ into the report.
 """
 from __future__ import annotations
 import math
+import warnings
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from sklearn.exceptions import UndefinedMetricWarning
 from sklearn.metrics import cohen_kappa_score, confusion_matrix
 
 OUT = Path("annotation_round2")
@@ -31,15 +33,24 @@ KEY = OUT / "round2_key_DO_NOT_SHARE.csv"
 LABELS = ["Verified", "Uncertain", "Hallucinated"]
 N_BOOT = 2000
 SEED = 42
-NORM = {
-    "verified": "Verified", "ok": "Verified", "correct": "Verified", "true": "Verified",
-    "hallucinated": "Hallucinated", "hallucination": "Hallucinated", "false": "Hallucinated",
-    "uncertain": "Uncertain", "unsure": "Uncertain", "unclear": "Uncertain",
-}
+
+
+def _norm1(v):
+    """Normalise one free-text verdict. Prefix-based (not an exact dict) so it
+    tolerates typos like 'verfied' -- IDENTICAL to compute_iaa.py and
+    generate_results_summary.py, so every script reads the same labels."""
+    s = str(v).strip().lower()
+    if s.startswith(("verif", "verf")):
+        return "Verified"
+    if s.startswith(("hall", "halu")):
+        return "Hallucinated"
+    if s.startswith(("uncert", "unsure", "unclear")):
+        return "Uncertain"
+    return None
 
 
 def _norm(s: pd.Series) -> pd.Series:
-    return s.astype(str).str.strip().str.lower().map(NORM)
+    return s.map(_norm1)
 
 
 def load_sheet(tag: str):
@@ -69,12 +80,16 @@ def kappa_ci(a: np.ndarray, b: np.ndarray, labels, n_boot=N_BOOT, seed=SEED):
     rng = np.random.default_rng(seed)
     n = len(a)
     ks = []
-    for _ in range(n_boot):
-        idx = rng.integers(0, n, n)
-        with np.errstate(invalid="ignore"):
+    # A resample that lands on a single class makes kappa undefined (0/0 -> NaN);
+    # that is expected under heavy skew, so we skip those and silence the per-call
+    # warning rather than print it thousands of times.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=UndefinedMetricWarning)
+        for _ in range(n_boot):
+            idx = rng.integers(0, n, n)
             k = cohen_kappa_score(a[idx], b[idx], labels=labels)
-        if k == k:  # not NaN
-            ks.append(k)
+            if k == k:  # not NaN
+                ks.append(k)
     if not ks:
         return point, float("nan"), float("nan"), 0
     lo, hi = np.percentile(ks, [2.5, 97.5])
@@ -136,11 +151,15 @@ def main() -> None:
          f"both annotators (of 50 issued). The private key (gold + AI verdicts) is "
          f"git-ignored and not reproduced here.\n",
          "## 1. Human–human agreement",
-         "| Scheme | kappa | 95% CI (bootstrap) | raw agreement |",
-         "| --- | --- | --- | --- |",
-         f"| 3-class (V/U/H) | {pc(k3)} | [{pc(k3lo)}, {pc(k3hi)}] | {raw3:.0%} |",
-         f"| Binary (Hallucinated vs not) | {pc(kH)} | [{pc(kHlo)}, {pc(kHhi)}] | {rawH:.0%} |",
+         "| Scheme | kappa | 95% CI (bootstrap) | valid resamples | raw agreement |",
+         "| --- | --- | --- | --- | --- |",
+         f"| 3-class (V/U/H) | {pc(k3)} | [{pc(k3lo)}, {pc(k3hi)}] | {k3n}/{N_BOOT} | {raw3:.0%} |",
+         f"| Binary (Hallucinated vs not) | {pc(kH)} | [{pc(kHlo)}, {pc(kHhi)}] | {kHn}/{N_BOOT} | {rawH:.0%} |",
          "",
+         (f"- **Binary kappa {pc(kH)} is {'AT/ABOVE' if kH >= 0.65 else 'BELOW'} the guideline "
+          f"target of 0.65.** Raw agreement is high ({rawH:.0%}) but the labels are heavily "
+          f"skewed to Verified, so chance agreement is high and kappa stays low — read the two "
+          f"together, and note the wide CI on this n."),
          f"- Claims **both** annotators called Hallucinated: **{both_hallu}**.",
          "- Confusion matrix (rows = A, cols = B; order Verified / Uncertain / Hallucinated):",
          "```",
@@ -155,9 +174,14 @@ def main() -> None:
     if never:
         L.append("")
         for tag, lab in never:
-            L.append(f"> **FLAG: annotator {tag} never used \"{lab}\".** The annotators applied "
-                     f"different label schemes; the 3-class kappa partly reflects that mismatch, "
-                     f"not only disagreement.")
+            L.append(f"> **FLAG: annotator {tag} never used \"{lab}\".**")
+        L.append("> Context: this round-2 set is drawn from `ai_agreed` claims — ones clear "
+                 "enough that the reviewer and the AI already agreed — which are mostly "
+                 "unambiguous. So an unused \"Uncertain\" here most likely means no genuinely "
+                 "ambiguous claims appeared in this sample, not that the annotators used the "
+                 "wrong scheme. It does mean the Verified/Uncertain boundary was never "
+                 "exercised, so the 3-class and binary kappa coincide and this sample cannot "
+                 "measure 3-class agreement — it measures the binary hallucinated-vs-not call.")
     L.append("")
 
     L += ["## 3. Anchoring check (where the two humans agree)",

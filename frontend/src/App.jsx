@@ -7,6 +7,8 @@ import FlaggedList from './components/FlaggedList'
 import WaitingState from './components/WaitingState'
 import LoadingGate from './components/LoadingGate'
 import HistoryPanel from './components/HistoryPanel'
+import DocumentSummary from './components/DocumentSummary'
+import ClaimScores from './components/ClaimScores'
 
 function Legend({ color, label }) {
   return (
@@ -37,6 +39,7 @@ export default function App() {
   const [result, setResult] = useState(null)
   const [submitted, setSubmitted] = useState({ text: '', language: 'en' })
   const [error, setError] = useState(null)
+  const [showScores, setShowScores] = useState(false)
 
   // history
   const [history, setHistory] = useState(() => loadHistory())
@@ -207,6 +210,8 @@ export default function App() {
 
             {result && !loading && (
               <div className="animate-fade-in-up space-y-10">
+                <DocumentSummary result={result} />
+
                 <div>
                   <h2 className="font-serif text-xl text-navy">Annotated text</h2>
                   <div className="mt-3 rounded-md border border-rule bg-white p-6">
@@ -219,6 +224,7 @@ export default function App() {
                   <div className="mt-3 flex flex-wrap gap-4 text-xs text-ink/60">
                     <Legend color="bg-flag-hallucinated" label="Not supported by evidence" />
                     <Legend color="bg-flag-uncertain" label="Could not verify" />
+                    <Legend color="bg-flag-verified" label="Supported (not highlighted)" />
                   </div>
                 </div>
 
@@ -227,6 +233,20 @@ export default function App() {
                   <div className="mt-3">
                     <FlaggedList claims={result.claims} language={submitted.language} />
                   </div>
+                </div>
+
+                <div>
+                  <button
+                    onClick={() => setShowScores((s) => !s)}
+                    className="text-sm text-navy underline decoration-rule underline-offset-4 transition hover:decoration-navy"
+                  >
+                    {showScores ? 'Hide' : 'Show'} all claims with scores
+                  </button>
+                  {showScores && (
+                    <div className="mt-3 animate-fade-in">
+                      <ClaimScores claims={result.claims} language={submitted.language} />
+                    </div>
+                  )}
                 </div>
               </div>
             )}

@@ -40,7 +40,9 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Literal
 
-from member1_model.cmhsa import CMHSAScorer, ClaimScore, ClaimSubScores, Verdict
+from member1_model.cmhsa import (
+    CMHSAScorer, ClaimScore, ClaimSubScores, DocumentSummary, Verdict, aggregate_document,
+)
 from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
 from member2_data.entity_linker import EntityLinker
@@ -159,6 +161,7 @@ class PipelineResult:
     processing_time_ms: float
     # Per-stage timings (ms): claim_extraction, embedding, retrieval, nli, kg, fusion, total.
     timings_ms: dict[str, float] = field(default_factory=dict)
+    document: DocumentSummary | None = None  # whole-text verdict (worst-claim rule)
 
 
 class DetectionPipeline:
@@ -301,7 +304,10 @@ class DetectionPipeline:
                     active_signals=[],
                     note="insufficient evidence: no sufficiently relevant passage found in the corpus",
                 ))
+        # overall_score (mean) is kept for backward compatibility; `document`
+        # is the whole-text verdict and should be what a reader looks at.
         overall_score = sum(s.hallu_score for s in scores) / len(scores)
+        document = aggregate_document([s.verdict for s in scores])
         timings["fusion"] = (time.perf_counter() - t) * 1000
         timings["total"] = (time.perf_counter() - t_start) * 1000
 
@@ -312,6 +318,7 @@ class DetectionPipeline:
             overall_score=overall_score,
             processing_time_ms=timings["total"],
             timings_ms=timings,
+            document=document,
         )
 
     def _extract_claims(self, text: str, language: Language) -> list[ExtractedClaim]:

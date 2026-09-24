@@ -25,6 +25,14 @@ MURIL_MODEL_NAME = "google/muril-base-cased"
 
 MAX_BATCH_SIZE = 128
 
+# OFF by default. The evidence corpus (corpus_vectors*.npy) is embedded with
+# XLM-R only, so a query vector from MuRIL lives in a DIFFERENT vector space and
+# its cosine against the corpus is meaningless. Routing transliterated Hindi to
+# MuRIL therefore broke retrieval for exactly those queries. Every vector that
+# gets compared (query and corpus) must come from ONE model. Only turn this on
+# if the corpus is re-embedded with the same routing.
+USE_MURIL_FALLBACK = False
+
 # Rough heuristic: if a Hindi-tagged claim is mostly ASCII letters, it's
 # likely transliterated (Latin-script) Hindi rather than Devanagari.
 _DEVANAGARI_RANGE = re.compile(r"[\u0900-\u097F]")
@@ -85,7 +93,7 @@ class CrossLingualEmbedder:
         # Route each claim to XLM-R or MuRIL.
         xlmr_idx, muril_idx = [], []
         for i, (text, lang) in enumerate(zip(texts, languages)):
-            if lang == "hi" and _looks_transliterated(text):
+            if USE_MURIL_FALLBACK and lang == "hi" and _looks_transliterated(text):
                 muril_idx.append(i)
             else:
                 xlmr_idx.append(i)

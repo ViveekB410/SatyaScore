@@ -32,7 +32,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from starlette.middleware.cors import CORSMiddleware
 
-from member1_model.cmhsa import CMHSAScorer
+from member1_model.cmhsa import CMHSAScorer, aggregate_document
 from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
 from member2_data.entity_linker import EntityLinker
@@ -97,9 +97,21 @@ class ClaimResult(BaseModel):
     extraction_method: str
 
 
+class DocumentResult(BaseModel):
+    """Whole-text verdict: judged by the worst claim (any Hallucinated claim ->
+    Hallucinated; else any Uncertain -> Uncertain; else Verified)."""
+    verdict: str
+    n_claims: int
+    n_verified: int
+    n_uncertain: int
+    n_hallucinated: int
+    supported_fraction: float
+
+
 class DetectResponse(BaseModel):
     claims: list[ClaimResult]
-    overall_score: float
+    document: DocumentResult
+    overall_score: float  # mean per-claim score; kept for backward compatibility
     processing_time_ms: float
 
 STARTER_TOPICS_EN = [
@@ -354,8 +366,16 @@ def detect(request: DetectRequest, api_key: str = Depends(require_api_key)) -> D
         for claim, score in zip(result.claims, result.scores)
     ]
 
+    # Aggregate from the FINAL per-claim verdicts (after any threshold override),
+    # so the document verdict always agrees with the claims shown.
+    doc = aggregate_document([c.verdict for c in claims])
     response = DetectResponse(
         claims=claims,
+        document=DocumentResult(
+            verdict=doc.document_verdict.value, n_claims=doc.n_claims,
+            n_verified=doc.n_verified, n_uncertain=doc.n_uncertain,
+            n_hallucinated=doc.n_hallucinated, supported_fraction=doc.supported_fraction,
+        ),
         overall_score=result.overall_score,
         processing_time_ms=result.processing_time_ms,
     )

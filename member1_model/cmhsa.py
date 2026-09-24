@@ -54,6 +54,41 @@ class ClaimScore:
                               # is backward compatible with existing callers
 
 
+@dataclass
+class DocumentSummary:
+    """Whole-text result, aggregated from the per-claim verdicts."""
+    document_verdict: Verdict
+    n_claims: int
+    n_verified: int
+    n_uncertain: int
+    n_hallucinated: int
+    supported_fraction: float  # share of claims Verified
+
+
+def aggregate_document(verdicts: list[Verdict | str]) -> DocumentSummary:
+    """Judge the whole text by its WORST claim -- the same rule annotators use
+    for a claim that bundles several facts: any Hallucinated claim makes the
+    text Hallucinated; otherwise any Uncertain claim makes it Uncertain;
+    otherwise Verified. A mean score would let one false claim among many true
+    ones average away, which is exactly what a hallucination check must not do.
+    """
+    if not verdicts:
+        raise ValueError("aggregate_document needs at least one claim verdict")
+    vs = [Verdict(v) for v in verdicts]
+    n_v = sum(v is Verdict.VERIFIED for v in vs)
+    n_u = sum(v is Verdict.UNCERTAIN for v in vs)
+    n_h = sum(v is Verdict.HALLUCINATED for v in vs)
+    if n_h:
+        doc = Verdict.HALLUCINATED
+    elif n_u:
+        doc = Verdict.UNCERTAIN
+    else:
+        doc = Verdict.VERIFIED
+    return DocumentSummary(document_verdict=doc, n_claims=len(vs), n_verified=n_v,
+                           n_uncertain=n_u, n_hallucinated=n_h,
+                           supported_fraction=n_v / len(vs))
+
+
 class _SoftmaxWeightModel(nn.Module):
     """
     Learns raw logits (a, b, g) such that

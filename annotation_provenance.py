@@ -74,6 +74,14 @@ def main() -> None:
     out(f"Source of record: `{SRC}` (clean UTF-8 export of the annotator's sheet).")
     out(f"Derived gold: `{GOLD}` ({len(gold)} claims).\n")
 
+    out("## 0. Review protocol")
+    out("- Review was **full, not sampled**: the annotator reviewed every one of the AI-suggested "
+        "verdicts in the sheet.")
+    out("- The annotator wrote a verdict only when they **disagreed** with the AI. A blank annotator "
+        "field (or 'ok') therefore means **\"reviewed and agreed\"**, not \"not reviewed\".")
+    out("- Limitation: review happened with the AI verdict visible, which biases toward agreement "
+        "(anchoring). The blind round-2 re-labelling (`results/label_audit.md`) measures this directly.\n")
+
     out("## 1. Traceability")
     out(f"- Gold claims: {len(gold_ids)} | Source claims: {len(src_ids)}")
     out(f"- Gold claims with NO matching source row (should be 0): **{len(orphan_gold)}**")
@@ -99,10 +107,11 @@ def main() -> None:
     verdict = "PROVEN" if (not orphan_gold and not missing_in_gold and not mismatches) else "FAILED — see above"
     out(f"\n## Verdict: {verdict}")
     out("Every gold label is reproducible from the human annotator file by a fixed, "
-        "documented rule; no label is invented. The honest caveat: only the "
-        f"{active} actively-judged claims carry strong human signal; the other "
-        f"{agreed} are agreement-by-silence with the AI suggestion (single annotator, "
-        "no second reviewer / IAA yet).")
+        "documented rule; no label is invented. The honest caveat: "
+        f"{active} labels are human overrides/confirmations and {agreed} are "
+        "reviewed-and-agreed with the AI suggestion, reviewed with the AI verdict visible "
+        "(anchoring) by a single annotator. Two blind inter-annotator rounds check this: "
+        "round 1 (`iaa/`) and round 2 (`results/label_audit.md`).")
 
     with open("ANNOTATION_PROVENANCE.md", "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines) + "\n")

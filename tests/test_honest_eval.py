@@ -138,3 +138,30 @@ def test_discrimination_auc_holds_the_positive_class_fixed():
     assert auc["n_positive"] == 10
     assert auc["vs_synthetic_hallucinated"]["fused_auc"] == pytest.approx(1.0)
     assert auc["vs_human_annotated_hallucinated"]["fused_auc"] == pytest.approx(0.5)
+
+
+# --- IMPROVEMENT_PLAN.md 1.2 / 1.3 -------------------------------------------
+
+def test_metrics_with_ci_reports_intervals_and_positive_count():
+    import pandas as pd
+    frame = pd.DataFrame({
+        "gold_verdict": ["Hallucinated"] * 3 + ["Verified"] * 7,
+        "fused": [0.1, 0.2, 0.9] + [0.9] * 7,
+    })
+    m = he.metrics(frame, (0.35, 0.65), ci=True)
+    assert m["n"] == 10 and m["n_hallucinated"] == 3
+    assert m["too_few_positives"] is True  # 3 < MIN_POSITIVES_TO_INTERPRET
+    lo, hi = m["hallucinated_f1_ci95"]
+    assert 0.0 <= lo <= m["hallucinated_f1"] <= hi <= 1.0
+    lo, hi = m["accuracy_ci95"]
+    assert 0.0 <= lo <= m["accuracy"] <= hi <= 1.0
+    assert "accuracy_ci95" not in he.metrics(frame, (0.35, 0.65))  # off by default
+
+
+def test_committed_split_shares_no_source_question():
+    import pandas as pd
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    train = pd.read_csv(root / "gold_train_clean.csv")
+    test = pd.read_csv(root / "gold_test_clean.csv")
+    assert not set(train.source_query_id) & set(test.source_query_id)

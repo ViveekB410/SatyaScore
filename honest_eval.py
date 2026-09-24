@@ -117,15 +117,52 @@ def verdict(score: float, hallucinated_below: float, verified_above: float) -> s
 
 # ── Metrics ─────────────────────────────────────────────────────────────
 
-def metrics(df: pd.DataFrame, cutpoints: tuple[float, float]) -> dict | None:
+# Below this many Hallucinated test claims, Hallu-F1 is reported but marked
+# "too few positives to interpret" (corrections spec B2).
+MIN_POSITIVES_TO_INTERPRET = 10
+N_BOOT = 2000
+BOOT_SEED = 42
+
+
+def bootstrap_ci(y_true: list[str], y_pred: list[str], n_boot: int = N_BOOT,
+                 seed: int = BOOT_SEED) -> dict:
+    """95% bootstrap CIs (resampling claims) for accuracy and Hallucinated-F1."""
+    t = np.array(y_true)
+    p = np.array(y_pred)
+    rng = np.random.default_rng(seed)
+    n = len(t)
+    acc, hf1 = [], []
+    for _ in range(n_boot):
+        idx = rng.integers(0, n, n)
+        tb, pb = t[idx], p[idx]
+        acc.append(float((tb == pb).mean()))
+        tp = int(((tb == "Hallucinated") & (pb == "Hallucinated")).sum())
+        fp = int(((tb != "Hallucinated") & (pb == "Hallucinated")).sum())
+        fn = int(((tb == "Hallucinated") & (pb != "Hallucinated")).sum())
+        denom = 2 * tp + fp + fn
+        hf1.append(2 * tp / denom if denom else 0.0)
+
+    def ci(values):
+        lo, hi = np.percentile(values, [2.5, 97.5])
+        return [round(float(lo), 4), round(float(hi), 4)]
+
+    return {"accuracy_ci95": ci(acc), "hallucinated_f1_ci95": ci(hf1), "n_boot": n_boot}
+
+
+def metrics(df: pd.DataFrame, cutpoints: tuple[float, float], ci: bool = False) -> dict | None:
+    """Test metrics. Always reports n and n_hallucinated. With ci=True also adds
+    95% bootstrap CIs for accuracy and Hallu-F1 (off by default: the cut-point
+    search calls this hundreds of times)."""
     scored = df[df["fused"].notna()]
     if scored.empty:
         return None
     y_true = scored["gold_verdict"].tolist()
     y_pred = [verdict(s, *cutpoints) for s in scored["fused"]]
-    return {
+    n_hallucinated = int((scored["gold_verdict"] == "Hallucinated").sum())
+    out = {
         "n": len(y_true),
-        "n_hallucinated": int((scored["gold_verdict"] == "Hallucinated").sum()),
+        "n_hallucinated": n_hallucinated,
+        "too_few_positives": n_hallucinated < MIN_POSITIVES_TO_INTERPRET,
         "accuracy": round(accuracy_score(y_true, y_pred), 4),
         "macro_f1": round(f1_score(y_true, y_pred, labels=CLASSES,
                                    average="macro", zero_division=0), 4),
@@ -135,6 +172,9 @@ def metrics(df: pd.DataFrame, cutpoints: tuple[float, float]) -> dict | None:
                                       average="macro", zero_division=0), 4),
         "hallucinated_recall": _recall(scored, y_pred, "Hallucinated"),
     }
+    if ci:
+        out.update(bootstrap_ci(y_true, y_pred))
+    return out
 
 
 def _recall(scored: pd.DataFrame, y_pred: list[str], label: str) -> float | None:

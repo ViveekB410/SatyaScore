@@ -1,0 +1,523 @@
+{
+  "generated_at": "2026-09-17",
+  "mode": "no_semsim",
+  "objective": "macro_f1",
+  "train_csv": "gold_train_clean.csv",
+  "test_csv": "gold_test_clean.csv",
+  "languages": {
+    "en": {
+      "weights": {
+        "alpha": 0.0,
+        "beta": 0.5002472142250936,
+        "gamma": 0.4997527857749064
+      },
+      "configurations": {
+        "Full (S+N+KG)": {
+          "cutpoints_fitted_on_train": [
+            0.23,
+            0.43
+          ],
+          "test_all": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.6667,
+            "macro_f1": 0.3556,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8169,
+            "hallucinated_recall": 0.0
+          },
+          "test_human_annotated_only": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.6667,
+            "macro_f1": 0.3556,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8169,
+            "hallucinated_recall": 0.0
+          },
+          "test_all_shipped_cutpoints": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.2667,
+            "macro_f1": 0.1898,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.4444,
+            "hallucinated_recall": 0.0
+          },
+          "identical_predictions_with": [
+            "NLI only",
+            "SemSim + NLI",
+            "NLI + KG"
+          ]
+        },
+        "SemSim only": {
+          "cutpoints_fitted_on_train": [
+            0.54,
+            0.55
+          ],
+          "test_all": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.6444,
+            "macro_f1": 0.3069,
+            "hallucinated_f1": 0.1429,
+            "verified_f1": 0.7778,
+            "hallucinated_recall": 0.1111
+          },
+          "test_human_annotated_only": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.6444,
+            "macro_f1": 0.3069,
+            "hallucinated_f1": 0.1429,
+            "verified_f1": 0.7778,
+            "hallucinated_recall": 0.1111
+          },
+          "test_all_shipped_cutpoints": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.4444,
+            "macro_f1": 0.284,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.6296,
+            "hallucinated_recall": 0.0
+          },
+          "identical_predictions_with": [
+            "SemSim + KG"
+          ]
+        },
+        "NLI only": {
+          "cutpoints_fitted_on_train": [
+            0.23,
+            0.43
+          ],
+          "test_all": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.6667,
+            "macro_f1": 0.3556,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8169,
+            "hallucinated_recall": 0.0
+          },
+          "test_human_annotated_only": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.6667,
+            "macro_f1": 0.3556,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8169,
+            "hallucinated_recall": 0.0
+          },
+          "test_all_shipped_cutpoints": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.2667,
+            "macro_f1": 0.1898,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.4444,
+            "hallucinated_recall": 0.0
+          },
+          "identical_predictions_with": [
+            "Full (S+N+KG)",
+            "SemSim + NLI",
+            "NLI + KG"
+          ]
+        },
+        "SemSim + NLI": {
+          "cutpoints_fitted_on_train": [
+            0.23,
+            0.43
+          ],
+          "test_all": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.6667,
+            "macro_f1": 0.3556,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8169,
+            "hallucinated_recall": 0.0
+          },
+          "test_human_annotated_only": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.6667,
+            "macro_f1": 0.3556,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8169,
+            "hallucinated_recall": 0.0
+          },
+          "test_all_shipped_cutpoints": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.2667,
+            "macro_f1": 0.1898,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.4444,
+            "hallucinated_recall": 0.0
+          },
+          "identical_predictions_with": [
+            "Full (S+N+KG)",
+            "NLI only",
+            "NLI + KG"
+          ]
+        },
+        "NLI + KG": {
+          "cutpoints_fitted_on_train": [
+            0.23,
+            0.43
+          ],
+          "test_all": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.6667,
+            "macro_f1": 0.3556,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8169,
+            "hallucinated_recall": 0.0
+          },
+          "test_human_annotated_only": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.6667,
+            "macro_f1": 0.3556,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8169,
+            "hallucinated_recall": 0.0
+          },
+          "test_all_shipped_cutpoints": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.2667,
+            "macro_f1": 0.1898,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.4444,
+            "hallucinated_recall": 0.0
+          },
+          "identical_predictions_with": [
+            "Full (S+N+KG)",
+            "NLI only",
+            "SemSim + NLI"
+          ]
+        },
+        "SemSim + KG": {
+          "cutpoints_fitted_on_train": [
+            0.54,
+            0.55
+          ],
+          "test_all": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.6444,
+            "macro_f1": 0.3069,
+            "hallucinated_f1": 0.1429,
+            "verified_f1": 0.7778,
+            "hallucinated_recall": 0.1111
+          },
+          "test_human_annotated_only": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.6444,
+            "macro_f1": 0.3069,
+            "hallucinated_f1": 0.1429,
+            "verified_f1": 0.7778,
+            "hallucinated_recall": 0.1111
+          },
+          "test_all_shipped_cutpoints": {
+            "n": 45,
+            "n_hallucinated": 9,
+            "accuracy": 0.4444,
+            "macro_f1": 0.284,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.6296,
+            "hallucinated_recall": 0.0
+          },
+          "identical_predictions_with": [
+            "SemSim only"
+          ]
+        },
+        "KG only": {
+          "n_scored": 0,
+          "note": "no claim carried any signal in this configuration"
+        },
+        "always_verified_baseline": {
+          "test_all": {
+            "n": 45,
+            "accuracy": 0.7111,
+            "macro_f1": 0.2771,
+            "hallucinated_f1": 0.0
+          }
+        }
+      },
+      "identical_groups": [
+        [
+          "Full (S+N+KG)",
+          "NLI only",
+          "SemSim + NLI",
+          "NLI + KG"
+        ],
+        [
+          "SemSim only",
+          "SemSim + KG"
+        ]
+      ]
+    },
+    "hi": {
+      "weights": {
+        "alpha": 0.0,
+        "beta": 0.4992213754217447,
+        "gamma": 0.5007786245782553
+      },
+      "configurations": {
+        "Full (S+N+KG)": {
+          "cutpoints_fitted_on_train": [
+            0.18,
+            0.22
+          ],
+          "test_all": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.7895,
+            "macro_f1": 0.2941,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8824,
+            "hallucinated_recall": 0.0
+          },
+          "test_human_annotated_only": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.7895,
+            "macro_f1": 0.2941,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8824,
+            "hallucinated_recall": 0.0
+          },
+          "test_all_shipped_cutpoints": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.1842,
+            "macro_f1": 0.1263,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.25,
+            "hallucinated_recall": 0.0
+          },
+          "identical_predictions_with": [
+            "NLI only",
+            "SemSim + NLI",
+            "NLI + KG"
+          ]
+        },
+        "SemSim only": {
+          "cutpoints_fitted_on_train": [
+            0.51,
+            0.53
+          ],
+          "test_all": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.8684,
+            "macro_f1": 0.3143,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.9429,
+            "hallucinated_recall": 0.0
+          },
+          "test_human_annotated_only": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.8684,
+            "macro_f1": 0.3143,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.9429,
+            "hallucinated_recall": 0.0
+          },
+          "test_all_shipped_cutpoints": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.5789,
+            "macro_f1": 0.2848,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.7368,
+            "hallucinated_recall": 0.0
+          },
+          "identical_predictions_with": [
+            "SemSim + KG"
+          ]
+        },
+        "NLI only": {
+          "cutpoints_fitted_on_train": [
+            0.18,
+            0.22
+          ],
+          "test_all": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.7895,
+            "macro_f1": 0.2941,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8824,
+            "hallucinated_recall": 0.0
+          },
+          "test_human_annotated_only": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.7895,
+            "macro_f1": 0.2941,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8824,
+            "hallucinated_recall": 0.0
+          },
+          "test_all_shipped_cutpoints": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.1842,
+            "macro_f1": 0.1263,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.25,
+            "hallucinated_recall": 0.0
+          },
+          "identical_predictions_with": [
+            "Full (S+N+KG)",
+            "SemSim + NLI",
+            "NLI + KG"
+          ]
+        },
+        "SemSim + NLI": {
+          "cutpoints_fitted_on_train": [
+            0.18,
+            0.22
+          ],
+          "test_all": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.7895,
+            "macro_f1": 0.2941,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8824,
+            "hallucinated_recall": 0.0
+          },
+          "test_human_annotated_only": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.7895,
+            "macro_f1": 0.2941,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8824,
+            "hallucinated_recall": 0.0
+          },
+          "test_all_shipped_cutpoints": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.1842,
+            "macro_f1": 0.1263,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.25,
+            "hallucinated_recall": 0.0
+          },
+          "identical_predictions_with": [
+            "Full (S+N+KG)",
+            "NLI only",
+            "NLI + KG"
+          ]
+        },
+        "NLI + KG": {
+          "cutpoints_fitted_on_train": [
+            0.18,
+            0.22
+          ],
+          "test_all": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.7895,
+            "macro_f1": 0.2941,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8824,
+            "hallucinated_recall": 0.0
+          },
+          "test_human_annotated_only": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.7895,
+            "macro_f1": 0.2941,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.8824,
+            "hallucinated_recall": 0.0
+          },
+          "test_all_shipped_cutpoints": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.1842,
+            "macro_f1": 0.1263,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.25,
+            "hallucinated_recall": 0.0
+          },
+          "identical_predictions_with": [
+            "Full (S+N+KG)",
+            "NLI only",
+            "SemSim + NLI"
+          ]
+        },
+        "SemSim + KG": {
+          "cutpoints_fitted_on_train": [
+            0.51,
+            0.53
+          ],
+          "test_all": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.8684,
+            "macro_f1": 0.3143,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.9429,
+            "hallucinated_recall": 0.0
+          },
+          "test_human_annotated_only": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.8684,
+            "macro_f1": 0.3143,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.9429,
+            "hallucinated_recall": 0.0
+          },
+          "test_all_shipped_cutpoints": {
+            "n": 38,
+            "n_hallucinated": 2,
+            "accuracy": 0.5789,
+            "macro_f1": 0.2848,
+            "hallucinated_f1": 0.0,
+            "verified_f1": 0.7368,
+            "hallucinated_recall": 0.0
+          },
+          "identical_predictions_with": [
+            "SemSim only"
+          ]
+        },
+        "KG only": {
+          "n_scored": 0,
+          "note": "no claim carried any signal in this configuration"
+        },
+        "always_verified_baseline": {
+          "test_all": {
+            "n": 38,
+            "accuracy": 0.8684,
+            "macro_f1": 0.3099,
+            "hallucinated_f1": 0.0
+          }
+        }
+      },
+      "identical_groups": [
+        [
+          "Full (S+N+KG)",
+          "NLI only",
+          "SemSim + NLI",
+          "NLI + KG"
+        ],
+        [
+          "SemSim only",
+          "SemSim + KG"
+        ]
+      ]
+    }
+  }
+}

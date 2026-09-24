@@ -129,8 +129,13 @@ def main() -> None:
     lines.append(f"| {doc_claims}-claim document total | {doc_total:.0f} ms | < {PER_DOC_TARGET_MS} ms | "
                  f"**{met(doc_total, PER_DOC_TARGET_MS)}** |")
 
-    lines.append(f"\n_NLI is the dominant stage; on CPU the per-claim targets are expected to be MISSED. "
-                 f"Re-run on a GPU (device=cuda) for the real numbers._\n")
+    # Name the dominant stage from the measurements -- it differs by device
+    # (NLI dominates on CPU; on GPU the KG network call dominates the mean).
+    stage_means = {s: statistics.mean(per_stage[s]) for s in STAGES if s != "total"}
+    dominant = max(stage_means, key=stage_means.get)
+    lines.append(f"\n_Dominant stage by mean on this run: **{dominant}** "
+                 f"({stage_means[dominant]:.0f} ms of {claim_total_mean:.0f} ms). "
+                 f"Figures are for device={device}; CPU is much slower than GPU._\n")
 
     out = ROOT / "results" / "latency_benchmark.md"
     out.parent.mkdir(exist_ok=True)

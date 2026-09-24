@@ -44,7 +44,9 @@ import pandas as pd
 from honest_eval import (
     CLASS_CODES,
     DEFAULT_CUTPOINTS,
+    MIN_POSITIVES_TO_INTERPRET,
     WEIGHT_FLOOR,
+    bootstrap_ci,
     load_split,
     metrics,
     search_cutpoints,
@@ -135,8 +137,8 @@ def run_language(language: str, mode: str, train_df: pd.DataFrame, test_df: pd.D
         cutpoints = fit_cutpoints(train_scored, objective)
         results[name] = {
             "cutpoints_fitted_on_train": list(cutpoints),
-            "test_all": metrics(test_scored, cutpoints),
-            "test_human_annotated_only": metrics(human_only, cutpoints),
+            "test_all": metrics(test_scored, cutpoints, ci=True),
+            "test_human_annotated_only": metrics(human_only, cutpoints, ci=True),
             "test_all_shipped_cutpoints": metrics(test_scored, DEFAULT_CUTPOINTS),
         }
         prediction_vectors[name] = predictions(test_scored, cutpoints)
@@ -159,14 +161,18 @@ def run_language(language: str, mode: str, train_df: pd.DataFrame, test_df: pd.D
     baseline_true = test_lang["gold_verdict"].tolist()
     baseline_pred = ["Verified"] * len(baseline_true)
     from sklearn.metrics import accuracy_score, f1_score
+    n_hallucinated = int(sum(v == "Hallucinated" for v in baseline_true))
     results["always_verified_baseline"] = {
         "test_all": {
             "n": len(baseline_true),
+            "n_hallucinated": n_hallucinated,
+            "too_few_positives": n_hallucinated < MIN_POSITIVES_TO_INTERPRET,
             "accuracy": round(accuracy_score(baseline_true, baseline_pred), 4),
             "macro_f1": round(f1_score(baseline_true, baseline_pred,
                                        labels=["Hallucinated", "Uncertain", "Verified"],
                                        average="macro", zero_division=0), 4),
             "hallucinated_f1": 0.0,
+            **bootstrap_ci(baseline_true, baseline_pred),
         }
     }
 
@@ -177,38 +183,60 @@ def run_language(language: str, mode: str, train_df: pd.DataFrame, test_df: pd.D
     }
 
 
+def _ci(m: dict, key: str) -> str:
+    lo, hi = m.get(f"{key}_ci95", (None, None))
+    return f" [{lo:.2f}, {hi:.2f}]" if lo is not None else ""
+
+
+def _hallu_f1(m: dict) -> str:
+    cell = f"{m['hallucinated_f1']:.3f}{_ci(m, 'hallucinated_f1')}"
+    return cell + " †" if m.get("too_few_positives") else cell
+
+
 def markdown_table(report: dict) -> str:
     lines = []
+    any_too_few = False
+    any_synthetic = False
     for language, block in report["languages"].items():
         alpha, beta, gamma = (block["weights"][k] for k in ("alpha", "beta", "gamma"))
+        base = block["configurations"]["always_verified_baseline"]["test_all"]
+        any_too_few |= base["too_few_positives"]
         lines.append(f"### {language.upper()} "
                      f"(alpha={alpha:.3f}, beta={beta:.3f}, gamma={gamma:.3f})\n")
-        lines.append("| Configuration | Cut-points | Acc (all) | Macro-F1 (all) | "
-                     "Hallu-F1 (all) | Acc (human) | Hallu-F1 (human) |")
-        lines.append("| --- | --- | --- | --- | --- | --- | --- |")
+        lines.append(f"Test split: **n = {base['n']}**, of which **Hallucinated = "
+                     f"{base['n_hallucinated']}**"
+                     + (" — too few positives to interpret Hallu-F1." if base["too_few_positives"] else ".")
+                     + "\n")
+        lines.append("| Configuration | Cut-points | Acc [95% CI] | Macro-F1 | Hallu-F1 [95% CI] |")
+        lines.append("| --- | --- | --- | --- | --- |")
         for name, result in block["configurations"].items():
             if name == "always_verified_baseline":
-                base = result["test_all"]
-                lines.append(f"| Always-Verified baseline | n/a | {base['accuracy']:.3f} | "
-                             f"{base['macro_f1']:.3f} | 0.000 | n/a | n/a |")
+                lines.append(f"| Always-Verified baseline | n/a | {base['accuracy']:.3f}{_ci(base, 'accuracy')} | "
+                             f"{base['macro_f1']:.3f} | {_hallu_f1(base)} |")
                 continue
             if result.get("n_scored") == 0:
-                lines.append(f"| {name} | n/a | not scoreable | | | | |")
+                lines.append(f"| {name} | n/a | not scoreable | | |")
                 continue
             low, high = result["cutpoints_fitted_on_train"]
             all_m, human_m = result["test_all"], result["test_human_annotated_only"]
+            any_synthetic |= human_m is None or human_m["n"] != all_m["n"]
             lines.append(
-                f"| {name} | {low:.2f}/{high:.2f} | {all_m['accuracy']:.3f} | "
-                f"{all_m['macro_f1']:.3f} | {all_m['hallucinated_f1']:.3f} | "
-                f"{human_m['accuracy']:.3f} | {human_m['hallucinated_f1']:.3f} |"
+                f"| {name} | {low:.2f}/{high:.2f} | {all_m['accuracy']:.3f}{_ci(all_m, 'accuracy')} | "
+                f"{all_m['macro_f1']:.3f} | {_hallu_f1(all_m)} |"
             )
         for group in block["identical_groups"]:
             lines.append(f"\nIdentical predictions on the test split: {', '.join(group)}.")
         lines.append("")
     lines.append("Cut-points are fitted on the training split separately for each "
                  "configuration, because dropping a signal changes the scale of the "
-                 "fused score. The human columns cover the test claims that were "
-                 "annotated by hand, excluding synthetic perturbations.")
+                 "fused score. CIs are 95% bootstrap intervals (2,000 resamples of test claims).")
+    if any_too_few:
+        lines.append(f"† Fewer than {MIN_POSITIVES_TO_INTERPRET} Hallucinated test claims: the "
+                     "Hallu-F1 is printed but is too few positives to interpret.")
+    if not any_synthetic:
+        lines.append("Every test claim is human-annotated (no synthetic perturbations), so a "
+                     "separate human-only column would repeat these numbers and is omitted; "
+                     "it remains in the JSON.")
     return "\n".join(lines)
 
 

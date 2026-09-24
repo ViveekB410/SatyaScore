@@ -1,0 +1,436 @@
+{
+  "q01@openai/gpt-oss-120b": {
+    "qid": "q01",
+    "question": "Where was Birsa Munda born?",
+    "relation": "born in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "Birsa Munda was born on 15 November 1875 in the village of **Ulihatu**, which is now in the Ranchi district of the Indian state of **Jharkhand** (then part of the Bengal Presidency/Bihar under British India)."
+  },
+  "q02@openai/gpt-oss-120b": {
+    "qid": "q02",
+    "question": "Where was Alluri Sitarama Raju born?",
+    "relation": "born in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "Alluri Sitarama Raju was born on 4 July 1897 in the village of Pandrangi (near Kothavalasa) in the Vizianagaram district of what is now Andhra Pradesh, India (then part of the Madras Presidency, British India)."
+  },
+  "q03@openai/gpt-oss-120b": {
+    "qid": "q03",
+    "question": "Where was Savitribai Phule born?",
+    "relation": "born in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "Savitribai Phule was born in **Naigaon, near Pune in the state of Maharashtra, India** (on 3 January 1831)."
+  },
+  "q04@openai/gpt-oss-120b": {
+    "qid": "q04",
+    "question": "Where was Srinivasa Ramanujan born?",
+    "relation": "born in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "Srinivasa Ramanujan was born on 22 December 1887 in **Erode**, which was then part of the Madras Presidency in British India (now in the state of Tamil Nadu, India)."
+  },
+  "q05@openai/gpt-oss-120b": {
+    "qid": "q05",
+    "question": "Where was Homi J. Bhabha born?",
+    "relation": "born in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "Homi J. Bhabha was born in Bombay (now Mumbai), British India, on 30 October 1909."
+  },
+  "q06@openai/gpt-oss-120b": {
+    "qid": "q06",
+    "question": "Where was Rani Gaidinliu born?",
+    "relation": "born in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "Rani Gaidinliu was born on 20 January 1915 in the village of Khoupum, in the princely state of Manipur (then part of British India)."
+  },
+  "q07@openai/gpt-oss-120b": {
+    "qid": "q07",
+    "question": "Where was Kanaklata Barua born?",
+    "relation": "born in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "Kanaklata Barua was born on 24 November 1920 in the village of **Gohpur** (then part of Darrang district, now Sonitpur district) in the Indian state of **Assam**."
+  },
+  "q08@openai/gpt-oss-120b": {
+    "qid": "q08",
+    "question": "Where did Subramania Bharati die?",
+    "relation": "died in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "Subramania Bharati died in Madras (present‑day Chennai), India, on 11 September 1921, at his home in the Triplicane area of the city."
+  },
+  "q09@openai/gpt-oss-120b": {
+    "qid": "q09",
+    "question": "Where did Swami Vivekananda die?",
+    "relation": "died in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "Swami Vivekananda died in New York City, USA, on 4 July 1902 (at his brother’s residence on Henry Street)."
+  },
+  "q10@openai/gpt-oss-120b": {
+    "qid": "q10",
+    "question": "Where did Tipu Sultan die?",
+    "relation": "died in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "Tipu Sultan died in 1799 during the Siege of Seringapatam, at the fortress town of Seringapatam (now Srirangapatna) in the Kingdom of Mysore, present‑day Karnataka, India."
+  },
+  "q11@openai/gpt-oss-120b": {
+    "qid": "q11",
+    "question": "What is the capital of Nagaland?",
+    "relation": "is the capital of",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The capital of Nagaland is **Kohima**."
+  },
+  "q12@openai/gpt-oss-120b": {
+    "qid": "q12",
+    "question": "What is the capital of Mizoram?",
+    "relation": "is the capital of",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The capital of Mizoram is **Aizawl**."
+  },
+  "q13@openai/gpt-oss-120b": {
+    "qid": "q13",
+    "question": "What is the capital of Arunachal Pradesh?",
+    "relation": "is the capital of",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The capital of Arunachal Pradesh is **Itanagar**."
+  },
+  "q14@openai/gpt-oss-120b": {
+    "qid": "q14",
+    "question": "What is the capital of Bhutan?",
+    "relation": "is the capital of",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The capital of Bhutan is **Thimphu**."
+  },
+  "q15@openai/gpt-oss-120b": {
+    "qid": "q15",
+    "question": "What is the capital of Burkina Faso?",
+    "relation": "is the capital of",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The capital of Burkina Faso is **Ouagadougou**."
+  },
+  "q16@openai/gpt-oss-120b": {
+    "qid": "q16",
+    "question": "Where is the Indian Space Research Organisation headquartered?",
+    "relation": "headquartered in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The Indian Space Research Organisation (ISRO) is headquartered in **Bengaluru (Bangalore), Karnataka, India**—specifically at Antariksh Bhavan, New BEL Road, Bengaluru 560094."
+  },
+  "q17@openai/gpt-oss-120b": {
+    "qid": "q17",
+    "question": "Where is the Reserve Bank of India headquartered?",
+    "relation": "headquartered in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The Reserve Bank of India (RBI) is headquartered in **Mumbai, Maharashtra, India** (its main office is at Madhav Rao Scindia Marg, Mumbai)."
+  },
+  "q18@openai/gpt-oss-120b": {
+    "qid": "q18",
+    "question": "Where is Tata Steel headquartered?",
+    "relation": "headquartered in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "Tata Steel is headquartered in Mumbai, Maharashtra, India."
+  },
+  "q19@openai/gpt-oss-120b": {
+    "qid": "q19",
+    "question": "Where is the International Cricket Council headquartered?",
+    "relation": "headquartered in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The International Cricket Council (ICC) is headquartered in **Dubai, United Arab Emirates**. It moved its headquarters from London to Dubai in 2005."
+  },
+  "q20@openai/gpt-oss-120b": {
+    "qid": "q20",
+    "question": "Where is the Asian Development Bank headquartered?",
+    "relation": "headquartered in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The Asian Development Bank (ADB) is headquartered in **Manila, Philippines**."
+  },
+  "q21@openai/gpt-oss-120b": {
+    "qid": "q21",
+    "question": "Who founded the Bombay Natural History Society?",
+    "relation": "founded by",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The Bombay Natural History Society (BNHS) was founded on 15 September 1883 by a small group of amateur naturalists—including the British civil‑servant and naturalist **Dr. Henry H. Godwin‑Austen**—who organized the society to promote the study and conservation of India’s wildlife."
+  },
+  "q22@openai/gpt-oss-120b": {
+    "qid": "q22",
+    "question": "Who founded the Indian Institute of Science?",
+    "relation": "founded by",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The Indian Institute of Science (IISc) was founded in 1909 by industrialist **Jamsetji Tata**, with major support from the Government of Mysore and its ruler, Maharaja Krishnaraja Wadiyar IV, as well as contributions from Sir M. Visvesvaraya and other philanthropists."
+  },
+  "q23@openai/gpt-oss-120b": {
+    "qid": "q23",
+    "question": "Who founded the Asiatic Society of Bengal?",
+    "relation": "founded by",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The Asiatic Society of Bengal was founded by Sir William Jones in 1784."
+  },
+  "q24@openai/gpt-oss-120b": {
+    "qid": "q24",
+    "question": "Who founded the Servants of India Society?",
+    "relation": "founded by",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The Servants of India Society was founded by Gopal Krishna Gokhale in 1905."
+  },
+  "q25@openai/gpt-oss-120b": {
+    "qid": "q25",
+    "question": "Who founded the Deccan Education Society?",
+    "relation": "founded by",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The Deccan Education Society was founded in 1884 in Pune by a group of Indian reformers led by **Bal Gangadhar Tilak**, **Gopal Ganesh Agarkar**, and **Vishnushastri Chiplunkar**, along with other like‑minded activists."
+  },
+  "q26@openai/gpt-oss-120b": {
+    "qid": "q26",
+    "question": "Where is the Konark Sun Temple located?",
+    "relation": "located in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The Konark Sun Temple is located in the town of **Konark**, in the state of **Odisha (formerly Orissa), India**. It sits on the eastern coast of India, about 35 km (≈22 mi) east of the city of Puri and near the Bay of Bengal."
+  },
+  "q27@openai/gpt-oss-120b": {
+    "qid": "q27",
+    "question": "Where is the Hampi group of monuments located?",
+    "relation": "located in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The Hampi Group of Monuments is located in the town of **Hampi** in the state of **Karnataka, India** (within the Vijayanagara district). It lies on the banks of the Tungabhadra River, about 350 km south‑west of Bengaluru."
+  },
+  "q28@openai/gpt-oss-120b": {
+    "qid": "q28",
+    "question": "Where is Kaziranga National Park located?",
+    "relation": "located in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "Kaziranga National Park is located in the state of **Assam** in northeastern India, spanning the Golaghat and Nagaon districts near the Brahmaputra River. (Approx. 26.7° N 93.2° E)."
+  },
+  "q29@openai/gpt-oss-120b": {
+    "qid": "q29",
+    "question": "Where is the Brihadisvara Temple located?",
+    "relation": "located in",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "The Brihadisvara Temple (also called Peruvudaiyar Kovil) is situated in the city of **Thanjavur** in the Indian state of **Tamil Nadu**. It lies on the banks of the Kaveri River, about 350 km south‑west of Chennai."
+  },
+  "q30@openai/gpt-oss-120b": {
+    "qid": "q30",
+    "question": "Which international organizations is India a member of?",
+    "relation": "member of",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "**India’s membership in major international organisations (as of 2026)**  \n\n| Category | Organisation(s) |\n|----------|-----------------|\n| **United Nations system** | United Nations (UN), UN General Assembly, UN Security Council (non‑permanent member 2021‑2022), UN Development Programme (UNDP), UN Children’s Fund (UNICEF), UN Educational, Scientific & Cultural Organisation (UNESCO), World Health Organization (WHO), International Labour Organization (ILO), International Monetary Fund (IMF), World Bank Group (IBRD & IDA), International Atomic Energy Agency (IAEA), UN High‑Commissioner for Refugees (UNHCR), UN Women, UN Environment Programme (UNEP) |\n| **Global economic & trade bodies** | World Trade Organization (WTO), World Customs Organization (WCO), World Intellectual Property Organization (WIPO), International Trade Centre (ITC), Organisation for Economic Co‑operation and Development (OECD) – partner country, G20 (member), G7 + India (partner), G77 (founding member) |\n| **Financial institutions** | International Monetary Fund (IMF), World Bank (IBRD & IDA), Asian Development Bank (ADB), New Development Bank (NDB – founder‑member), Islamic Development Bank (IDB – observer), Asian Infrastructure Investment Bank (AIIB – member) |\n| **Regional & security groups** | South Asian Association for Regional Cooperation (SAARC), Bay of Bengal Initiative for Multi‑Sectoral Technical and Economic Cooperation (BIMSTEC), Association of Southeast Asian Nations (ASEAN) – dialogue partner, East Asia Summit (EAS) – participant, Shanghai Cooperation Organisation (SCO) – dialogue partner, Indian Ocean Rim Association (IORA), Commonwealth of Nations (member), Non‑Aligned Movement (NAM – founding member), International Solar Alliance (ISA – founder‑member) |\n| **Strategic & defence forums** | NATO‑India Individual Partnership Programme, Quadrilateral Security Dialogue (Quad – member), Indo‑Pacific Economic Framework for Prosperity (IPEF – member), United Nations Peacekeeping Operations (major troop contributor) |\n| **Science, technology & standards** | International Telecommunication Union (ITU), International Civil Aviation Organisation (ICAO), International Maritime Organisation (IMO), International Organization for Standardisation (ISO – member), International Renewable Energy Agency (IRENA – member) |\n| **Cultural & sports bodies** | International Olympic Committee (IOC – member), Fédération Internationale de Football Association (FIFA – member), International Cricket Council (ICC – member), UNESCO‑World Heritage Committee (member) |\n| **Human rights & legal** | International Criminal Court (ICC – signatory, not a party), International Court of Justice (ICJ – member state), International Commission on Missing Persons (ICMP – member) |\n| **Other multilateral groups** | Global Green Growth Institute (GGGI), International Energy Agency (IEA – associate), World Meteorological Organization (WMO), International Fund for Agricultural Development (IFAD), Food and Agriculture Organization (FAO), International Maritime Satellite Organisation (INMARSAT), International Renewable Energy Agency (IRENA) |\n\n*India is a founding or early member of several of these bodies (e.g., UN, NAM, BRICS, ISA, NDB) and actively participates in many others as a full member, observer, or dialogue partner.*"
+  },
+  "q31@openai/gpt-oss-120b": {
+    "qid": "q31",
+    "question": "Which international organizations is Nepal a member of?",
+    "relation": "member of",
+    "model": "openai/gpt-oss-120b",
+    "response_text": "**International organisations of which Nepal is a full member (or an official participant)**  \n\n| Category | Organisations (full membership) |\n|----------|----------------------------------|\n| **United Nations system** | United Nations (UN), UN General Assembly, UN Security Council (non‑permanent member in 2000‑01, 2013‑14), UN Development Programme (UNDP), UN Children’s Fund (UNICEF), UN Educational, Scientific & Cultural Organisation (UNESCO), World Health Organization (WHO), International Labour Organization (ILO), International Monetary Fund (IMF), World Bank Group (IBRD & IDA), International Civil Aviation Organization (ICAO), International Fund for Agricultural Development (IFAD), International Atomic Energy Agency (IAEA) (as a member state), United Nations Environment Programme (UNEP), United Nations Human Settlements Programme (UN‑Habitat), etc. |\n| **Regional / sub‑regional bodies** | South Asian Association for Regional Cooperation (SAARC), Asian Development Bank (ADB), Asian Cooperation Dialogue (ACD), Bay of Bengal Initiative for Multi‑Sectoral Technical and Economic Cooperation (BIMSTEC) – observer, South Asian Economic Union (SAEU) (as part of SAARC), Asian Infrastructure Investment Bank (AIIB) (member). |\n| **Economic & trade groups** | World Trade Organization (WTO), Group of 77 (G‑77) & China, Non‑Aligned Movement (NAM), Commonwealth of Nations (as a “partner country” – not a full member). |\n| **Security & law‑enforcement** | INTERPOL (member), International Criminal Police Organization. |\n| **Other multilateral organisations** | International Organization for Standardization (ISO), International Telecommunication Union (ITU), World Meteorological Organization (WMO), International Maritime Organization (IMO), United Nations Office on Drugs and Crime (UNODC), United Nations Educational, Scientific and Cultural Organization (UNESCO) – listed already under UN system. |\n\n*Notes*  \n\n- Nepal joined the United Nations on 14 December 1955.  \n- It became a WTO member in 2004, an IMF member in 1956, and a World Bank member in 1956.  \n- It is a founding member of SAARC (established 1985).  \n- Membership in some bodies (e.g., BIMSTEC, Commonwealth) is as an observer or partner rather than full member; the table focuses on full membership or official participation.  \n\nThese are the principal international organisations in which Nepal participates as a sovereign state."
+  },
+  "q01@qwen/qwen3.8-27b": {
+    "qid": "q01",
+    "question": "Where was Birsa Munda born?",
+    "relation": "born in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Birsa Munda was born in the village of **Udanki** in the Manbhum district of the Chota Nagpur Plateau. This area is currently part of the **Khunti district** in the state of Jharkhand, India."
+  },
+  "q02@qwen/qwen3.8-27b": {
+    "qid": "q02",
+    "question": "Where was Alluri Sitarama Raju born?",
+    "relation": "born in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Alluri Sitarama Raju was born in **Chintalpapalle**, a village in the current **Parvathipuram Manyam district** of Andhra Pradesh, India."
+  },
+  "q03@qwen/qwen3.8-27b": {
+    "qid": "q03",
+    "question": "Where was Savitribai Phule born?",
+    "relation": "born in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Savitribai Phule was born in Niphad, in the Nashik district of Maharashtra, India."
+  },
+  "q04@qwen/qwen3.8-27b": {
+    "qid": "q04",
+    "question": "Where was Srinivasa Ramanujan born?",
+    "relation": "born in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Srinivasa Ramanujan was born in **Erode**, in the state of Tamil Nadu, India."
+  },
+  "q05@qwen/qwen3.8-27b": {
+    "qid": "q05",
+    "question": "Where was Homi J. Bhabha born?",
+    "relation": "born in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Homi J. Bhabha was born in Mumbai (then Bombay), India."
+  },
+  "q06@qwen/qwen3.8-27b": {
+    "qid": "q06",
+    "question": "Where was Rani Gaidinliu born?",
+    "relation": "born in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Rani Gaidinliu was born in the village of **Longwa**, in the **Longleng district** of the Indian state of **Manipur**."
+  },
+  "q08@qwen/qwen3.8-27b": {
+    "qid": "q08",
+    "question": "Where did Subramania Bharati die?",
+    "relation": "died in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Subramania Bharati died in **Chidambaram**, Tamil Nadu, India."
+  },
+  "q09@qwen/qwen3.8-27b": {
+    "qid": "q09",
+    "question": "Where did Swami Vivekananda die?",
+    "relation": "died in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Swami Vivekananda died in Kolkata (then Calcutta), India. Specifically, he passed away at the Advaita Ashram in Belur Math, located on the banks of the Hooghly River in Howrah, West Bengal, on July 4, 1902."
+  },
+  "q10@qwen/qwen3.8-27b": {
+    "qid": "q10",
+    "question": "Where did Tipu Sultan die?",
+    "relation": "died in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Tipu Sultan died in **Srirangapatna** (also spelled Seringapatam), in present-day Karnataka, India.\n\nHe was killed during the **Fourth Anglo-Mysore War** on **May 4, 1799**, while defending his palace against the forces of the British East India Company under General Sir Arthur Wellesley (the future Duke of Wellington). His body was never officially identified, though some accounts suggest it was buried in an unmarked grave inside the fort complex."
+  },
+  "q11@qwen/qwen3.8-27b": {
+    "qid": "q11",
+    "question": "What is the capital of Nagaland?",
+    "relation": "is the capital of",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The capital of Nagaland is **Kohima**."
+  },
+  "q12@qwen/qwen3.8-27b": {
+    "qid": "q12",
+    "question": "What is the capital of Mizoram?",
+    "relation": "is the capital of",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The capital of Mizoram is **Aizawl**."
+  },
+  "q13@qwen/qwen3.8-27b": {
+    "qid": "q13",
+    "question": "What is the capital of Arunachal Pradesh?",
+    "relation": "is the capital of",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The capital of Arunachal Pradesh is **Itanagar**."
+  },
+  "q14@qwen/qwen3.8-27b": {
+    "qid": "q14",
+    "question": "What is the capital of Bhutan?",
+    "relation": "is the capital of",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The capital of Bhutan is **Thimphu**."
+  },
+  "q15@qwen/qwen3.8-27b": {
+    "qid": "q15",
+    "question": "What is the capital of Burkina Faso?",
+    "relation": "is the capital of",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The capital of Burkina Faso is **Ouagadougou**."
+  },
+  "q16@qwen/qwen3.8-27b": {
+    "qid": "q16",
+    "question": "Where is the Indian Space Research Organisation headquartered?",
+    "relation": "headquartered in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The Indian Space Research Organisation (ISRO) is headquartered in **Bengaluru** (formerly known as Bangalore), Karnataka, India. Specifically, its main office is located in the sector 1 area of the city."
+  },
+  "q17@qwen/qwen3.8-27b": {
+    "qid": "q17",
+    "question": "Where is the Reserve Bank of India headquartered?",
+    "relation": "headquartered in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The Reserve Bank of India (RBI) is headquartered in **Mumbai**, Maharashtra.\n\nSpecifically, its head office is located at **Dalal Street**, in the Fort district of Mumbai."
+  },
+  "q18@qwen/qwen3.8-27b": {
+    "qid": "q18",
+    "question": "Where is Tata Steel headquartered?",
+    "relation": "headquartered in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Tata Steel is headquartered in **Mumbai, India**.\n\n*(Note: While the company has significant global operations and a major European headquarters in IJmuiden, Netherlands, the global parent company, Tata Steel Limited, is headquartered in Mumbai.)*"
+  },
+  "q19@qwen/qwen3.8-27b": {
+    "qid": "q19",
+    "question": "Where is the International Cricket Council headquartered?",
+    "relation": "headquartered in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The International Cricket Council (ICC) is headquartered in **Dubai, United Arab Emirates**. Specifically, its offices are located on the 21st floor of the Dubai International Financial Centre (DIFC)."
+  },
+  "q21@qwen/qwen3.8-27b": {
+    "qid": "q21",
+    "question": "Who founded the Bombay Natural History Society?",
+    "relation": "founded by",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The Bombay Natural History Society (BNHS) was founded in **1883** by a group of amateur naturalists. The key founding figures include:\n\n*   **Ralph Tate** (often credited as the primary founder and first president)\n*   **William Thomas Blanford**\n*   **Howard Melville**\n*   **C. W. Atkinson**\n*   **G. A. Kelaart**\n\nIt was established shortly after the 1882 International Conference on Natural History in Bombay (now Mumbai)."
+  },
+  "q22@qwen/qwen3.8-27b": {
+    "qid": "q22",
+    "question": "Who founded the Indian Institute of Science?",
+    "relation": "founded by",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The Indian Institute of Science (IISc) was founded by **Jamsetji Nusserwanji**, a prominent Indian industrialist and philanthropist. He established the institution in 1909 in Bangalore (now Bengaluru), India."
+  },
+  "q23@qwen/qwen3.8-27b": {
+    "qid": "q23",
+    "question": "Who founded the Asiatic Society of Bengal?",
+    "relation": "founded by",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The Asiatic Society of Bengal was founded by **Sir William Jones** in 1784."
+  },
+  "q24@qwen/qwen3.8-27b": {
+    "qid": "q24",
+    "question": "Who founded the Servants of India Society?",
+    "relation": "founded by",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The Servants of India Society was founded by **Gopal Krishna Gokhale** in 1905."
+  },
+  "q25@qwen/qwen3.8-27b": {
+    "qid": "q25",
+    "question": "Who founded the Deccan Education Society?",
+    "relation": "founded by",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The Deccan Education Society was founded by **Mahatma Jyotirao Phule**.\n\nHe established it in **1847** in Pune, Maharashtra, to promote education among the lower castes and marginalized communities in the Deccan region, particularly in response to the caste-based restrictions on education."
+  },
+  "q26@qwen/qwen3.8-27b": {
+    "qid": "q26",
+    "question": "Where is the Konark Sun Temple located?",
+    "relation": "located in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The Konark Sun Temple is located in the state of **Odisha**, India. Specifically, it is situated in the town of Konark, within the Puri district, on the east coast of India along the Bay of Bengal."
+  },
+  "q27@qwen/qwen3.8-27b": {
+    "qid": "q27",
+    "question": "Where is the Hampi group of monuments located?",
+    "relation": "located in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The Hampi group of monuments is located in the village of Hampi, in the Ballari (Bellary) district of the state of Karnataka, India."
+  },
+  "q28@qwen/qwen3.8-27b": {
+    "qid": "q28",
+    "question": "Where is Kaziranga National Park located?",
+    "relation": "located in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Kaziranga National Park is located in the **Golaghat and Nalbari districts** of the Indian state of **Assam**."
+  },
+  "q29@qwen/qwen3.8-27b": {
+    "qid": "q29",
+    "question": "Where is the Brihadisvara Temple located?",
+    "relation": "located in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The Brihadisvara Temple (also known as the Brihadeeswarar Temple) is located in **Thanjavur** (Tanjore), in the state of **Tamil Nadu**, **India**.\n\nIt is a UNESCO World Heritage Site and one of the largest and tallest Hindu temples in the world, built by the Chola dynasty in the 11th century."
+  },
+  "q30@qwen/qwen3.8-27b": {
+    "qid": "q30",
+    "question": "Which international organizations is India a member of?",
+    "relation": "member of",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "India is a member of numerous international organizations, spanning global, regional, and specialized bodies. Key memberships include:\n\n**Global/Universal Organizations:**\n*   **United Nations (UN)** and its specialized agencies (e.g., WHO, UNESCO, FAO, ILO)\n*   **World Trade Organization (WTO)**\n*   **International Monetary Fund (IMF)**\n*   **World Bank Group**\n*   **International Civil Aviation Organization (ICAO)**\n*   **International Telecommunication Union (ITU)**\n\n**Regional/Groupings:**\n*   **South Asian Association for Regional Cooperation (SAARC)**\n*   **Group of Twenty (G20)**\n*   **Group of Seventy-seven (G77)**\n*   **Non-Aligned Movement (NAM)**\n*   **Indian Ocean Rim Association (IORA)**\n*   **Bay of Bengal Initiative for Multi-Sectoral Technical and Economic Cooperation (BIMSTEC)**\n*   **Cooperation in Energy, Trade, and Transport (CETC) – A trilateral grouping with Bangladesh and Myanmar**\n\n**Defense and Security Forums:**\n*   **Quad** (with the US, Japan, and Australia)\n*   **Shanghai Cooperation Organisation (SCO)** – India became a full member in 2017\n*   **Brahmin Forum** (with Russia, China, and Iran)\n\n**Other Notable Groupings:**\n*   **International Solar Alliance (ISA)** – India is a founding member\n*   **International Renewable Energy Agency (IRENA)** – India is a founding member\n*   **Nuclear Suppliers Group (NSG)** – India became a member in 2025 (pending ratification by some members, but effectively granted observer-like status earlier and full membership negotiations concluded recently)\n\n*Note: India is **not** a member of the UN Security Council (though it is a non-permanent member on a rotating basis), the G7, or the European Union (as it is not a European country).*"
+  },
+  "q31@qwen/qwen3.8-27b": {
+    "qid": "q31",
+    "question": "Which international organizations is Nepal a member of?",
+    "relation": "member of",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Nepal is a member of numerous international organizations, including the following key ones:\n\n*   **United Nations (UN)** and its specialized agencies (e.g., UNICEF, UNESCO, WHO, FAO)\n*   **South Asian Association for Regional Cooperation (SAARC)**\n*   **BIMSTEC** (Bay of Bengal Initiative for Multi-Sectoral Technical and Economic Cooperation)\n*   **Basic Group** (a trade bloc of South Asian countries)\n*   **Cooperation Council for the Gulf Region (CCGR)**\n*   **International Monetary Fund (IMF)**\n*   **World Bank**\n*   **Asian Development Bank (ADB)**\n*   **Commonwealth of Nations**\n*   **International Olympic Committee (IOC)**\n*   **International Telecommunication Union (ITU)**\n*   **World Trade Organization (WTO)** (as an observer, though it has not yet fully acceded)\n\nNepal also participates in various bilateral and regional forums, particularly those focused on connectivity, trade, and security in South Asia."
+  },
+  "q07@qwen/qwen3.8-27b": {
+    "qid": "q07",
+    "question": "Where was Kanaklata Barua born?",
+    "relation": "born in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "Kanaklata Barua was born in **Bodua**, a village in the Darrang district of Assam, India."
+  },
+  "q20@qwen/qwen3.8-27b": {
+    "qid": "q20",
+    "question": "Where is the Asian Development Bank headquartered?",
+    "relation": "headquartered in",
+    "model": "qwen/qwen3.8-27b",
+    "response_text": "The Asian Development Bank (ADB) is headquartered in **Manila, Philippines**."
+  }
+}

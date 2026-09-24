@@ -1,0 +1,46 @@
+claim_id,claim_text,relation_phrase,nli_net,contra_top1,top1_sim,kg_conf,kg_status
+r3_q03_gptoss120b_0,Savitribai Phule was born in Naigaon near Pune in the state of Maharashtra India on 3 January 1831.,was born in,0.006333351135253906,0.9988565444946289,0.46572667,0.0,contradicted
+r3_q05_gptoss120b_0,Homi J. Bhabha was born in Bombay now Mumbai British India on 30 October 1909.,was born in,0.018324851989746094,0.8935546875,0.5425863,1.0,supported
+r3_q08_gptoss120b_0,Subramania Bharati died in Madras present‑day Chennai India on 11 September 1921 at Chennai home in the Triplicane area of the city.,died in,0.020446062088012695,0.566162109375,0.44679087,,unknown
+r3_q09_gptoss120b_0,Swami Vivekananda died in New York City USA on 4 July 1902 at Swami Vivekananda brother’s residence on Henry Street.,died in,0.009165525436401367,0.2001953125,0.35040498,,unlinked
+r3_q10_gptoss120b_1,Tipu Sultan died in 1799 during the Siege of Seringapatam at the fortress town of Seringapatam now Srirangapatna in the Kingdom of Mysore.,died in,0.3850059509277344,0.986541748046875,0.5409934,,unknown
+r3_q16_gptoss120b_1,The Indian Space Research Organisation is headquartered in Bengaluru Bangalore Karnataka India specifically at Antariksh Bhavan New BEL Road Bengaluru 560094.,is headquartered in,0.4946632385253906,0.9757232666015625,0.48756066,,unlinked
+r3_q17_gptoss120b_0,The Reserve Bank of India RBI is headquartered in Mumbai Maharashtra India India main office is at Madhav Rao Scindia Marg Mumbai.,is headquartered in,0.3329734802246094,0.65673828125,0.5729338,,unlinked
+r3_q18_gptoss120b_0,Tata Steel is headquartered in Mumbai Maharashtra India.,is headquartered in,0.48922061920166016,0.9958572387695312,0.46068007,1.0,supported
+r3_q19_gptoss120b_1,The International Cricket Council is headquartered in Dubai United Arab Emirates.,is headquartered in,0.9974454641342163,0.99212646484375,0.6938684,,unlinked
+r3_q20_gptoss120b_1,The Asian Development Bank is headquartered in Manila Philippines.,is headquartered in,0.012533187866210938,0.0244140625,0.47729954,,unknown
+r3_q22_gptoss120b_1,The Indian Institute of Science was founded in 1909 by industrialist Jamsetji Tata with major support from the Government of Mysore and the Government of Mysore ruler Maharaja Krishnaraja Wadiyar IV as well as contributions from Sir M. Visvesvaraya and other philanthropists.,was founded in,0.0013905763626098633,0.720703125,0.50434023,,unknown
+r3_q23_gptoss120b_0,The Asiatic Society of Bengal was founded by Sir William Jones in 1784.,was founded by,0.15256977081298828,0.302734375,0.46166766,1.0,supported
+r3_q24_gptoss120b_0,The Servants of India Society was founded by Gopal Krishna Gokhale in 1905.,was founded by,0.026454925537109375,0.05029296875,0.46067232,,unlinked
+r3_q25_gptoss120b_0,The Deccan Education Society was founded in 1884 in Pune by a group of Indian reformers led by Bal Gangadhar Tilak Gopal Ganesh Agarkar and Vishnushastri Chiplunkar along with other like‑minded activists.,was founded in,0.0074967145919799805,0.18603515625,0.5610159,,unknown
+r3_q26_gptoss120b_0,The Konark Sun Temple is located in the town of Konark in the state of Odisha formerly Orissa India.,is located in,0.4761505126953125,0.93389892578125,0.40256992,,unlinked
+r3_q27_gptoss120b_0,The Hampi Group of Monuments is located in the town of Hampi in the state of Karnataka India within the Vijayanagara district.,is located in,0.074859619140625,0.9855422973632812,0.45017976,,unlinked
+r3_q28_gptoss120b_0,Kaziranga National Park is located in the state of Assam in northeastern India spanning the Golaghat and Nagaon districts near the Brahmaputra River.,is located in,0.044283390045166016,0.91790771484375,0.54345024,1.0,supported
+r3_q29_gptoss120b_0,The Brihadisvara Temple also called Peruvudaiyar Kovil is situated in the city of Thanjavur in the Indian state of Tamil Nadu.,is situated in,0.025537490844726562,0.04443359375,0.48261446,,unlinked
+r3_q01_qwen3827b_0,Birsa Munda was born in the village of Udanki in the Manbhum district of the Chota Nagpur Plateau.,was born in,0.44464778900146484,0.932861328125,0.45155552,,unlinked
+r3_q02_qwen3827b_0,Alluri Sitarama Raju was born in Chintalpapalle a village in the current Parvathipuram Manyam district of Andhra Pradesh India.,was born in,0.029659271240234375,0.05615234375,0.5087153,,unlinked
+r3_q03_qwen3827b_0,Savitribai Phule was born in Niphad in the Nashik district of Maharashtra India.,was born in,0.47704315185546875,0.963134765625,0.45642728,0.0,contradicted
+r3_q04_qwen3827b_0,Srinivasa Ramanujan was born in Erode in the state of Tamil Nadu India.,was born in,0.013598203659057617,0.0263671875,0.4638442,0.0,contradicted
+r3_q05_qwen3827b_0,Homi J. Bhabha was born in Mumbai then Bombay India.,was born in,0.831329345703125,0.96490478515625,0.5288765,1.0,supported
+r3_q06_qwen3827b_0,Rani Gaidinliu was born in the village of Longwa in the Longleng district of the Indian state of Manipur.,was born in,0.011531829833984375,0.02197265625,0.4323383,,unknown
+r3_q07_qwen3827b_0,Kanaklata Barua was born in Bodua a village in the Darrang district of Assam India.,was born in,0.009369373321533203,0.01708984375,0.41869146,0.0,contradicted
+r3_q08_qwen3827b_0,Subramania Bharati died in Chidambaram Tamil Nadu India.,died in,0.021009445190429688,0.04150390625,0.46761924,,unlinked
+r3_q09_qwen3827b_0,Swami Vivekananda died in Kolkata then Calcutta India.,died in,0.012349724769592285,0.0244140625,0.46937773,0.0,contradicted
+r3_q10_qwen3827b_0,Tipu Sultan died in Srirangapatna also spelled Seringapatam in present-day Karnataka India.,died in,0.14162445068359375,0.8330078125,0.50902677,,unknown
+r3_q16_qwen3827b_1,The Indian Space Research Organisation is headquartered in Bengaluru formerly known as Bangalore Karnataka India.,is headquartered in,0.08117032051086426,0.9957695007324219,0.4468102,,unlinked
+r3_q16_qwen3827b_2,Specifically India main office is located in the sector 1 area of the city.,is located in,0.3699455261230469,0.732421875,0.5149418,,unknown
+r3_q17_qwen3827b_1,The Reserve Bank of India is headquartered in Mumbai Maharashtra.,is headquartered in,0.017848491668701172,0.978607177734375,0.59862167,,unknown
+r3_q18_qwen3827b_0,Tata Steel is headquartered in Mumbai India.,is headquartered in,0.4861001968383789,0.9976902008056641,0.44640702,1.0,supported
+r3_q18_qwen3827b_1,"While the company has significant global operations and a major European headquarters in IJmuiden, Netherlands, the global parent company, Tata Steel Limited, is headquartered in Mumbai.",is headquartered in,0.4598512649536133,0.917236328125,0.51828766,,unknown
+r3_q21_qwen3827b_1,The Bombay Natural History Society was founded in 1883 by a group of amateur naturalists.,was founded in,0.07847309112548828,0.9802093505859375,0.50155807,,unknown
+r3_q22_qwen3827b_1,The Indian Institute of Science was founded by Jamsetji Nusserwanji a prominent Indian industrialist and philanthropist.,was founded by,0.013865470886230469,0.9801483154296875,0.43500447,1.0,supported
+r3_q23_qwen3827b_0,The Asiatic Society of Bengal was founded by Sir William Jones in 1784.,was founded by,0.13255071640014648,0.26318359375,0.46166766,1.0,supported
+r3_q24_qwen3827b_0,The Servants of India Society was founded by Gopal Krishna Gokhale in 1905.,was founded by,0.014902114868164062,0.0283203125,0.46067232,,unlinked
+r3_q25_qwen3827b_0,The Deccan Education Society was founded by Mahatma Jyotirao Phule.,was founded by,0.0021178722381591797,0.00390625,0.40481907,,unknown
+r3_q26_qwen3827b_0,The Konark Sun Temple is located in the state of Odisha India.,is located in,0.1147146224975586,0.959259033203125,0.406309,,unlinked
+r3_q26_qwen3827b_1,Specifically India is situated in the town of Konark within the Puri district on the east coast of India along the Bay of Bengal.,is situated in,0.10245132446289062,0.9974784851074219,0.5603251,,unknown
+r3_q27_qwen3827b_0,The Hampi group of monuments is located in the village of Hampi in the Ballari Bellary district of the state of Karnataka India.,is located in,0.41045379638671875,0.9854812622070312,0.4843586,,unknown
+r3_q28_qwen3827b_0,Kaziranga National Park is located in the Golaghat and Nalbari districts of the Indian state of Assam.,is located in,0.014707565307617188,0.9931640625,0.4821873,,unknown
+r3_q29_qwen3827b_0,The Brihadisvara Temple also known as the Brihadeeswarar Temple is located in Thanjavur Tanjore in the state of Tamil Nadu India.,is located in,0.11654281616210938,0.22509765625,0.5262787,,unlinked
+r3_q30_qwen3827b_0,India is a member of numerous international organizations spanning global regional and specialized bodies.,is a member of,0.995452880859375,0.99969482421875,0.68754053,,unlinked
+r3_q31_qwen3827b_0,"Nepal is a member of numerous international organizations, including the following key ones.",is a member of,0.3237447738647461,0.9995725154876709,0.58088696,,unlinked

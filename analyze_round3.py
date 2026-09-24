@@ -22,6 +22,8 @@ ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "round3"
 N_BOOT, SEED, MIN_POS = 2000, 42, 10
 LOW, HIGH = 0.35, 0.65  # shipped verdict cut-offs
+# Deviation 2 (declared before labelling): coreference-garbled claims, sensitivity run only.
+SENSITIVITY_EXCLUDE = ["r3_q16_qwen3827b_2", "r3_q26_qwen3827b_1", "r3_q17_gptoss120b_0"]
 
 
 def hallu_f1(y: np.ndarray, s: np.ndarray) -> float:
@@ -48,6 +50,39 @@ def paired(y, a, b, stat):
     return stat(y, b) - stat(y, a), lo, hi
 
 
+def discrimination(gold: pd.DataFrame, title: str) -> list[str]:
+    """H1 and H3 on one set of gold claims."""
+    y = (gold.a == "Verified").astype(int).to_numpy()
+    n_h = int((y == 0).sum())
+    if len(set(y)) < 2:
+        return [f"## {title}", "- Only one class present; nothing to compute.", ""]
+    few = n_h < MIN_POS or int(y.sum()) < 2
+    nli = gold.nli_net.fillna(0.5).to_numpy()            # no evidence -> neutral, as the API
+    kg = gold.kg_conf.to_numpy(dtype=float)
+    kg_only = np.where(np.isnan(kg), 0.5, kg)
+    fused = np.where(np.isnan(kg), nli, (nli + np.nan_to_num(kg)) / 2)  # NLI and KG 0.5 each
+    contra = gold.contra_top1.fillna(0.5).to_numpy()
+    L = [f"## {title}", f"n = {len(gold)} gold claims (Verified {int(y.sum())}, Hallucinated {n_h})"
+         + (" — **too few positives to interpret**." if few else "."), "",
+         "| Score | AUC | Hallucinated-F1 @0.35/0.65 |", "| --- | --- | --- |"]
+    for name, s in (("NLI only (semantic+NLI, SemSim weight 0)", nli), ("KG only", kg_only),
+                    ("**Fused NLI + KG (full CMHSA)**", fused), ("1 − P(contradiction)", contra)):
+        L.append(f"| {name} | {auc(y, s):.3f} | {hallu_f1(y, s):.3f} |")
+    da, alo, ahi = paired(y, nli, fused, auc)
+    df1, flo, fhi = paired(y, nli, fused, hallu_f1)
+    dc, clo, chi = paired(y, nli, contra, auc)
+    L += ["",
+          f"- **H1 (PRD KG ablation):** ΔAUC fused − NLI = {da:+.3f} [{alo:+.3f}, {ahi:+.3f}]; "
+          f"ΔHallucinated-F1 = {df1:+.3f} [{flo:+.3f}, {fhi:+.3f}] (PRD target ≥ +0.03).",
+          "  → " + ("not declared (too few positives)." if few else
+                    ("**KG helps on relational claims** (CI above 0)." if alo > 0 else
+                     "KG's gain is not established (CI includes 0).")),
+          f"- **H3 (contradiction re-test):** ΔAUC = {dc:+.3f} [{clo:+.3f}, {chi:+.3f}] → "
+          + ("not declared (too few positives)." if few else
+             ("adopt the contradiction signal." if clo > 0 else "not adopted.")), ""]
+    return L
+
+
 def main() -> None:
     A = pd.read_excel(OUT / "round3_annotator_A.xlsx").set_index("claim_id")
     B = pd.read_excel(OUT / "round3_annotator_B.xlsx").set_index("claim_id")
@@ -63,12 +98,6 @@ def main() -> None:
     excluded = d.drop(gold.index)
     y = (gold.a == "Verified").astype(int).to_numpy()
     n_h = int((y == 0).sum())
-
-    nli = gold.nli_net.fillna(0.5).to_numpy()            # no evidence -> neutral, as the API
-    kg = gold.kg_conf.to_numpy(dtype=float)
-    kg_only = np.where(np.isnan(kg), 0.5, kg)
-    fused = np.where(np.isnan(kg), nli, (nli + np.nan_to_num(kg)) / 2)  # NLI and KG 0.5 each
-    contra = gold.contra_top1.fillna(0.5).to_numpy()
 
     L = ["# Round 3 — KG relational pilot: results\n",
          "Pre-registered in `round3/PREREGISTRATION.md` (committed before any answer or label). "
@@ -97,24 +126,10 @@ def main() -> None:
                  + (f" ({k / len(s):.0%}, 95% CI [{lo:.0%}, {hi:.0%}])" if len(s) else ""))
     L.append("")
 
-    if len(set(y)) == 2:
-        L += ["## Discrimination (AUC; 0.5 = chance) and the PRD KG ablation (H1)",
-              "| Score | AUC | Hallucinated-F1 @0.35/0.65 |", "| --- | --- | --- |"]
-        for name, s in (("NLI only (semantic+NLI, SemSim weight 0)", nli), ("KG only", kg_only),
-                        ("**Fused NLI + KG (full CMHSA)**", fused), ("1 − P(contradiction)", contra)):
-            L.append(f"| {name} | {auc(y, s):.3f} | {hallu_f1(y, s):.3f} |")
-        da, alo, ahi = paired(y, nli, fused, auc)
-        df1, flo, fhi = paired(y, nli, fused, hallu_f1)
-        dc, clo, chi = paired(y, nli, contra, auc)
-        L += ["",
-              f"- **H1 (PRD KG ablation):** ΔAUC fused − NLI = {da:+.3f} [{alo:+.3f}, {ahi:+.3f}]; "
-              f"ΔHallucinated-F1 = {df1:+.3f} [{flo:+.3f}, {fhi:+.3f}] (PRD target ≥ +0.03).",
-              f"  → " + ("not declared (too few positives)." if few else
-                         ("**KG helps on relational claims** (CI above 0)." if alo > 0 else
-                          "KG's gain is not established (CI includes 0).")),
-              f"- **H3 (contradiction re-test):** ΔAUC = {dc:+.3f} [{clo:+.3f}, {chi:+.3f}] → "
-              + ("not declared (too few positives)." if few else
-                 ("adopt the contradiction signal." if clo > 0 else "not adopted.")), ""]
+    L += discrimination(gold, "Primary analysis — all claims (pre-registered)")
+    sens = gold.drop([c for c in SENSITIVITY_EXCLUDE if c in gold.index])
+    L += discrimination(sens, f"Sensitivity — without the {len(SENSITIVITY_EXCLUDE)} "
+                              "coreference-garbled claims (Deviation 2)")
     if len(excluded):
         L += ["## Excluded claims (for adjudication)", "| claim | A | B |", "| --- | --- | --- |"]
         L += [f"| {r.claim_text[:90]} | {r.a} | {r.b} |" for r in excluded.itertuples()]

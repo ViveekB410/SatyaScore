@@ -45,6 +45,24 @@ def kg(claim: str, ce: ClaimExtractor, el: EntityLinker, wd: WikidataConnector):
     return v.confidence, v.status
 
 
+KG_ATTEMPTS, KG_RETRY_WAIT_S = 3, 5
+
+
+def kg_stable(claim, ce, el, wd):
+    """A failed Wikidata search (e.g. rate-limited) looks the same as "no match"
+    (unlinked) and a failed lookup as "unknown". Found on the first run: one claim
+    was unlinked, then contradicted on re-run. Retry non-answers; a genuine
+    unlinked/unknown is stable, so retries cannot manufacture an answer."""
+    import time
+    conf, status = kg(claim, ce, el, wd)
+    for _ in range(KG_ATTEMPTS - 1):
+        if status in ("supported", "contradicted"):
+            break
+        time.sleep(KG_RETRY_WAIT_S)
+        conf, status = kg(claim, ce, el, wd)
+    return conf, status
+
+
 def main() -> None:
     df = pd.read_csv(OUT / "claims_round3.csv", encoding="utf-8")
     passages = json.loads((ROOT / "corpus_passages_demo.json").read_text(encoding="utf-8"))
@@ -72,7 +90,7 @@ def main() -> None:
     df["top1_sim"] = S.max(axis=1)
 
     ce, el, wd = ClaimExtractor(), EntityLinker(), WikidataConnector()
-    kgs = [kg(c, ce, el, wd) for c in df.claim_text]
+    kgs = [kg_stable(c, ce, el, wd) for c in df.claim_text]
     df["kg_conf"] = [k for k, _ in kgs]
     df["kg_status"] = [s for _, s in kgs]
     df[["claim_id", "claim_text", "relation_phrase", "nli_net", "contra_top1", "top1_sim",

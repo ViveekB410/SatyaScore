@@ -64,3 +64,17 @@ The live system's settings: demo corpus, top-3 retrieval, relevance threshold 0.
 - **Consequence:** round 3 is not from the same model as the 456 existing claims. Its results
   are reported as a separate pilot, not pooled with round 1–2 numbers.
 - Everything else in this pre-registration is unchanged.
+
+## Deviation 2 — sensitivity analysis (recorded 2026-09-25, after generation, BEFORE any label)
+- **Outcome of generation:** 62 answers (31 per model); 45 relational claims, all used (below the
+  70 cap): gpt-oss-120b 18, qwen3.8-27b 27. No `<think>` block appeared in any answer.
+- **Found on inspection:** the rule-based coreference resolver mapped "its" to "India" in 3 claims,
+  garbling their subjects: `r3_q16_qwen3827b_2`, `r3_q26_qwen3827b_1`, `r3_q17_gptoss120b_0`.
+- **Primary analysis unchanged:** all 45 claims, as pre-registered.
+- **Declared now, before labelling:** a sensitivity analysis repeating H1–H3 without those 3
+  claims. Both are reported; the primary result is the one the pre-registration names.
+- **Signals locked (before labelling):** `round3/signals_round3.csv`. A first run showed one KG
+  lookup failure recorded as "unlinked" (rate-limited search); `round3_signals.py` now retries
+  non-answers (a genuine unknown/unlinked is stable). Re-run: exactly that claim changed
+  (unlinked → contradicted); NLI identical. Final KG status: supported 8, contradicted 5,
+  unknown 15, unlinked 17 (KG answered 13 of 45).

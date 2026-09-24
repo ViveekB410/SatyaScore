@@ -1,0 +1,110 @@
+claim_id,language,source_question,claim_text,full_response,relation_phrase,source_llm
+r3_q03_gptoss120b_0,en,Where was Savitribai Phule born?,Savitribai Phule was born in Naigaon near Pune in the state of Maharashtra India on 3 January 1831.,"Savitribai Phule was born in **Naigaon, near Pune in the state of Maharashtra, India** (on 3 January 1831).",was born in,openai/gpt-oss-120b
+r3_q05_gptoss120b_0,en,Where was Homi J. Bhabha born?,Homi J. Bhabha was born in Bombay now Mumbai British India on 30 October 1909.,"Homi J. Bhabha was born in Bombay (now Mumbai), British India, on 30 October 1909.",was born in,openai/gpt-oss-120b
+r3_q08_gptoss120b_0,en,Where did Subramania Bharati die?,Subramania Bharati died in Madras present‑day Chennai India on 11 September 1921 at Chennai home in the Triplicane area of the city.,"Subramania Bharati died in Madras (present‑day Chennai), India, on 11 September 1921, at his home in the Triplicane area of the city.",died in,openai/gpt-oss-120b
+r3_q09_gptoss120b_0,en,Where did Swami Vivekananda die?,Swami Vivekananda died in New York City USA on 4 July 1902 at Swami Vivekananda brother’s residence on Henry Street.,"Swami Vivekananda died in New York City, USA, on 4 July 1902 (at his brother’s residence on Henry Street).",died in,openai/gpt-oss-120b
+r3_q10_gptoss120b_1,en,Where did Tipu Sultan die?,Tipu Sultan died in 1799 during the Siege of Seringapatam at the fortress town of Seringapatam now Srirangapatna in the Kingdom of Mysore.,"Tipu Sultan died in 1799 during the Siege of Seringapatam, at the fortress town of Seringapatam (now Srirangapatna) in the Kingdom of Mysore, present‑day Karnataka, India.",died in,openai/gpt-oss-120b
+r3_q16_gptoss120b_1,en,Where is the Indian Space Research Organisation headquartered?,The Indian Space Research Organisation is headquartered in Bengaluru Bangalore Karnataka India specifically at Antariksh Bhavan New BEL Road Bengaluru 560094.,"The Indian Space Research Organisation (ISRO) is headquartered in **Bengaluru (Bangalore), Karnataka, India**—specifically at Antariksh Bhavan, New BEL Road, Bengaluru 560094.",is headquartered in,openai/gpt-oss-120b
+r3_q17_gptoss120b_0,en,Where is the Reserve Bank of India headquartered?,The Reserve Bank of India RBI is headquartered in Mumbai Maharashtra India India main office is at Madhav Rao Scindia Marg Mumbai.,"The Reserve Bank of India (RBI) is headquartered in **Mumbai, Maharashtra, India** (its main office is at Madhav Rao Scindia Marg, Mumbai).",is headquartered in,openai/gpt-oss-120b
+r3_q18_gptoss120b_0,en,Where is Tata Steel headquartered?,Tata Steel is headquartered in Mumbai Maharashtra India.,"Tata Steel is headquartered in Mumbai, Maharashtra, India.",is headquartered in,openai/gpt-oss-120b
+r3_q19_gptoss120b_1,en,Where is the International Cricket Council headquartered?,The International Cricket Council is headquartered in Dubai United Arab Emirates.,"The International Cricket Council (ICC) is headquartered in **Dubai, United Arab Emirates**. It moved its headquarters from London to Dubai in 2005.",is headquartered in,openai/gpt-oss-120b
+r3_q20_gptoss120b_1,en,Where is the Asian Development Bank headquartered?,The Asian Development Bank is headquartered in Manila Philippines.,"The Asian Development Bank (ADB) is headquartered in **Manila, Philippines**.",is headquartered in,openai/gpt-oss-120b
+r3_q22_gptoss120b_1,en,Who founded the Indian Institute of Science?,The Indian Institute of Science was founded in 1909 by industrialist Jamsetji Tata with major support from the Government of Mysore and the Government of Mysore ruler Maharaja Krishnaraja Wadiyar IV as well as contributions from Sir M. Visvesvaraya and other philanthropists.,"The Indian Institute of Science (IISc) was founded in 1909 by industrialist **Jamsetji Tata**, with major support from the Government of Mysore and its ruler, Maharaja Krishnaraja Wadiyar IV, as well as contributions from Sir M. Visvesvaraya and other philanthropists.",was founded in,openai/gpt-oss-120b
+r3_q23_gptoss120b_0,en,Who founded the Asiatic Society of Bengal?,The Asiatic Society of Bengal was founded by Sir William Jones in 1784.,The Asiatic Society of Bengal was founded by Sir William Jones in 1784.,was founded by,openai/gpt-oss-120b
+r3_q24_gptoss120b_0,en,Who founded the Servants of India Society?,The Servants of India Society was founded by Gopal Krishna Gokhale in 1905.,The Servants of India Society was founded by Gopal Krishna Gokhale in 1905.,was founded by,openai/gpt-oss-120b
+r3_q25_gptoss120b_0,en,Who founded the Deccan Education Society?,The Deccan Education Society was founded in 1884 in Pune by a group of Indian reformers led by Bal Gangadhar Tilak Gopal Ganesh Agarkar and Vishnushastri Chiplunkar along with other like‑minded activists.,"The Deccan Education Society was founded in 1884 in Pune by a group of Indian reformers led by **Bal Gangadhar Tilak**, **Gopal Ganesh Agarkar**, and **Vishnushastri Chiplunkar**, along with other like‑minded activists.",was founded in,openai/gpt-oss-120b
+r3_q26_gptoss120b_0,en,Where is the Konark Sun Temple located?,The Konark Sun Temple is located in the town of Konark in the state of Odisha formerly Orissa India.,"The Konark Sun Temple is located in the town of **Konark**, in the state of **Odisha (formerly Orissa), India**. It sits on the eastern coast of India, about 35 km (≈22 mi) east of the city of Puri and near the Bay of Bengal.",is located in,openai/gpt-oss-120b
+r3_q27_gptoss120b_0,en,Where is the Hampi group of monuments located?,The Hampi Group of Monuments is located in the town of Hampi in the state of Karnataka India within the Vijayanagara district.,"The Hampi Group of Monuments is located in the town of **Hampi** in the state of **Karnataka, India** (within the Vijayanagara district). It lies on the banks of the Tungabhadra River, about 350 km south‑west of Bengaluru.",is located in,openai/gpt-oss-120b
+r3_q28_gptoss120b_0,en,Where is Kaziranga National Park located?,Kaziranga National Park is located in the state of Assam in northeastern India spanning the Golaghat and Nagaon districts near the Brahmaputra River.,"Kaziranga National Park is located in the state of **Assam** in northeastern India, spanning the Golaghat and Nagaon districts near the Brahmaputra River. (Approx. 26.7° N 93.2° E).",is located in,openai/gpt-oss-120b
+r3_q29_gptoss120b_0,en,Where is the Brihadisvara Temple located?,The Brihadisvara Temple also called Peruvudaiyar Kovil is situated in the city of Thanjavur in the Indian state of Tamil Nadu.,"The Brihadisvara Temple (also called Peruvudaiyar Kovil) is situated in the city of **Thanjavur** in the Indian state of **Tamil Nadu**. It lies on the banks of the Kaveri River, about 350 km south‑west of Chennai.",is situated in,openai/gpt-oss-120b
+r3_q01_qwen3827b_0,en,Where was Birsa Munda born?,Birsa Munda was born in the village of Udanki in the Manbhum district of the Chota Nagpur Plateau.,"Birsa Munda was born in the village of **Udanki** in the Manbhum district of the Chota Nagpur Plateau. This area is currently part of the **Khunti district** in the state of Jharkhand, India.",was born in,qwen/qwen3.8-27b
+r3_q02_qwen3827b_0,en,Where was Alluri Sitarama Raju born?,Alluri Sitarama Raju was born in Chintalpapalle a village in the current Parvathipuram Manyam district of Andhra Pradesh India.,"Alluri Sitarama Raju was born in **Chintalpapalle**, a village in the current **Parvathipuram Manyam district** of Andhra Pradesh, India.",was born in,qwen/qwen3.8-27b
+r3_q03_qwen3827b_0,en,Where was Savitribai Phule born?,Savitribai Phule was born in Niphad in the Nashik district of Maharashtra India.,"Savitribai Phule was born in Niphad, in the Nashik district of Maharashtra, India.",was born in,qwen/qwen3.8-27b
+r3_q04_qwen3827b_0,en,Where was Srinivasa Ramanujan born?,Srinivasa Ramanujan was born in Erode in the state of Tamil Nadu India.,"Srinivasa Ramanujan was born in **Erode**, in the state of Tamil Nadu, India.",was born in,qwen/qwen3.8-27b
+r3_q05_qwen3827b_0,en,Where was Homi J. Bhabha born?,Homi J. Bhabha was born in Mumbai then Bombay India.,"Homi J. Bhabha was born in Mumbai (then Bombay), India.",was born in,qwen/qwen3.8-27b
+r3_q06_qwen3827b_0,en,Where was Rani Gaidinliu born?,Rani Gaidinliu was born in the village of Longwa in the Longleng district of the Indian state of Manipur.,"Rani Gaidinliu was born in the village of **Longwa**, in the **Longleng district** of the Indian state of **Manipur**.",was born in,qwen/qwen3.8-27b
+r3_q07_qwen3827b_0,en,Where was Kanaklata Barua born?,Kanaklata Barua was born in Bodua a village in the Darrang district of Assam India.,"Kanaklata Barua was born in **Bodua**, a village in the Darrang district of Assam, India.",was born in,qwen/qwen3.8-27b
+r3_q08_qwen3827b_0,en,Where did Subramania Bharati die?,Subramania Bharati died in Chidambaram Tamil Nadu India.,"Subramania Bharati died in **Chidambaram**, Tamil Nadu, India.",died in,qwen/qwen3.8-27b
+r3_q09_qwen3827b_0,en,Where did Swami Vivekananda die?,Swami Vivekananda died in Kolkata then Calcutta India.,"Swami Vivekananda died in Kolkata (then Calcutta), India. Specifically, he passed away at the Advaita Ashram in Belur Math, located on the banks of the Hooghly River in Howrah, West Bengal, on July 4, 1902.",died in,qwen/qwen3.8-27b
+r3_q10_qwen3827b_0,en,Where did Tipu Sultan die?,Tipu Sultan died in Srirangapatna also spelled Seringapatam in present-day Karnataka India.,"Tipu Sultan died in **Srirangapatna** (also spelled Seringapatam), in present-day Karnataka, India.
+
+He was killed during the **Fourth Anglo-Mysore War** on **May 4, 1799**, while defending his palace against the forces of the British East India Company under General Sir Arthur Wellesley (the future Duke of Wellington). His body was never officially identified, though some accounts suggest it was buried in an unmarked grave inside the fort complex.",died in,qwen/qwen3.8-27b
+r3_q16_qwen3827b_1,en,Where is the Indian Space Research Organisation headquartered?,The Indian Space Research Organisation is headquartered in Bengaluru formerly known as Bangalore Karnataka India.,"The Indian Space Research Organisation (ISRO) is headquartered in **Bengaluru** (formerly known as Bangalore), Karnataka, India. Specifically, its main office is located in the sector 1 area of the city.",is headquartered in,qwen/qwen3.8-27b
+r3_q16_qwen3827b_2,en,Where is the Indian Space Research Organisation headquartered?,Specifically India main office is located in the sector 1 area of the city.,"The Indian Space Research Organisation (ISRO) is headquartered in **Bengaluru** (formerly known as Bangalore), Karnataka, India. Specifically, its main office is located in the sector 1 area of the city.",is located in,qwen/qwen3.8-27b
+r3_q17_qwen3827b_1,en,Where is the Reserve Bank of India headquartered?,The Reserve Bank of India is headquartered in Mumbai Maharashtra.,"The Reserve Bank of India (RBI) is headquartered in **Mumbai**, Maharashtra.
+
+Specifically, its head office is located at **Dalal Street**, in the Fort district of Mumbai.",is headquartered in,qwen/qwen3.8-27b
+r3_q18_qwen3827b_0,en,Where is Tata Steel headquartered?,Tata Steel is headquartered in Mumbai India.,"Tata Steel is headquartered in **Mumbai, India**.
+
+*(Note: While the company has significant global operations and a major European headquarters in IJmuiden, Netherlands, the global parent company, Tata Steel Limited, is headquartered in Mumbai.)*",is headquartered in,qwen/qwen3.8-27b
+r3_q18_qwen3827b_1,en,Where is Tata Steel headquartered?,"While the company has significant global operations and a major European headquarters in IJmuiden, Netherlands, the global parent company, Tata Steel Limited, is headquartered in Mumbai.","Tata Steel is headquartered in **Mumbai, India**.
+
+*(Note: While the company has significant global operations and a major European headquarters in IJmuiden, Netherlands, the global parent company, Tata Steel Limited, is headquartered in Mumbai.)*",is headquartered in,qwen/qwen3.8-27b
+r3_q21_qwen3827b_1,en,Who founded the Bombay Natural History Society?,The Bombay Natural History Society was founded in 1883 by a group of amateur naturalists.,"The Bombay Natural History Society (BNHS) was founded in **1883** by a group of amateur naturalists. The key founding figures include:
+
+*   **Ralph Tate** (often credited as the primary founder and first president)
+*   **William Thomas Blanford**
+*   **Howard Melville**
+*   **C. W. Atkinson**
+*   **G. A. Kelaart**
+
+It was established shortly after the 1882 International Conference on Natural History in Bombay (now Mumbai).",was founded in,qwen/qwen3.8-27b
+r3_q22_qwen3827b_1,en,Who founded the Indian Institute of Science?,The Indian Institute of Science was founded by Jamsetji Nusserwanji a prominent Indian industrialist and philanthropist.,"The Indian Institute of Science (IISc) was founded by **Jamsetji Nusserwanji**, a prominent Indian industrialist and philanthropist. He established the institution in 1909 in Bangalore (now Bengaluru), India.",was founded by,qwen/qwen3.8-27b
+r3_q23_qwen3827b_0,en,Who founded the Asiatic Society of Bengal?,The Asiatic Society of Bengal was founded by Sir William Jones in 1784.,The Asiatic Society of Bengal was founded by **Sir William Jones** in 1784.,was founded by,qwen/qwen3.8-27b
+r3_q24_qwen3827b_0,en,Who founded the Servants of India Society?,The Servants of India Society was founded by Gopal Krishna Gokhale in 1905.,The Servants of India Society was founded by **Gopal Krishna Gokhale** in 1905.,was founded by,qwen/qwen3.8-27b
+r3_q25_qwen3827b_0,en,Who founded the Deccan Education Society?,The Deccan Education Society was founded by Mahatma Jyotirao Phule.,"The Deccan Education Society was founded by **Mahatma Jyotirao Phule**.
+
+He established it in **1847** in Pune, Maharashtra, to promote education among the lower castes and marginalized communities in the Deccan region, particularly in response to the caste-based restrictions on education.",was founded by,qwen/qwen3.8-27b
+r3_q26_qwen3827b_0,en,Where is the Konark Sun Temple located?,The Konark Sun Temple is located in the state of Odisha India.,"The Konark Sun Temple is located in the state of **Odisha**, India. Specifically, it is situated in the town of Konark, within the Puri district, on the east coast of India along the Bay of Bengal.",is located in,qwen/qwen3.8-27b
+r3_q26_qwen3827b_1,en,Where is the Konark Sun Temple located?,Specifically India is situated in the town of Konark within the Puri district on the east coast of India along the Bay of Bengal.,"The Konark Sun Temple is located in the state of **Odisha**, India. Specifically, it is situated in the town of Konark, within the Puri district, on the east coast of India along the Bay of Bengal.",is situated in,qwen/qwen3.8-27b
+r3_q27_qwen3827b_0,en,Where is the Hampi group of monuments located?,The Hampi group of monuments is located in the village of Hampi in the Ballari Bellary district of the state of Karnataka India.,"The Hampi group of monuments is located in the village of Hampi, in the Ballari (Bellary) district of the state of Karnataka, India.",is located in,qwen/qwen3.8-27b
+r3_q28_qwen3827b_0,en,Where is Kaziranga National Park located?,Kaziranga National Park is located in the Golaghat and Nalbari districts of the Indian state of Assam.,Kaziranga National Park is located in the **Golaghat and Nalbari districts** of the Indian state of **Assam**.,is located in,qwen/qwen3.8-27b
+r3_q29_qwen3827b_0,en,Where is the Brihadisvara Temple located?,The Brihadisvara Temple also known as the Brihadeeswarar Temple is located in Thanjavur Tanjore in the state of Tamil Nadu India.,"The Brihadisvara Temple (also known as the Brihadeeswarar Temple) is located in **Thanjavur** (Tanjore), in the state of **Tamil Nadu**, **India**.
+
+It is a UNESCO World Heritage Site and one of the largest and tallest Hindu temples in the world, built by the Chola dynasty in the 11th century.",is located in,qwen/qwen3.8-27b
+r3_q30_qwen3827b_0,en,Which international organizations is India a member of?,India is a member of numerous international organizations spanning global regional and specialized bodies.,"India is a member of numerous international organizations, spanning global, regional, and specialized bodies. Key memberships include:
+
+**Global/Universal Organizations:**
+*   **United Nations (UN)** and its specialized agencies (e.g., WHO, UNESCO, FAO, ILO)
+*   **World Trade Organization (WTO)**
+*   **International Monetary Fund (IMF)**
+*   **World Bank Group**
+*   **International Civil Aviation Organization (ICAO)**
+*   **International Telecommunication Union (ITU)**
+
+**Regional/Groupings:**
+*   **South Asian Association for Regional Cooperation (SAARC)**
+*   **Group of Twenty (G20)**
+*   **Group of Seventy-seven (G77)**
+*   **Non-Aligned Movement (NAM)**
+*   **Indian Ocean Rim Association (IORA)**
+*   **Bay of Bengal Initiative for Multi-Sectoral Technical and Economic Cooperation (BIMSTEC)**
+*   **Cooperation in Energy, Trade, and Transport (CETC) – A trilateral grouping with Bangladesh and Myanmar**
+
+**Defense and Security Forums:**
+*   **Quad** (with the US, Japan, and Australia)
+*   **Shanghai Cooperation Organisation (SCO)** – India became a full member in 2017
+*   **Brahmin Forum** (with Russia, China, and Iran)
+
+**Other Notable Groupings:**
+*   **International Solar Alliance (ISA)** – India is a founding member
+*   **International Renewable Energy Agency (IRENA)** – India is a founding member
+*   **Nuclear Suppliers Group (NSG)** – India became a member in 2025 (pending ratification by some members, but effectively granted observer-like status earlier and full membership negotiations concluded recently)
+
+*Note: India is **not** a member of the UN Security Council (though it is a non-permanent member on a rotating basis), the G7, or the European Union (as it is not a European country).*",is a member of,qwen/qwen3.8-27b
+r3_q31_qwen3827b_0,en,Which international organizations is Nepal a member of?,"Nepal is a member of numerous international organizations, including the following key ones.","Nepal is a member of numerous international organizations, including the following key ones:
+
+*   **United Nations (UN)** and its specialized agencies (e.g., UNICEF, UNESCO, WHO, FAO)
+*   **South Asian Association for Regional Cooperation (SAARC)**
+*   **BIMSTEC** (Bay of Bengal Initiative for Multi-Sectoral Technical and Economic Cooperation)
+*   **Basic Group** (a trade bloc of South Asian countries)
+*   **Cooperation Council for the Gulf Region (CCGR)**
+*   **International Monetary Fund (IMF)**
+*   **World Bank**
+*   **Asian Development Bank (ADB)**
+*   **Commonwealth of Nations**
+*   **International Olympic Committee (IOC)**
+*   **International Telecommunication Union (ITU)**
+*   **World Trade Organization (WTO)** (as an observer, though it has not yet fully acceded)
+
+Nepal also participates in various bilateral and regional forums, particularly those focused on connectivity, trade, and security in South Asia.",is a member of,qwen/qwen3.8-27b

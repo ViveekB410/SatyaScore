@@ -33,6 +33,17 @@ HONESTY NOTE — scope and known limitations (read before relying on this):
    did Z"). It will NOT catch every way a sentence can bundle multiple
    facts — this is a rule-based system, not a learned one.
 
+   SAFETY NET (IMPROVEMENT_PLAN.md task 1.1): when any piece of a sentence
+   comes out as an unjudgeable fragment (no finite verb in the source, a
+   lost "%", or a "Label:" glued to its content), the whole sentence becomes
+   ONE sentence_level claim instead, preferring the content after a "Label:".
+   Sentences with no subject at all (headings, bare list items like
+   "Registering political parties.") yield no claim. Measured on all 50
+   English source answers: broken claims 14.3% -> 0% (results/
+   extraction_quality.md). Known loss: spaCy's small model sometimes tags a
+   verb as a noun ("the points system awards..."), and such a sentence is
+   skipped; a larger spaCy model would fix it.
+
 3. HINDI/MARATHI: sentence segmentation only (via IndicNLP, with a plain
    punctuation-splitter fallback if IndicNLP's resources aren't
    available), no decomposition, no coreference resolution. Each
@@ -67,6 +78,11 @@ PRONOUN_PERSON = {"he", "him", "his", "himself", "she", "her", "hers", "herself"
 PRONOUN_NONPERSON = {"it", "its", "itself"}
 PRONOUN_PLURAL = {"they", "them", "their", "theirs", "themselves"}
 ALL_PRONOUNS = PRONOUN_PERSON | PRONOUN_NONPERSON | PRONOUN_PLURAL
+_NON_REFERENT_LABELS = {"CARDINAL", "ORDINAL", "QUANTITY", "PERCENT", "MONEY", "DATE", "TIME"}
+_FINITE_TAGS = {"VBD", "VBZ", "VBP", "MD"}  # past, 3sg-present, non-3sg-present, modal
+# Objects / complements. Deliberately excludes "pobj": "The rules for a
+# run-out are:" has one but still says nothing on its own.
+_COMPLEMENT_DEPS = {"dobj", "attr", "acomp", "oprd", "ccomp", "xcomp", "dative"}
 
 _WS_BEFORE_PUNCT = re.compile(r"\s+([.,!?])")
 _MULTI_SPACE = re.compile(r"\s{2,}")
@@ -110,6 +126,54 @@ def _get_english_pipeline() -> SpacyLanguage:
     if "en" not in _nlp_cache:
         _nlp_cache["en"] = spacy.load("en_core_web_sm")
     return _nlp_cache["en"]
+
+
+# --- Claim quality: the ONE definition of a "broken" claim --------------------
+# Used by the extractor (to fall back to the whole sentence instead of emitting
+# a broken fragment) and by flag_quality.py (to audit gold_final.csv), so both
+# always agree on what "broken" means. Conservative: flags only claims that are
+# genuinely unjudgeable, not merely awkward.
+_STRIPPED_SYMBOL = re.compile(r"(\w+\.?\s+)?\d+\s+of\s+the\b")  # e.g. "65 of the warming" (% lost)
+# "<Article> 370 of the ..." is a reference number, not a percentage whose %
+# was stripped; without this exemption real claims about Article 370 were
+# flagged broken.
+_REFERENCE_WORDS = {"article", "articles", "section", "sections", "clause", "chapter",
+                    "schedule", "rule", "part", "amendment", "act", "no", "no.", "number"}
+# Subjects that make a clause judgeable. "expl" is existential "there"
+# ("There are 11 players on a cricket team." has no nsubj but is a claim).
+_SUBJECT_DEPS = ("nsubj", "nsubjpass", "expl", "csubj", "csubjpass")
+
+
+def _has_stripped_symbol(text: str) -> bool:
+    for m in _STRIPPED_SYMBOL.finditer(text):
+        prev = (m.group(1) or "").strip().lower()
+        if prev not in _REFERENCE_WORDS:
+            return True
+    return False
+
+
+def _has_finite_clause_en(text: str) -> bool:
+    doc = _get_english_pipeline()(text)
+    return any(t.dep_ in _SUBJECT_DEPS and t.head.pos_ in ("VERB", "AUX") for t in doc)
+
+
+def claim_quality(text: str, language: Language) -> tuple[str, str]:
+    """Return ("ok", "") or ("broken", reason) for one claim text."""
+    t = str(text).strip()
+    words = t.split()
+    if language != "en":
+        return ("broken", "too_short") if len(words) < 3 else ("ok", "")
+    if len(words) < 4:
+        return "broken", "too_short"
+    if _has_stripped_symbol(t):
+        return "broken", "stripped_symbol"
+    if not _has_finite_clause_en(t):
+        return "broken", "no_finite_clause"
+    return "ok", ""
+
+
+def is_well_formed_claim(text: str, language: Language) -> bool:
+    return claim_quality(text, language)[0] == "ok"
 
 
 @dataclass
@@ -159,16 +223,29 @@ class ClaimExtractor:
         referents = self._build_pronoun_referents(doc)
 
         claims: list[ExtractedClaim] = []
-        counter = 0
         for sent in doc.sents:
+            pieces = []
             for method, token_ids, precise_span in self._decompose_sentence(sent):
                 claim_text, had_unresolved = self._render_tokens(doc, token_ids, referents)
                 if not claim_text or len(claim_text.split()) < 2:
                     continue  # skip fragments too short to be a meaningful claim
                 span = precise_span or (sent.start_char, sent.end_char)
+                pieces.append((claim_text, span, method, had_unresolved, token_ids))
+
+            # Rule-based decomposition sometimes yields an ungrammatical,
+            # unjudgeable fragment (17% of English gold claims were). When ANY
+            # piece of a sentence is broken, keep the whole sentence as ONE claim
+            # instead -- same as the Hindi path. Pronouns are still resolved.
+            if not pieces or any(self._piece_is_broken(sent, p) for p in pieces):
+                fallback = self._sentence_fallback(sent, referents)
+                if fallback is None:
+                    continue  # a heading / list label / subjectless fragment
+                pieces = [fallback]
+
+            for claim_text, span, method, had_unresolved, _ in pieces:
                 claims.append(
                     ExtractedClaim(
-                        claim_id=f"claim_{counter}",
+                        claim_id=f"claim_{len(claims)}",
                         text=claim_text,
                         start_char=span[0],
                         end_char=span[1],
@@ -176,14 +253,121 @@ class ClaimExtractor:
                         had_unresolved_pronoun=had_unresolved,
                     )
                 )
-                counter += 1
         return claims
+
+    def _sentence_fallback(self, sent: Span, referents: dict[int, str | None]):
+        """One whole-sentence claim for a sentence whose decomposition broke,
+        or None if the sentence is not a judgeable claim.
+
+        Keeps the sentence's own punctuation and spacing (dropping the commas
+        makes spaCy mis-parse e.g. "In Formula 1, the points system awards...").
+        For "Label: content" lines, prefers the content after the colon when it
+        is a claim on its own ("Blood sugar regulation: Insulin lowers...").
+        """
+        tokens = [t for t in sent if not t.is_space]
+        colon = next((i for i, t in enumerate(tokens) if t.text == ":"), None)
+        # (tokens, needs_complement). Order: the content after a "Label:",
+        # then the clause before a colon, then the whole sentence (only when
+        # there is no colon -- otherwise the label would be glued on).
+        candidates: list[tuple[list[Token], bool]] = []
+        if colon is None:
+            candidates.append((tokens, False))
+        else:
+            candidates.append((tokens[colon + 1:], False))
+            # "Mass and weight ... have distinct meanings:" is a claim that
+            # introduces a list; "Its significance includes:" is only an intro.
+            candidates.append((tokens[:colon], True))
+            # "Common symptoms of dengue fever include: High fever, Severe
+            # headache, ..." -- the list IS the object of the intro verb, so
+            # the whole line is one checkable claim. Needs real list content.
+            content = [t for t in tokens[colon + 1:] if not t.is_punct]
+            if len(content) >= 3:
+                candidates.append((tokens, False))
+        for toks, needs_complement in candidates:
+            while toks and toks[-1].is_punct:
+                toks = toks[:-1]  # trailing full stop / colon; "." is re-added on render
+            if not toks:
+                continue
+            text, had_unresolved = self._render_surface(toks, referents)
+            if not is_well_formed_claim(text, "en"):
+                continue
+            if needs_complement and not self._has_complement(toks):
+                continue  # a bare list intro, not a claim
+            span = (toks[0].idx, toks[-1].idx + len(toks[-1].text))
+            return text, span, "sentence_level", had_unresolved, [t.i for t in toks]
+        return None
+
+    @staticmethod
+    def _has_complement(tokens: list[Token]) -> bool:
+        """Does the clause say something (an object / complement), rather than
+        just announce a list ("The rules are:", "Its significance includes:")?"""
+        return any(t.dep_ in _COMPLEMENT_DEPS for t in tokens)
+
+    @staticmethod
+    def _piece_is_broken(sent: Span, piece) -> bool:
+        """Is one decomposed piece an unjudgeable fragment?
+
+        Judged on the ORIGINAL sentence's parse (the piece's source tokens),
+        not by re-parsing the short rendered text: re-parsing "The Ganga
+        originates in Gangotri." alone mis-tags "Ganga", and the audit's 4-word
+        minimum rejects valid short claims like "Modi visited Delhi.".
+        """
+        claim_text, _, method, _, token_ids = piece
+        doc = sent.doc
+        toks = [doc[i] for i in token_ids if i >= 0]  # -1 = the "is" inserted for appositives
+        if _has_stripped_symbol(claim_text):
+            return True
+        # Needs a finite verb from the source text -- except appositive pieces,
+        # whose "X is Y" verb is inserted by design (they need a real noun).
+        if method == "decomposed_appos":
+            if not any(t.pos_ in ("NOUN", "PROPN", "NUM") for t in toks):
+                return True
+        elif not any(t.tag_ in _FINITE_TAGS for t in toks):
+            return True
+        # "Label: content" glued into one claim.
+        colon = next((t.i for t in sent if t.text == ":"), None)
+        if colon is not None and any(t.i < colon for t in toks) and any(t.i > colon for t in toks):
+            return True
+        # A sentence ending in ":" introduces a list. A piece of it that has no
+        # object/complement ("Its significance includes", "The rules for a
+        # run-out are") says nothing on its own.
+        last = next((t for t in reversed(sent) if not t.is_space), None)
+        if last is not None and last.text == ":" and not any(t.dep_ in _COMPLEMENT_DEPS for t in toks):
+            return True
+        return False
+
+    @staticmethod
+    def _render_surface(tokens: list[Token], referents: dict[int, str | None]) -> tuple[str, bool]:
+        """Render tokens with their original spacing and punctuation, swapping
+        resolved pronouns for their referent."""
+        had_unresolved = False
+        parts = []
+        for t in tokens:
+            if t.text.lower() in ALL_PRONOUNS:
+                ref = referents.get(t.i)
+                if ref:
+                    parts.append(ref + t.whitespace_)
+                    continue
+                had_unresolved = True
+            parts.append(t.text_with_ws)
+        text = _MULTI_SPACE.sub(" ", "".join(parts)).strip()
+        if text and text[0].islower():
+            text = text[0].upper() + text[1:]
+        if text and text[-1] not in ".!?":
+            text += "."
+        return text, had_unresolved
 
     def _build_pronoun_referents(self, doc: Doc) -> dict[int, str | None]:
         """Maps token.i -> resolved referent text for every pronoun token,
         based on the nearest preceding entity of a compatible type. See
         module docstring item 1 for known limitations."""
-        entities_in_order = sorted(doc.ents, key=lambda e: e.start_char)
+        # A pronoun never refers to a number, date or amount; without this
+        # filter "their finishing position" became "1 finishing position" and
+        # "It serves as..." became "first serves as...".
+        entities_in_order = sorted(
+            (e for e in doc.ents if e.label_ not in _NON_REFERENT_LABELS),
+            key=lambda e: e.start_char,
+        )
         referents: dict[int, str | None] = {}
 
         for token in doc:
@@ -214,12 +398,21 @@ class ClaimExtractor:
         excluded_ids: set[int] = set()
         results: list[tuple[str, list[int], tuple[int, int] | None]] = []
 
+        # The subject's FULL noun phrase, minus any relative clause / appositive
+        # hanging off it. Using only the head token (subj.i) produced truncated
+        # claims like "Programme is UIP." for "The Universal Immunization
+        # Programme (UIP) ...".
+        subj_ids: list[int] = []
+        if subj is not None:
+            carved = {t.i for c in subj.children if c.dep_ in ("relcl", "appos") for t in c.subtree}
+            subj_ids = sorted(t.i for t in subj.subtree if t.i not in carved and t.pos_ != "PUNCT")
+
         if subj is not None:
             for child in subj.children:
                 if child.dep_ == "relcl":
                     subtree = sorted(child.subtree, key=lambda t: t.i)
                     non_pronoun = [t for t in subtree if not (t.dep_ == "nsubj" and t.pos_ == "PRON")]
-                    token_ids = [subj.i] + [t.i for t in non_pronoun]
+                    token_ids = subj_ids + [t.i for t in non_pronoun]
                     span = (subtree[0].idx, subtree[-1].idx + len(subtree[-1].text))
                     results.append(("decomposed_relcl", token_ids, span))
                     excluded_ids |= {t.i for t in subtree}
@@ -229,7 +422,8 @@ class ClaimExtractor:
                 if child.dep_ == "appos":
                     subtree = sorted(child.subtree, key=lambda t: t.i)
                     span = (subtree[0].idx, subtree[-1].idx + len(subtree[-1].text))
-                    results.append(("decomposed_appos", [subj.i, -1] + [t.i for t in subtree], span))
+                    appos_ids = [t.i for t in subtree if t.pos_ != "PUNCT"]  # drop the "(" ")"
+                    results.append(("decomposed_appos", subj_ids + [-1] + appos_ids, span))
                     excluded_ids |= {t.i for t in subtree}
                     excluded_ids |= self._adjacent_comma_ids(sent, subtree)
 
@@ -240,7 +434,7 @@ class ClaimExtractor:
                 subtree = sorted(child.subtree, key=lambda t: t.i)
                 has_own_subject = any(t.dep_ in ("nsubj", "nsubjpass") for t in subtree)
                 has_own_aux = any(t.dep_ in ("aux", "auxpass") for t in subtree)
-                token_ids = [t.i for t in subtree]
+                token_ids = [t.i for t in subtree if t.text != ":"]  # a list-intro colon is not content
 
                 # English elides a shared auxiliary across coordinated verbs
                 # ("Water is absorbed ... and transported ...") -- the
@@ -249,20 +443,29 @@ class ClaimExtractor:
                 # this, the extracted claim reads as an ungrammatical
                 # fragment ("Water transported to the leaves."). Borrow the
                 # root's auxiliary so the standalone claim stays complete.
-                if not has_own_aux:
+                # Only when the conjunct also shares the subject: "..., but they
+                # have distinct meanings" has its own subject and finite verb,
+                # and borrowing "are" produced "Are they have distinct meanings".
+                if not has_own_aux and not has_own_subject:
                     root_aux = next((t for t in root.children if t.dep_ in ("aux", "auxpass")), None)
                     if root_aux is not None:
                         token_ids = [root_aux.i] + token_ids
 
                 if not has_own_subject and subj is not None:
-                    token_ids = [subj.i] + token_ids
+                    token_ids = subj_ids + token_ids
                 span = (subtree[0].idx, subtree[-1].idx + len(subtree[-1].text))
                 results.append(("decomposed_conj", token_ids, span))
                 excluded_ids |= {t.i for t in subtree}
         if has_conj:
             excluded_ids |= {t.i for t in sent if t.dep_ == "cc" and t.head.i == root.i}
 
-        base_ids = [t.i for t in sent if t.i not in excluded_ids and not t.is_punct]
+        # Drop real punctuation only. spaCy marks "%" as is_punct (pos NOUN), so
+        # filtering on is_punct turned "65% of the warming" into "65 of the
+        # warming" -- a different claim. Filter on the PUNCT part-of-speech.
+        # Word-internal hyphens (tag HYPH: "run-out", "non-violently") are
+        # part of the word, not punctuation to drop.
+        base_ids = [t.i for t in sent
+                    if t.i not in excluded_ids and (t.pos_ != "PUNCT" or t.tag_ == "HYPH")]
         if base_ids:
             results.append(("decomposed_base", base_ids, None))
 
@@ -298,7 +501,14 @@ class ClaimExtractor:
             else:
                 words.append(token.text)
 
-        text = " ".join(words)
+        # Join with the SOURCE spacing where two tokens were adjacent in the
+        # original text ("65%", "non-violently", "14-18", "body's"); a single
+        # space where tokens were carved apart.
+        text = ""
+        for pos, (tid, word) in enumerate(zip(token_ids, words)):
+            nxt = token_ids[pos + 1] if pos + 1 < len(token_ids) else None
+            sep = doc[tid].whitespace_ if tid >= 0 and nxt == tid + 1 else " "
+            text += word + sep
         text = _WS_BEFORE_CONTRACTION.sub(r"\1", text)
         text = _WS_BEFORE_PUNCT.sub(r"\1", text)
         text = _MULTI_SPACE.sub(" ", text).strip()

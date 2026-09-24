@@ -115,3 +115,76 @@ def test_known_limitation_nearest_entity_coref_can_pick_wrong_referent(extractor
     claims = extractor.extract(text, "en")
     conj_claim = next(c for c in claims if c.extraction_method == "decomposed_conj")
     assert "Gangotri" in conj_claim.text  # known-wrong resolution, tracked here on purpose
+
+
+# --- IMPROVEMENT_PLAN.md task 1.1: no broken fragments, no lost facts ---------
+
+def test_percent_sign_is_kept_so_the_claim_keeps_its_meaning(extractor):
+    claims = extractor.extract("About 65% of the warming is caused by carbon dioxide.", "en")
+    assert any("65%" in c.text for c in claims)
+    assert not any("65 of the" in c.text for c in claims)
+
+
+def test_appositive_claim_uses_the_full_subject_phrase(extractor):
+    claims = extractor.extract(
+        "The Universal Immunization Programme (UIP) is a vaccination programme "
+        "launched by the Government of India in 1985.", "en")
+    appos = next(c for c in claims if c.extraction_method == "decomposed_appos")
+    assert appos.text == "The Universal Immunization Programme is UIP."
+
+
+def test_existential_there_sentence_is_a_claim(extractor):
+    claims = extractor.extract("There are 11 players on a cricket team.", "en")
+    assert [c.text for c in claims] == ["There are 11 players on a cricket team."]
+
+
+def test_label_prefix_is_stripped_to_the_claim(extractor):
+    claims = extractor.extract("Capital city: Paris is the capital of France.", "en")
+    assert [c.text for c in claims] == ["Paris is the capital of France."]
+    assert claims[0].extraction_method == "sentence_level"
+
+
+def test_bare_list_intro_is_not_a_claim(extractor):
+    assert extractor.extract("Its significance includes:", "en") == []
+    assert extractor.extract("The rules for a run-out are:", "en") == []
+
+
+def test_intro_plus_list_line_is_one_claim(extractor):
+    claims = extractor.extract(
+        "Common symptoms of dengue fever include: High fever, severe headache and "
+        "pain behind the eyes.", "en")
+    assert len(claims) == 1
+    assert "include" in claims[0].text and "High fever" in claims[0].text
+
+
+def test_conjunct_with_its_own_subject_does_not_borrow_the_auxiliary(extractor):
+    claims = extractor.extract(
+        "Mass and weight are often used interchangeably, but they have distinct meanings:", "en")
+    assert not any(c.text.startswith("Are ") for c in claims)
+    assert any("distinct meanings" in c.text for c in claims)
+
+
+def test_pronoun_is_never_resolved_to_a_number(extractor):
+    claims = extractor.extract("In 1947 India became independent. It adopted a constitution.", "en")
+    assert any(c.text.startswith("India adopted") for c in claims)
+    assert not any("1947 adopted" in c.text for c in claims)
+
+
+def test_no_emitted_claim_is_broken_by_the_audit_rules(extractor):
+    from member3_backend.claim_extractor import is_well_formed_claim
+    text = ("Photosynthesis happens in plants. Key Features: Chlorophyll absorbs light. "
+            "Registering and regulating political parties. About 65% of the warming is caused "
+            "by carbon dioxide. There are 11 players on a cricket team.")
+    claims = extractor.extract(text, "en")
+    assert claims and all(is_well_formed_claim(c.text, "en") for c in claims)
+
+
+def test_quality_rule_false_positives_are_fixed():
+    from member3_backend.claim_extractor import claim_quality
+    # reference numbers are not stripped percentages
+    assert claim_quality("Article 370 of the Indian Constitution granted special status "
+                         "to Jammu and Kashmir.", "en") == ("ok", "")
+    assert claim_quality("There are 11 players on a cricket team.", "en") == ("ok", "")
+    # a genuinely stripped % is still caught
+    assert claim_quality("The candidate with more than 50 of the total votes is elected.",
+                         "en") == ("broken", "stripped_symbol")

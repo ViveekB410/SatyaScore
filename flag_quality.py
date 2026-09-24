@@ -11,55 +11,19 @@ Writes claim_quality.csv (claim_id, language, gold_verdict, quality_flag, reason
 Reads gold_final.csv; does NOT modify it.
 """
 from __future__ import annotations
-import re, sys
+import sys
 import pandas as pd
+
+# The single definition of a "broken" claim lives in the extractor, so the
+# extractor's sentence-level fallback and this audit always agree.
+from member3_backend.claim_extractor import claim_quality as flag
 
 GOLD = "gold_final.csv"
 OUT = "claim_quality.csv"
-STRIPPED_SYMBOL = re.compile(r"\d+\s+of\s+the\b")   # e.g. "65 of the warming" (% stripped)
-
-_nlp = None
-def get_nlp():
-    global _nlp
-    if _nlp is None:
-        try:
-            import spacy
-            _nlp = spacy.load("en_core_web_sm")
-        except Exception:
-            _nlp = False
-    return _nlp
-
-
-def has_finite_clause_en(text: str) -> bool:
-    nlp = get_nlp()
-    if nlp is False:
-        # regex fallback: needs a lowercase word (crude "has a predicate") and > 3 words
-        return len(text.split()) > 3 and bool(re.search(r"\b[a-z]{3,}\b", text))
-    doc = nlp(text)
-    return any(t.dep_ in ("nsubj", "nsubjpass") and t.head.pos_ in ("VERB", "AUX") for t in doc)
-
-
-def flag(text: str, lang: str) -> tuple[str, str]:
-    t = str(text).strip()
-    words = t.split()
-    if lang == "hi":
-        if len(words) < 3:
-            return "broken", "too_short"
-        return "ok", ""
-    # English
-    if len(words) < 4:
-        return "broken", "too_short"
-    if STRIPPED_SYMBOL.search(t):
-        return "broken", "stripped_symbol"
-    if not has_finite_clause_en(t):
-        return "broken", "no_finite_clause"
-    return "ok", ""
 
 
 def main() -> None:
     df = pd.read_csv(GOLD, encoding="utf-8")
-    nlp = get_nlp()
-    print("spaCy model:", "loaded" if nlp not in (None, False) else "UNAVAILABLE (regex fallback)")
 
     flags = [flag(r.claim_text, r.language) for r in df.itertuples()]
     df["quality_flag"] = [f[0] for f in flags]

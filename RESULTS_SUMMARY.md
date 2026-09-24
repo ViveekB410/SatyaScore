@@ -105,6 +105,7 @@ hi       Hallucinated    0.717     0.536
 - **Retrieval diagnostic (English):** the claim's own source article is in the top 3 retrieved passages for 0.64 of Hallucinated vs 0.83 of Verified claims, computed only on claims with a recorded source (n = 90; including claims with no source gives 0.60 vs 0.81, which understates the gap). Suggestive at this sample size, not established.
 - **Hindi similarity inversion:** mean top-1 retrieval similarity is higher for Hallucinated (0.717) than Verified (0.649) claims — a candidate explanation for the below-chance Hindi SemSim AUC. Hypothesis only (n = 9 Hallucinated).
 - **C2-lite (sentence-level NLI premises):** English ΔAUC -0.012, 95% CI [-0.121, +0.094] — no significant change; the switch stays off by default.
+- **Contradiction as its own signal (English):** AUC 0.629 for 1 − P(contradiction) vs 0.552 for the current net score (entailment alone 0.492); ΔAUC +0.078, 95% CI [-0.013, +0.173]. Suggestive, not established — not adopted under the fixed rule; re-test with more annotated hallucinations.
 
 ## 9. Defensible findings
 

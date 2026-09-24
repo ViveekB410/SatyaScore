@@ -201,6 +201,17 @@ def phase3_block() -> list[str]:
             d, lo, hi = (float(x) for x in m.groups())
             L.append(f"- **C2-lite (sentence-level NLI premises):** English ΔAUC {d:+.3f}, 95% CI "
                      f"[{lo:+.3f}, {hi:+.3f}] — no significant change; the switch stays off by default.")
+    cs = Path("results/contradiction_signal.md")
+    if cs.exists():
+        m = re.search(r"\| EN \| \d+ / \d+ \| ([\d.]+) \| ([\d.]+) \| ([\d.]+) \| ([-+][\d.]+) "
+                      r"\[([-+][\d.]+), ([-+][\d.]+)\]", cs.read_text(encoding="utf-8"))
+        if m:
+            net, con, ent, d, lo, hi = (float(x) for x in m.groups())
+            L.append(f"- **Contradiction as its own signal (English):** AUC {con:.3f} for 1 − "
+                     f"P(contradiction) vs {net:.3f} for the current net score (entailment alone "
+                     f"{ent:.3f}); ΔAUC {d:+.3f}, 95% CI [{lo:+.3f}, {hi:+.3f}]. Suggestive, not "
+                     f"established — not adopted under the fixed rule; re-test with more "
+                     f"annotated hallucinations.")
     return L + [""]
 
 

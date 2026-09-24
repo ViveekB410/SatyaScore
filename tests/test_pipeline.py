@@ -233,3 +233,25 @@ def test_sentence_premises_switch_reads_env(monkeypatch):
     monkeypatch.setenv("SATYASCORE_SENTENCE_PREMISES", "true")
     assert pl._sentence_premises_enabled() is True
     assert pl.passage_to_premises("A. B.") == ["A.", "B."]
+
+
+# --- IMPROVEMENT_PLAN.md 3.2: explicit abstention when no evidence is usable ---
+
+@pytest.mark.parametrize("retriever", [
+    _mock_retriever(has_passage=False),   # nothing retrieved
+    _mock_retriever(score=0.1),           # retrieved, but below MIN_RELEVANCE_THRESHOLD
+])
+def test_no_usable_evidence_abstains_as_uncertain_with_a_note(retriever):
+    from member1_model.cmhsa import Verdict
+    claim_extractor = MagicMock()
+    c = MagicMock()
+    c.text = "Some unverifiable claim."
+    claim_extractor.extract.return_value = [c]
+    pipeline = DetectionPipeline(embedder=_mock_embedder(1), retriever=retriever,
+                                 scorer=_real_scorer(), claim_extractor=claim_extractor)
+    result = pipeline.run("Some unverifiable claim.", language="en")
+    score = result.scores[0]
+    assert score.verdict is Verdict.UNCERTAIN
+    assert score.active_signals == []
+    assert score.note and "insufficient evidence" in score.note
+    assert result.document.document_verdict is Verdict.UNCERTAIN

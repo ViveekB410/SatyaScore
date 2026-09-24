@@ -3,7 +3,7 @@
 **Author:** Claude (Opus 4.8), from `FABLE_PLANNING_BRIEF.md`, verified against the code.
 **Status (2026-09-24):** Phase 0 done (`a31c411`). Phase 1 done (`ccad2e2`, `1f65a35`).
 Phase 2 done — **negative result: retrieval is not the bottleneck** (see the Phase 2 outcome
-below). Next: Phase 3. The original plan text is kept below unedited; outcomes are added
+below). Phase 3 done (see its outcome). Remaining: Phase 4 (more sources) and Phase 5 (annotation + NLI fine-tuning, team + GPU). The original plan text is kept below unedited; outcomes are added
 beneath each phase.
 
 ## PRD traceability (checked against the PRD text, 2026-09-24)
@@ -129,6 +129,19 @@ Makes the 3-class output *mean* something.
 | **3.3 Contradiction signal + honest KG call** | `nli_scorer.py`, `pipeline.py`, `cmhsa.py` | Add contradiction-probability as its own signal (hallucination ≈ contradiction). Decide KG: either give it real coverage or **drop γ** and rename the fusion honestly. | Ablation reports the contradiction signal separately; the "multi-signal" claim matches reality. |
 
 *Impact: directly serves the guide's 3-class/trustworthiness ask.*
+
+> **Phase 3 outcome (measured).**
+> - 3.1 Calibration delivered as PRD FR-04 (`results/calibration.md`): P(Verified) + 95% Wilson
+>   CI per claim, fitted on train. The score adds no calibrated information over the base rate
+>   (test Brier EN 0.217 vs 0.197). The Uncertain band is **not** re-fitted: the PRD fixes the
+>   tiers at 0.35/0.65 (FR-04 SHALL), and fitting bands to an uninformative score would fit noise.
+> - 3.2 Abstention: the "insufficient evidence -> Uncertain" path (nothing retrieved, or nothing
+>   above the relevance threshold) is now covered by tests; no new mechanism needed.
+> - 3.3 Contradiction signal (`nli_components.py` -> `results/contradiction_signal.md`; the
+>   recompute reproduces the stored scores to 0.0004): English AUC 0.629 for 1 − P(contradiction)
+>   vs 0.552 for the net score, ΔAUC +0.078 [−0.013, +0.17] -> **not adopted, suggestive**; the
+>   first candidate to re-test once more hallucinations are annotated. KG: 0/456 claims covered;
+>   γ stays in the formula per PRD FR-04 and is reported as non-functional, not dropped.
 
 ## Phase 4 — More sources (≈3–5 days) · **gated behind Phase 2**
 

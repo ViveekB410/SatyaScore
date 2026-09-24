@@ -63,3 +63,10 @@ def test_analysis_detects_a_perfect_kg_and_applies_the_positive_floor(tmp_path, 
     assert "KG helps on relational claims" in report
     assert "Too few positives" not in report
     assert "KG **supported** → gold Verified: 20/20" in report
+
+
+def test_reasoning_blocks_are_removed_before_fact_checking():
+    from round3_generate import strip_reasoning
+    text = "<think>The user asks... maybe Erode?</think>\n\nRamanujan was born in Erode."
+    assert strip_reasoning(text) == "Ramanujan was born in Erode."
+    assert strip_reasoning("No reasoning here.") == "No reasoning here."

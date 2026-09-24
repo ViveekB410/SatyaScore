@@ -16,7 +16,8 @@ export const VERDICT_META = {
   Verified: {
     label: 'Supported by evidence',
     chip: 'bg-flag-verified text-white',
-    highlight: '', // clean text is the default reading experience
+    // PRD FR-06: verified claims are highlighted GREEN (red / amber / green)
+    highlight: 'bg-flag-verified/10 underline decoration-flag-verified decoration-2 underline-offset-4',
     dot: 'bg-flag-verified',
   },
 }

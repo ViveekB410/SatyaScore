@@ -52,6 +52,7 @@ ENCODERS = {
     "xlmr": ("sentence-transformers/paraphrase-xlm-r-multilingual-v1", "", ""),
     "e5": ("intfloat/multilingual-e5-base", "query: ", "passage: "),
     "labse": ("sentence-transformers/LaBSE", "", ""),
+    "muril": ("google/muril-base-cased", "", ""),  # PRD FR-02 fallback model (mean-pooled)
 }
 
 # ---------------------------------------------------------------- BM25 -------

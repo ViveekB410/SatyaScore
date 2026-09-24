@@ -5,6 +5,22 @@
 Phase 2 done — **negative result: retrieval is not the bottleneck** (see the Phase 2 outcome
 below). Next: Phase 3. The original plan text is kept below unedited; outcomes are added
 beneath each phase.
+
+## PRD traceability (checked against the PRD text, 2026-09-24)
+
+| PRD requirement | Status | Where |
+|---|---|---|
+| FR-01 extraction, coref, spans | Met; the Phase 1 safety net emits whole-sentence claims where splitting broke (less atomic) | `claim_extractor.py` |
+| FR-02 XLM-R primary + **MuRIL fallback** (transliterated Hindi) | Implemented compliantly (MuRIL queries search a MuRIL-embedded corpus, `build_muril_index.py`) but **off by default** (`SATYASCORE_MURIL_FALLBACK`): measured, MuRIL retrieval is far worse (Hindi R@3 0.575 vs 0.873, overall −0.194 [−0.240, −0.146], `results/retrieval_comparison.md`). Evidence-based deviation; measured on Devanagari Hindi (no transliterated eval set exists) | `embeddings.py`, `pipeline.py`, `api.py` |
+| FR-03 FAISS, Wikidata + English fallback, 24h cache | Met (index is the experiment/demo corpus, not Wikipedia-scale) | `faiss_retriever.py`, `wikidata_connector.py` |
+| FR-04 HalluScore **with confidence interval**, 3 tiers, threshold, ablation | Met: P(Verified) + 95% Wilson CI per claim, fitted on train (`results/calibration.md`) | `calibration.py`, `api.py` |
+| FR-05 REST API | Met | `api.py` |
+| FR-06 dashboard: red/amber/green, **bar chart, CSV/JSON export, .txt/.pdf upload** | Met in React (PRD says Streamlit). PDF needs `pdfminer.six` in the API's Python | `frontend/` |
+| FR-07 ≥3,000 claims, 40/30/30, 2–3 annotators, HF release | **Not met** (456, ~78% Verified, 1 annotator) — team work | — |
+| Goals: F1 ≥0.78 EN / ≥0.72 HI; beat 3/5 baselines; κ ≥0.65 | **Not met** (see `RESULTS_SUMMARY.md`) | — |
+| Goal: KG ablation ≥ +0.03 ("crux of the novelty claim") | **Not met**: KG coverage 0% on these claims | — |
+| NFR latency <500 ms/claim, <3 s/doc (GPU); fixed seeds | Met (median 104 ms; 2,414 ms/doc) | `results/latency_benchmark.md` |
+
 **Honest ceiling (state this to the guide):** near-chance detector accuracy is *data-bound*.
 Phases 0–4 make the system correct, calibrated, honest, and presentable, and they set up the
 one thing that actually raises the accuracy ceiling — **annotation + NLI fine-tuning (Phase 5)**.

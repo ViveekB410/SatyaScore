@@ -13,6 +13,7 @@ export default function ClaimScores({ claims, language }) {
             <th className="px-4 py-2 font-medium">Claim</th>
             <th className="px-4 py-2 font-medium">Verdict</th>
             <th className="px-4 py-2 text-right font-medium">Support score</th>
+            <th className="px-4 py-2 text-right font-medium">P(Verified) [95% CI]</th>
           </tr>
         </thead>
         <tbody>
@@ -30,6 +31,11 @@ export default function ClaimScores({ claims, language }) {
                 <td className="px-4 py-3 text-right tabular-nums text-ink/80">
                   {c.hallu_score.toFixed(2)}
                 </td>
+                <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-ink/80">
+                  {c.p_verified == null
+                    ? '—'
+                    : `${c.p_verified.toFixed(2)} [${c.p_verified_ci95[0].toFixed(2)}, ${c.p_verified_ci95[1].toFixed(2)}]`}
+                </td>
               </tr>
             )
           })}
@@ -37,7 +43,9 @@ export default function ClaimScores({ claims, language }) {
       </table>
       <p className="border-t border-rule px-4 py-2 text-xs text-ink/50">
         Support score: 0 = contradicted by evidence, 1 = supported. Below 0.35 is flagged as
-        not supported, above 0.65 as supported. Scores are not calibrated probabilities.
+        not supported, above 0.65 as supported. The score itself is not a probability; P(Verified)
+        is the share of training claims with a similar score that were Verified, with a 95%
+        interval. Wide or overlapping intervals mean the score is weak evidence either way.
       </p>
     </div>
   )

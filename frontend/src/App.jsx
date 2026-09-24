@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
-import { detect, health, ApiError } from './lib/api'
+import { detect, health, fileToText, ApiError } from './lib/api'
+import { exportCsv, exportJson } from './lib/exportResults'
+import ScoreChart from './components/ScoreChart'
 import { EXAMPLES } from './lib/verdicts'
 import { loadHistory, saveHistory } from './lib/history'
 import AnnotatedText from './components/AnnotatedText'
@@ -161,6 +163,26 @@ export default function App() {
               >
                 {loading ? 'Analysing…' : 'Analyse'}
               </button>
+              {/* PRD FR-06: .txt / .pdf upload fills the text box */}
+              <label className="cursor-pointer rounded-md border border-rule bg-white px-3 py-1.5 text-sm text-ink transition hover:bg-rule/40">
+                Upload .txt / .pdf
+                <input
+                  type="file"
+                  accept=".txt,.pdf"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const f = e.target.files?.[0]
+                    e.target.value = ''
+                    if (!f) return
+                    try {
+                      setError(null)
+                      setText(await fileToText(f))
+                    } catch (err) {
+                      setError(err.message || 'Could not read that file.')
+                    }
+                  }}
+                />
+              </label>
             </div>
 
             <div className="mt-4">
@@ -213,6 +235,26 @@ export default function App() {
                 <DocumentSummary result={result} />
 
                 <div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h2 className="font-serif text-xl text-navy">HalluScore by claim</h2>
+                    {/* PRD FR-06: export results */}
+                    <div className="flex gap-2">
+                      <button onClick={() => exportCsv(result)}
+                              className="rounded border border-rule px-3 py-1 text-xs text-ink transition hover:bg-rule/40">
+                        Export CSV
+                      </button>
+                      <button onClick={() => exportJson(result, submitted)}
+                              className="rounded border border-rule px-3 py-1 text-xs text-ink transition hover:bg-rule/40">
+                        Export JSON
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-3">
+                    <ScoreChart claims={result.claims} />
+                  </div>
+                </div>
+
+                <div>
                   <h2 className="font-serif text-xl text-navy">Annotated text</h2>
                   <div className="mt-3 rounded-md border border-rule bg-white p-6">
                     <AnnotatedText
@@ -224,7 +266,7 @@ export default function App() {
                   <div className="mt-3 flex flex-wrap gap-4 text-xs text-ink/60">
                     <Legend color="bg-flag-hallucinated" label="Not supported by evidence" />
                     <Legend color="bg-flag-uncertain" label="Could not verify" />
-                    <Legend color="bg-flag-verified" label="Supported (not highlighted)" />
+                    <Legend color="bg-flag-verified" label="Supported by evidence" />
                   </div>
                 </div>
 

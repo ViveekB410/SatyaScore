@@ -56,6 +56,27 @@ export async function detect(text, language) {
   return res.json()
 }
 
+// FR-06 file upload: .txt is read in the browser; .pdf is sent to the backend.
+export async function fileToText(file) {
+  const name = file.name.toLowerCase()
+  if (name.endsWith('.txt')) return file.text()
+  if (!name.endsWith('.pdf')) throw new ApiError('http_415', 'Only .txt and .pdf files are supported.')
+  const form = new FormData()
+  form.append('file', file)
+  let res
+  try {
+    res = await fetch(`${API_URL}/extract-text`, {
+      method: 'POST',
+      headers: { ...BASE_HEADERS, 'X-API-Key': API_KEY },
+      body: form,
+    })
+  } catch {
+    throw new ApiError('network', `Could not reach the backend at ${API_URL}. Is the API running?`)
+  }
+  if (!res.ok) throw await errorFromResponse(res)
+  return (await res.json()).text
+}
+
 export async function health() {
   try {
     const res = await fetch(`${API_URL}/health`, { headers: BASE_HEADERS })

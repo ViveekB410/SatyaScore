@@ -25,12 +25,10 @@ MURIL_MODEL_NAME = "google/muril-base-cased"
 
 MAX_BATCH_SIZE = 128
 
-# OFF by default. The evidence corpus (corpus_vectors*.npy) is embedded with
-# XLM-R only, so a query vector from MuRIL lives in a DIFFERENT vector space and
-# its cosine against the corpus is meaningless. Routing transliterated Hindi to
-# MuRIL therefore broke retrieval for exactly those queries. Every vector that
-# gets compared (query and corpus) must come from ONE model. Only turn this on
-# if the corpus is re-embedded with the same routing.
+# Default for embed(use_muril=None). A MuRIL query vector is only comparable to
+# MuRIL corpus vectors, so callers enable MuRIL routing (FR-02) exactly when
+# they can search a MuRIL-embedded corpus (DetectionPipeline does this when a
+# MuRIL index is loaded). Without one, everything goes through XLM-R.
 USE_MURIL_FALLBACK = False
 
 # Rough heuristic: if a Hindi-tagged claim is mostly ASCII letters, it's
@@ -86,14 +84,17 @@ class CrossLingualEmbedder:
         claim_ids: list[str],
         texts: list[str],
         languages: list[Language],
+        use_muril: bool | None = None,
     ) -> EmbeddingResult:
         if not (len(claim_ids) == len(texts) == len(languages)):
             raise ValueError("claim_ids, texts, and languages must be the same length")
+        if use_muril is None:
+            use_muril = USE_MURIL_FALLBACK
 
         # Route each claim to XLM-R or MuRIL.
         xlmr_idx, muril_idx = [], []
         for i, (text, lang) in enumerate(zip(texts, languages)):
-            if USE_MURIL_FALLBACK and lang == "hi" and _looks_transliterated(text):
+            if use_muril and lang == "hi" and _looks_transliterated(text):
                 muril_idx.append(i)
             else:
                 xlmr_idx.append(i)

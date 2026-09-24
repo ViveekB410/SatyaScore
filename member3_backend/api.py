@@ -27,11 +27,12 @@ import requests
 from collections import defaultdict
 from typing import Literal
 
-from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from starlette.middleware.cors import CORSMiddleware
 
+from member1_model.calibration import load_table, lookup
 from member1_model.cmhsa import CMHSAScorer, aggregate_document
 from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
@@ -95,6 +96,12 @@ class ClaimResult(BaseModel):
     start_char: int          # offset into the original input text (for in-place highlighting)
     end_char: int
     extraction_method: str
+    # FR-04 confidence interval: P(Verified) for claims with this score, with a
+    # 95% Wilson interval, from the train-split calibration table. None if no
+    # table exists for the language (see member1_model/calibration.py).
+    p_verified: float | None = None
+    p_verified_ci95: list[float] | None = None
+    calibration_n: int | None = None
 
 
 class DocumentResult(BaseModel):
@@ -234,6 +241,7 @@ app.add_middleware(
 # it's safe to always include them here rather than making them optional.
 _embedder = CrossLingualEmbedder()
 _retriever = FAISSRetriever(n_clusters=1)  # exact search: the corpus (~2.7k) is far below IVF's useful scale
+_retriever_muril = FAISSRetriever(n_clusters=1)  # FR-02 MuRIL fallback index (loaded if built)
 _scorer = CMHSAScorer()
 _claim_extractor = ClaimExtractor()
 _nli_scorer = NLIScorer()
@@ -256,6 +264,10 @@ for lang in ("en", "hi", "mr"):
     else:
         _scorer.load_weights(lang, alpha=0.5, beta=0.3, gamma=0.2)
         print(f"[api] no weights_{lang}.json — using placeholder 0.5/0.3/0.2 for {lang}")
+
+# FR-04 calibration tables (build_calibration.py -> calibration_<lang>.json).
+_calibration = {lang: t for lang in ("en", "hi", "mr")
+                if (t := load_table(_Path(__file__).resolve().parent.parent / f"calibration_{lang}.json"))}
 
 _pipeline = DetectionPipeline(
     embedder=_embedder,
@@ -292,6 +304,21 @@ def load_starter_corpus():
             for p in passages:
                 langs[p.get("lang", "?")] = langs.get(p.get("lang", "?"), 0) + 1
             print(f"[api] loaded cached bilingual corpus: {len(_retriever)} passages {langs}")
+            # FR-02: MuRIL fallback index for transliterated Hindi (built by
+            # build_muril_index.py). OFF unless SATYASCORE_MURIL_FALLBACK=true:
+            # measured, mean-pooled MuRIL retrieves the source article far less
+            # often than XLM-R (Hindi R@3 0.575 vs 0.873; overall -0.194,
+            # results/retrieval_comparison.md), so enabling it degrades answers.
+            import os as _os
+            muril_v = vectors_path.with_name(vectors_path.stem + "_muril.npy")
+            if _os.environ.get("SATYASCORE_MURIL_FALLBACK", "false").lower() in ("1", "true", "yes") \
+                    and muril_v.exists():
+                mv = np.load(muril_v)
+                if mv.shape[0] == len(passages):
+                    _retriever_muril.build_index([p["id"] for p in passages],
+                                                 [p["text"] for p in passages], mv)
+                    _pipeline.retriever_muril = _retriever_muril
+                    print(f"[api] MuRIL fallback index loaded ({muril_v.name})")
             return
         print("[api] corpus cache size mismatch — falling back to Wikipedia fetch")
 
@@ -351,6 +378,14 @@ def detect(request: DetectRequest, api_key: str = Depends(require_api_key)) -> D
             return "Verified" if score.hallu_score >= request.threshold else "Hallucinated"
         return score.verdict.value
 
+    table = _calibration.get(request.language)
+
+    def _calib(score):
+        if table is None or not score.active_signals:  # no evidence -> no calibrated reading
+            return {}
+        c = lookup(score.hallu_score, table)
+        return {"p_verified": c.p_verified, "p_verified_ci95": list(c.ci95), "calibration_n": c.n}
+
     claims = [
         ClaimResult(
             claim_id=score.claim_id,
@@ -362,6 +397,7 @@ def detect(request: DetectRequest, api_key: str = Depends(require_api_key)) -> D
             start_char=claim.start_char,
             end_char=claim.end_char,
             extraction_method=claim.extraction_method,
+            **_calib(score),
         )
         for claim, score in zip(result.claims, result.scores)
     ]
@@ -383,6 +419,38 @@ def detect(request: DetectRequest, api_key: str = Depends(require_api_key)) -> D
         # Opt-in only, so the default response is byte-identical for existing consumers.
         return JSONResponse(content={**response.model_dump(), "timings_ms": result.timings_ms})
     return response
+
+
+MAX_UPLOAD_BYTES = 5 * 1024 * 1024
+
+
+@app.post("/extract-text")
+async def extract_text(file: UploadFile = File(...), api_key: str = Depends(require_api_key)) -> dict:
+    """FR-06 file upload: return the plain text of an uploaded .txt or .pdf so
+    the dashboard can analyse it. PDF needs pdfminer.six in the API's Python."""
+    data = await file.read()
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=413, detail="File too large (max 5 MB).")
+    name = (file.filename or "").lower()
+    if name.endswith(".txt"):
+        text = data.decode("utf-8", errors="replace")
+    elif name.endswith(".pdf"):
+        try:
+            from io import BytesIO
+            from pdfminer.high_level import extract_text as pdf_text
+        except ImportError:
+            raise HTTPException(status_code=501, detail="PDF upload needs pdfminer.six installed "
+                                "in the API's Python environment (pip install pdfminer.six).")
+        try:
+            text = pdf_text(BytesIO(data))
+        except Exception:
+            raise HTTPException(status_code=422, detail="Could not read text from this PDF.")
+    else:
+        raise HTTPException(status_code=415, detail="Only .txt and .pdf files are supported.")
+    text = text.strip()
+    if not text:
+        raise HTTPException(status_code=422, detail="The file contains no extractable text.")
+    return {"filename": file.filename, "text": text[:20000], "truncated": len(text) > 20000}
 
 
 @app.get("/health")

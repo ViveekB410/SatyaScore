@@ -48,3 +48,58 @@ def test_transliterated_hindi_uses_the_same_model_as_the_corpus(monkeypatch):
     # the corpus is XLM-R only, so every query must be XLM-R too
     assert r.model_used == ["xlm-r", "xlm-r", "xlm-r"]
     assert emb.USE_MURIL_FALLBACK is False
+
+
+# --- PRD FR-02: MuRIL fallback searches a MuRIL index; FR-04: calibrated CI ---
+
+def test_muril_query_searches_the_muril_index_only():
+    from unittest.mock import MagicMock
+    from member1_model.cmhsa import CMHSAScorer
+    from member3_backend.faiss_retriever import RetrievalResult, RetrievedPassage
+    from member3_backend.pipeline import DetectionPipeline
+
+    embedder = MagicMock()
+    res = MagicMock()
+    res.vectors = np.ones((2, 768), np.float32)
+    res.model_used = ["xlm-r", "muril"]
+    embedder.embed.return_value = res
+
+    def retriever():
+        r = MagicMock()
+        r.retrieve.return_value = RetrievalResult(
+            "c", [RetrievedPassage("p", "Evidence.", 0.9)], 1.0, True)
+        return r
+    xlmr_r, muril_r = retriever(), retriever()
+    scorer = CMHSAScorer()
+    scorer.load_weights("hi", alpha=0.5, beta=0.3, gamma=0.2)
+    extractor = MagicMock()
+    c0, c1 = MagicMock(), MagicMock()
+    c0.text, c1.text = "पेरिस फ्रांस की राजधानी है।", "Paris France ki rajdhani hai."
+    extractor.extract.return_value = [c0, c1]
+
+    p = DetectionPipeline(embedder=embedder, retriever=xlmr_r, scorer=scorer,
+                          claim_extractor=extractor, retriever_muril=muril_r)
+    p.run("x", "hi")
+    assert embedder.embed.call_args.kwargs["use_muril"] is True
+    assert xlmr_r.retrieve.call_count == 1 and muril_r.retrieve.call_count == 1
+
+
+def test_without_a_muril_index_muril_is_not_used():
+    from unittest.mock import MagicMock
+    from member3_backend.pipeline import DetectionPipeline
+    embedder = MagicMock()
+    p = DetectionPipeline(embedder=embedder, retriever=MagicMock(), scorer=MagicMock())
+    assert p.retriever_muril is None  # -> embed(use_muril=False) in run()
+
+
+def test_calibration_bins_and_wilson_interval():
+    from member1_model.calibration import fit_bins, lookup, wilson
+    lo, hi = wilson(9, 10)
+    assert 0.55 < lo < 0.9 < hi <= 1.0
+    scores = np.linspace(0, 1, 100)
+    verified = scores > 0.5
+    t = fit_bins(scores, verified, n_bins=4)
+    low, high = lookup(0.05, t), lookup(0.95, t)
+    assert low.p_verified == 0.0 and high.p_verified == 1.0
+    assert high.ci95[0] > low.ci95[1]  # separated bins -> non-overlapping CIs
+    assert low.n == 25

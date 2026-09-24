@@ -177,9 +177,14 @@ class DetectionPipeline:
         entity_linker: EntityLinker | None = None,
         wikidata: WikidataConnector | None = None,
         nli_top_k: int = NLI_EVIDENCE_TOP_K,
+        retriever_muril: FAISSRetriever | None = None,
     ):
         self.embedder = embedder
         self.retriever = retriever
+        # FR-02: MuRIL fallback for transliterated Hindi. Only enabled when a
+        # MuRIL-embedded copy of the corpus is supplied, so a MuRIL query is
+        # always searched against MuRIL vectors (never across vector spaces).
+        self.retriever_muril = retriever_muril
         self.scorer = scorer
         self.claim_extractor = claim_extractor
         self.nli_scorer = nli_scorer
@@ -215,7 +220,8 @@ class DetectionPipeline:
         languages = [language] * len(claim_texts)
 
         t = time.perf_counter()
-        embedding_result = self.embedder.embed(claim_ids, claim_texts, languages)
+        embedding_result = self.embedder.embed(
+            claim_ids, claim_texts, languages, use_muril=self.retriever_muril is not None)
         timings["embedding"] = (time.perf_counter() - t) * 1000
 
         enabled = active_signals or self._default_enabled_signals()
@@ -231,7 +237,9 @@ class DetectionPipeline:
         for i, claim_id in enumerate(claim_ids):
             claim_text = claim_texts[i]
             t = time.perf_counter()
-            retrieval = self.retriever.retrieve(claim_id, embedding_result.vectors[i], top_k=self.nli_top_k)
+            retriever = (self.retriever_muril if embedding_result.model_used[i] == "muril"
+                         else self.retriever)
+            retrieval = retriever.retrieve(claim_id, embedding_result.vectors[i], top_k=self.nli_top_k)
             timings["retrieval"] += (time.perf_counter() - t) * 1000
 
             relevant_passages = [p for p in retrieval.passages if p.score >= MIN_RELEVANCE_THRESHOLD]

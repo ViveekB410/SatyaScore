@@ -353,6 +353,10 @@ class DetectionPipeline:
         the scorer's renormalisation — see module docstring)."""
         if self.claim_extractor is None:
             return None
+        # No known relation phrase -> the claim can never link. Return before
+        # any network call (this was ~1 s of Wikidata lookups per claim).
+        if not self.entity_linker.find_relation_pid(claim_text):
+            return None
         entities = self.claim_extractor.extract_entities(claim_text, language)
         if len(entities) < 2:
             return None

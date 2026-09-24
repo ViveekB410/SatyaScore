@@ -34,8 +34,9 @@ requirement: the traceability table in `IMPROVEMENT_PLAN.md`.
   `annotation_round2/` (`compute_round2.py` → `results/label_audit.md`).
 
 ## The result (one line)
-Multi-signal fusion does **not** beat NLI alone; KG verification is inapplicable to these
-descriptive claims; no configuration beats a trivial always-Verified baseline. The cause is
+Multi-signal fusion does **not** beat NLI alone; KG cannot be evaluated here (0 of 456 gold
+claims contain a linkable relation, `results/kg_ablation.md`); no configuration beats a trivial
+always-Verified baseline. The cause is
 not proven: the leading hypothesis is label reliability (IAA findings); retrieval was tested
 and is not the main limiter at article level. This is the **honest negative result the PRD
 §15 pre-registered**.
@@ -47,7 +48,9 @@ and is not the main limiter at article level. This is the **honest negative resu
 - IAA round 1: binary "hallucination vs not" **κ = 0.53** (headline; 0.61 on the well-formed
   subset, n = 49); 3-class κ = 0.15 because the annotators used different label schemes.
 - NLI is a pretrained mDeBERTa stand-in, not the PRD's DeBERTa-v3 + IndicXNLI fine-tune.
-- KG signal 0% coverage. English claim extraction fixed for new text (broken 14.3% → 0%);
+- KG: the verifier is fixed (supported / contradicted / unknown — a failed or missing lookup is
+  no longer scored as false; polite rate-limited Wikidata access), but no gold claim contains a
+  linkable relation, so its effect is unmeasured. English claim extraction fixed for new text (broken 14.3% → 0%);
   the annotated gold claims keep 38 broken rows (excluded as not well-formed).
 - **Latency, measured on a T4 GPU:** median 104 ms/claim (PRD < 500 ms met), 2,414 ms per
   10-claim document (< 3 s met); mean 1,171 ms (missed, driven by the KG network call). CPU

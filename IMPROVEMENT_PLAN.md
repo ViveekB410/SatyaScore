@@ -18,7 +18,7 @@ beneath each phase.
 | FR-06 dashboard: red/amber/green, **bar chart, CSV/JSON export, .txt/.pdf upload** | Met in React (PRD says Streamlit). PDF needs `pdfminer.six` in the API's Python | `frontend/` |
 | FR-07 ≥3,000 claims, 40/30/30, 2–3 annotators, HF release | **Not met** (456, ~78% Verified, 1 annotator) — team work | — |
 | Goals: F1 ≥0.78 EN / ≥0.72 HI; beat 3/5 baselines; κ ≥0.65 | **Not met** (see `RESULTS_SUMMARY.md`) | — |
-| Goal: KG ablation ≥ +0.03 ("crux of the novelty claim") | **Not met**: KG coverage 0% on these claims | — |
+| Goal: KG ablation ≥ +0.03 ("crux of the novelty claim") | **Not measurable on this dataset**: 0/456 gold claims contain a linkable relation (`results/kg_ablation.md`). KG verifier fixed: supported / contradicted / unknown, polite rate-limited Wikidata access; 7/7 live on relational claims | `wikidata_connector.py`, `entity_linker.py` |
 | NFR latency <500 ms/claim, <3 s/doc (GPU); fixed seeds | Met (median 104 ms; 2,414 ms/doc) | `results/latency_benchmark.md` |
 
 **Honest ceiling (state this to the guide):** near-chance detector accuracy is *data-bound*.

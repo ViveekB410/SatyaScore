@@ -59,8 +59,10 @@ but **off by default**: measured, it retrieves far worse than XLM-R (`results/re
 ## Key findings
 
 - **Signals are near chance.** ROC-AUC ≈ 0.56–0.58 (EN), ≈ 0.42–0.51 (HI). No fusion
-  configuration beats an always-"Verified" baseline; fusion collapses to NLI; KG is
-  inapplicable (0% coverage on this data).
+  configuration beats an always-"Verified" baseline; fusion collapses to NLI.
+- **KG cannot be evaluated on this dataset:** 0 of 456 gold claims contain a relation the KG
+  can link (`results/kg_ablation.md`). The KG verifier was fixed — a failed or missing lookup
+  used to score a true claim as false — and is 7/7 correct on relational claims.
 - **The test set is too small to measure detection:** 8 English and 2 Hindi hallucinated
   test claims. Hallucination-F1 is reported but marked "too few positives to interpret".
 - **Retrieval is not the main limiter** (`results/retrieval_bottleneck.md`): English NLI AUC
@@ -92,8 +94,9 @@ but **off by default**: measured, it retrieves far worse than XLM-R (`results/re
 
 1. **Detection accuracy is unproven either way on this data** — too few hallucinated test
    claims to measure it. More balanced annotation is the lever that makes it measurable.
-2. **PRD novelty claim at risk:** the KG ablation (PRD: "crux of the novelty claim") cannot
-   pass with 0% KG coverage. The paper must report it honestly or the team must add coverage.
+2. **PRD novelty claim at risk:** the KG ablation (PRD: "crux of the novelty claim") cannot be
+   measured on this dataset — its claims contain no linkable relations. Testing the PRD claim
+   needs relational claims in the dataset (team decision).
 3. **Paper/patent status is unknown to the backend lane** — needs an owner update.
 4. **Nothing is deployed live** (frontend + API) — a demo needs a GPU host for PRD latency.
 

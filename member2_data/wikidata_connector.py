@@ -23,10 +23,22 @@ from typing import Literal
 
 import requests
 
+from member2_data._http import polite_get
+
 Language = Literal["en", "hi", "mr"]
 
 WIKIDATA_SPARQL_ENDPOINT = "https://query.wikidata.org/sparql"
 CACHE_TTL_SECONDS = 24 * 60 * 60  # 24 hours, per FR-03
+
+# Single-valued properties: a DIFFERENT existing value is a real contradiction.
+# (capital of, has capital, place of birth, place of death)
+FUNCTIONAL_PIDS = {"P1376", "P36", "P19", "P20"}
+# Place-valued properties: the claimed object may be any enclosing region, so
+# the support query walks the located-in / country chain.
+HIERARCHICAL_PIDS = {"P19", "P20", "P131", "P159"}
+WIKIDATA_ENTITY_API = "https://www.wikidata.org/w/api.php"
+MAX_HIERARCHY_DEPTH = 6
+MAX_HIERARCHY_NODES = 60
 
 # Wikidata language codes differ slightly from ours for Hindi/Marathi in
 # some contexts, but these are the standard ones.
@@ -39,9 +51,10 @@ class TripleVerification:
     property_pid: str
     expected_value: str
     found: bool
-    confidence: float  # 0.0-1.0
+    confidence: float | None  # 1.0 supported, 0.0 contradicted, None unknown (no KG signal)
     used_fallback_label: bool  # True if we had to fall back to English label
     source: Literal["cache", "live"]
+    status: Literal["supported", "contradicted", "unknown"] = "unknown"
 
 
 class _TTLCache:
@@ -100,27 +113,114 @@ class WikidataConnector:
             # original (live) call, since both are the same object in memory.
             return replace(cached, source="cache")
 
-        query = self._build_ask_query(subject_qid, property_pid, expected_value)
-        found, used_fallback = self._run_ask_with_fallback(query, subject_qid, property_pid, expected_value, language)
+        # Three outcomes, not two. "Not found" is NOT evidence of falsity: the
+        # triple may be mis-built, Wikidata may be incomplete, or the lookup may
+        # have failed. Scoring those as 0.0 turned true claims into
+        # Hallucinated ("Modi is the Prime Minister of India" -> 0.0).
+        used_fallback = False
+        if expected_value.startswith("Q"):
+            found, has_value = self._entity_check(subject_qid, property_pid, expected_value)
+        else:  # literal value (rare): SPARQL ASK, with the Hindi-label fallback
+            query = self._build_ask_query(subject_qid, property_pid, expected_value)
+            found, used_fallback = self._run_ask_with_fallback(
+                query, subject_qid, property_pid, expected_value, language)
+            has_value = None
 
-        confidence = 1.0 if found else 0.0
-        if found and used_fallback:
+        if found is True:
+            status = "supported"
+        elif found is None:
+            status = "unknown"  # lookup failed (network / HTTP error)
+        elif property_pid in FUNCTIONAL_PIDS and has_value:
+            # Single-valued property that Wikidata DOES fill, with a different
+            # value: a genuine contradiction ("Paris is the capital of Germany").
+            status = "contradicted"
+        else:
+            status = "unknown"  # multi-valued property, or no value on record
+
+        if status == "supported":
             # Slightly discount confidence when we only matched via the
             # English-label fallback rather than a native-language label —
             # this is a known, documented limitation (Section 7.2 / 16).
-            confidence = 0.85
+            confidence = 0.85 if used_fallback else 1.0
+        elif status == "contradicted":
+            confidence = 0.0
+        else:
+            confidence = None  # no KG signal; the scorer renormalises around it
 
         result = TripleVerification(
             subject_qid=subject_qid,
             property_pid=property_pid,
             expected_value=expected_value,
-            found=found,
+            found=status == "supported",
             confidence=confidence,
             used_fallback_label=used_fallback,
             source="live",
+            status=status,
         )
-        self._cache.set(cache_key, result)
+        if found is not None:  # never cache a network failure for 24h
+            self._cache.set(cache_key, result)
         return result
+
+    # -- entity-API checks (fast, reliable; the SPARQL endpoint times out on paths)
+
+    def _claim_values(self, qid: str, pid: str) -> set[str] | None:
+        """Truthy entity values of `qid`'s property `pid` via wbgetclaims
+        (preferred rank if any, else normal; deprecated skipped). None if the
+        lookup failed."""
+        key = f"vals|{qid}|{pid}"
+        cached = self._cache.get(key)
+        if cached is not None:
+            return cached
+        try:
+            response = polite_get(self._session, WIKIDATA_ENTITY_API, params={"action": "wbgetclaims", "entity": qid, "property": pid, "format": "json"}, timeout=10)
+            statements = response.json()["claims"].get(pid, [])
+        except Exception:
+            return None
+        live = [s for s in statements if s.get("rank") != "deprecated"]
+        preferred = [s for s in live if s.get("rank") == "preferred"]
+        values = set()
+        for s in preferred or live:
+            v = s.get("mainsnak", {}).get("datavalue", {}).get("value")
+            if isinstance(v, dict) and "id" in v:
+                values.add(v["id"])
+        self._cache.set(key, values)
+        return values
+
+    def _reaches(self, start: set[str], target: str) -> bool | None:
+        """Is `target` an enclosing region of any of `start`, via country (P17,
+        checked first: usually one hop) and located-in (P131)? Breadth-first,
+        bounded, stops as soon as the target is found. None if a lookup failed."""
+        seen, frontier = set(start), list(start)
+        for _ in range(MAX_HIERARCHY_DEPTH):
+            nxt = []
+            for q in frontier:
+                for pid in ("P17", "P131"):
+                    vals = self._claim_values(q, pid)
+                    if vals is None:
+                        return None
+                    if target in vals:
+                        return True
+                    nxt += [v for v in vals if v not in seen]
+                    seen |= vals
+            if not nxt or len(seen) > MAX_HIERARCHY_NODES:
+                return False
+            frontier = nxt
+        return False
+
+    def _entity_check(self, subject_qid: str, pid: str, object_qid: str) -> tuple[bool | None, bool | None]:
+        """(found, has_value). found is None when a lookup failed."""
+        values = self._claim_values(subject_qid, pid)
+        if values is None:
+            return None, None
+        if object_qid in values:
+            return True, True
+        if pid in HIERARCHICAL_PIDS and values:
+            reached = self._reaches(values, object_qid)
+            if reached is None:
+                return None, True
+            if reached:
+                return True, True
+        return False, bool(values)
 
     def get_label(self, qid: str, language: Language = "en") -> tuple[str | None, bool]:
         """
@@ -148,8 +248,11 @@ class WikidataConnector:
 
     def _run_ask_with_fallback(
         self, query: str, subject_qid: str, property_pid: str, expected_value: str, language: Language
-    ) -> tuple[bool, bool]:
+    ) -> tuple[bool | None, bool]:
+        """(found, used_fallback); found is None when the lookup itself failed."""
         found = self._execute_ask(query)
+        if found is None:
+            return None, False
         if found:
             return True, False
 
@@ -180,34 +283,29 @@ class WikidataConnector:
         }} LIMIT 1
         """
         try:
-            response = self._session.get(
-                WIKIDATA_SPARQL_ENDPOINT,
-                params={"query": query, "format": "json"},
-                headers={"User-Agent": "SatyaScore/1.0 (capstone research project)"},
-                timeout=10,
-            )
-            response.raise_for_status()
+            response = polite_get(self._session, WIKIDATA_SPARQL_ENDPOINT, params={"query": query, "format": "json"}, timeout=10)
             bindings = response.json()["results"]["bindings"]
             return bindings[0]["label"]["value"] if bindings else None
         except (requests.RequestException, KeyError, IndexError, ValueError):
             return None
 
-    def _execute_ask(self, query: str) -> bool:
+    def _execute_ask(self, query: str) -> bool | None:
+        """True/False from Wikidata, or None if the lookup failed -- a failed
+        request must never be read as "the fact is false"."""
         try:
-            response = self._session.get(
-                WIKIDATA_SPARQL_ENDPOINT,
-                params={"query": query, "format": "json"},
-                headers={"User-Agent": "SatyaScore/1.0 (capstone research project)"},
-                timeout=10,
-            )
-            response.raise_for_status()
-            return bool(response.json().get("boolean", False))
-        except (requests.RequestException, KeyError, ValueError):
-            return False
+            response = polite_get(self._session, WIKIDATA_SPARQL_ENDPOINT, params={"query": query, "format": "json"}, timeout=10)
+            body = response.json()
+            if "boolean" not in body:
+                return None
+            return bool(body["boolean"])
+        except (requests.RequestException, KeyError, ValueError, Exception):
+            return None
 
     @staticmethod
     def _build_ask_query(subject_qid: str, property_pid: str, expected_value: str) -> str:
         # expected_value as a QID (entity-to-entity relation)
+        # (QID objects are checked via the entity API in _entity_check; a
+        # property-path ASK for place hierarchies timed out on the endpoint.)
         if expected_value.startswith("Q"):
             return f"ASK {{ wd:{subject_qid} wdt:{property_pid} wd:{expected_value} . }}"
         # expected_value as a literal (e.g. a date or plain string)

@@ -29,6 +29,8 @@ from typing import Literal
 
 import requests
 
+from member2_data._http import polite_get
+
 Language = Literal["en", "hi", "mr"]
 
 WIKIDATA_SEARCH_ENDPOINT = "https://www.wikidata.org/w/api.php"
@@ -42,10 +44,8 @@ WIKIDATA_SEARCH_ENDPOINT = "https://www.wikidata.org/w/api.php"
 # matches that ordering are included, so the SPARQL ASK query is meaningful.
 #
 # NOTE on P39 (position held): the OBJECT must be the office itself
-# (e.g. "Prime Minister of India" -> Q14212), not the country. That depends
-# on upstream NER extracting the office phrase as the object entity; if NER
-# instead extracts the country ("India"), the triple will mis-verify. This is
-# a known limitation of pairing a simple relation table with generic NER.
+# (e.g. "Prime Minister of India"), not the country NER extracts. link_claim
+# rebuilds it as "<role> of <place>" via OFFICE_ROLES below.
 RELATION_TO_PID: dict[str, str] = {
     # -- Positions / office held (object = the office) --
     "is the prime minister of": "P39",
@@ -88,6 +88,15 @@ RELATION_TO_PID: dict[str, str] = {
     "is a member of": "P463",
 }
 
+# P39 phrases whose object is a jurisdiction: the office is "<role> of <place>".
+OFFICE_ROLES: dict[str, str] = {
+    "is the prime minister of": "Prime Minister",
+    "is the president of": "President",
+    "is the chief minister of": "Chief Minister",
+    "is the vice president of": "Vice President",
+    "is the governor of": "Governor",
+}
+
 
 @dataclass
 class EntityMatch:
@@ -112,19 +121,13 @@ class EntityLinker:
     def search_entity(self, text: str, language: Language = "en", limit: int = 1) -> EntityMatch:
         """Looks up the best-matching Wikidata entity for a text mention."""
         try:
-            response = self._session.get(
-                WIKIDATA_SEARCH_ENDPOINT,
-                params={
+            response = polite_get(self._session, WIKIDATA_SEARCH_ENDPOINT, params={
                     "action": "wbsearchentities",
                     "search": text,
                     "language": language,
                     "format": "json",
                     "limit": limit,
-                },
-                headers={"User-Agent": "SatyaScore/1.0 (capstone research project)"},
-                timeout=10,
-            )
-            response.raise_for_status()
+                }, timeout=10)
             results = response.json().get("search", [])
         except (requests.RequestException, ValueError, KeyError):
             return EntityMatch(surface_text=text, qid=None, wikidata_label=None, confidence=0.0)
@@ -147,10 +150,15 @@ class EntityLinker:
         depending on dict insertion order. Still a lookup, not extraction —
         an unrecognised relation returns None and the claim gets no KG signal
         (kg_conf=None, which CMHSAScorer renormalises around)."""
+        phrase = self.find_relation_phrase(claim_text)
+        return RELATION_TO_PID[phrase] if phrase else None
+
+    @staticmethod
+    def find_relation_phrase(claim_text: str) -> str | None:
         lowered = claim_text.lower()
         for phrase in sorted(RELATION_TO_PID, key=len, reverse=True):
             if phrase in lowered:
-                return RELATION_TO_PID[phrase]
+                return phrase
         return None
 
     def link_claim(
@@ -169,7 +177,14 @@ class EntityLinker:
         built here — spaCy's NER in claim_extractor.py's pipeline could
         supply these spans as a follow-up integration).
         """
-        pid = self.find_relation_pid(claim_text)
+        phrase = self.find_relation_phrase(claim_text)
+        pid = RELATION_TO_PID[phrase] if phrase else None
+        # P39 ("position held") takes the OFFICE as its value, not the country:
+        # "Modi is the Prime Minister of India" -> (Modi, P39, "Prime Minister of
+        # India"). Linking the country ("India") built a triple Wikidata can
+        # never contain, which used to score a true claim as false.
+        if phrase in OFFICE_ROLES:
+            object_text = f"{OFFICE_ROLES[phrase]} of {object_text}"
         subject_match = self.search_entity(subject_text, language)
         object_match = self.search_entity(object_text, language)
 

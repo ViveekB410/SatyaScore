@@ -339,7 +339,10 @@ def main() -> None:
 
     L.append("## 9. Defensible findings\n")
     L.append("1. Multi-signal fusion does **not** beat NLI alone for this task/data.\n"
-             "2. Knowledge-graph verification is **inapplicable** to these descriptive claims (0% coverage).\n"
+             "2. Knowledge-graph verification **cannot be evaluated on this dataset**: 0 of 456 gold claims "
+             "contain a relation the KG can link (the claims are descriptive; `results/kg_ablation.md`), so "
+             "the PRD's KG ablation is not measurable here. On relational claims the fixed verifier is "
+             "correct (7/7 live).\n"
              "3. Semantic similarity measures **topicality, not truth** (below chance in Hindi).\n"
              "4. Detecting **naturally-occurring** hallucinations is hard; no configuration clears a "
              "trivial majority baseline on this data.\n"

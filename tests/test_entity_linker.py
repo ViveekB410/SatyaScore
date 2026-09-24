@@ -112,3 +112,23 @@ def test_prime_minister_still_maps_to_p39_after_expansion():
     # shadow the P39 relation the pipeline/tests rely on.
     linker = EntityLinker()
     assert linker.find_relation_pid("Narendra Modi is the Prime Minister of India") == "P39"
+
+
+def test_office_claim_links_the_office_not_the_country():
+    # "Modi is the Prime Minister of India" -> (Modi, P39, "Prime Minister of India")
+    from unittest.mock import MagicMock
+    from member2_data.entity_linker import EntityLinker
+    searched = []
+
+    def get(url, params, headers, timeout):
+        searched.append(params["search"])
+        r = MagicMock()
+        r.status_code, r.headers = 200, {}
+        r.json.return_value = {"search": [{"id": "Q" + str(len(searched)), "label": params["search"]}]}
+        return r
+    session = MagicMock()
+    session.get.side_effect = get
+    t = EntityLinker(session=session).link_claim(
+        "Narendra Modi is the Prime Minister of India.", "Narendra Modi", "India")
+    assert searched == ["Narendra Modi", "Prime Minister of India"]
+    assert t.property_pid == "P39" and t.linkable

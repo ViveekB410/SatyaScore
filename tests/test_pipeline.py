@@ -255,3 +255,21 @@ def test_no_usable_evidence_abstains_as_uncertain_with_a_note(retriever):
     assert score.active_signals == []
     assert score.note and "insufficient evidence" in score.note
     assert result.document.document_verdict is Verdict.UNCERTAIN
+
+
+def test_kg_makes_no_network_call_when_no_relation_phrase_matches():
+    from member2_data.entity_linker import EntityLinker
+    session = MagicMock()
+    claim_extractor = MagicMock()
+    extracted = MagicMock()
+    extracted.text = "Dengue fever is spread by mosquitoes."
+    claim_extractor.extract.return_value = [extracted]
+    wikidata = MagicMock()
+    pipeline = DetectionPipeline(embedder=_mock_embedder(1), retriever=_mock_retriever(score=0.9),
+                                 scorer=_real_scorer(), claim_extractor=claim_extractor,
+                                 entity_linker=EntityLinker(session=session), wikidata=wikidata)
+    result = pipeline.run(extracted.text, language="en")
+    assert "kg" not in result.scores[0].active_signals
+    session.get.assert_not_called()
+    wikidata.verify_triple.assert_not_called()
+    claim_extractor.extract_entities.assert_not_called()

@@ -62,11 +62,13 @@ _SENTENCE_SPLIT = re.compile(r"(?<=[.!?।])\s+")  # includes Hindi danda (।)
 # confidently compared against the Nehru article purely because it was the
 # closest thing available, not because it was relevant).
 #
-# NOTE: 0.3 is a reasonable starting point for cosine similarity between
-# genuinely unrelated multilingual-embedding text, but embedding spaces are
-# not perfectly calibrated (unrelated pairs don't reliably sit near 0) --
-# this should be tuned empirically once real query traffic or a labeled
-# relevance set is available, not treated as a validated constant.
+# MEASURED (IMPROVEMENT_PLAN.md Phase 2.2, results/retrieval_comparison.md and
+# results/retrieval_bottleneck.md): with XLM-R, 0.3 keeps ~100% of both
+# relevant and irrelevant best passages -- in practice it filters nothing.
+# The train-fitted cut-off (0.66) would drop ~half the relevant evidence and
+# 45% of claims, and NLI is no better on the claims it keeps (AUC 0.567 vs
+# 0.496, overlapping CIs). So 0.3 is kept deliberately, as "effectively no
+# filter"; revisit only if the encoder or NLI model changes.
 MIN_RELEVANCE_THRESHOLD = 0.3
 
 # How many top passages to check NLI against, instead of just the single

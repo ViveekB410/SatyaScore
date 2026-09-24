@@ -1,7 +1,10 @@
 # SatyaScore — Staged Improvement Plan
 
 **Author:** Claude (Opus 4.8), from `FABLE_PLANNING_BRIEF.md`, verified against the code.
-**Status:** plan for approval — no implementation started.
+**Status (2026-09-24):** Phase 0 done (`a31c411`). Phase 1 done (`ccad2e2`, `1f65a35`).
+Phase 2 done — **negative result: retrieval is not the bottleneck** (see the Phase 2 outcome
+below). Next: Phase 3. The original plan text is kept below unedited; outcomes are added
+beneath each phase.
 **Honest ceiling (state this to the guide):** near-chance detector accuracy is *data-bound*.
 Phases 0–4 make the system correct, calibrated, honest, and presentable, and they set up the
 one thing that actually raises the accuracy ceiling — **annotation + NLI fine-tuning (Phase 5)**.
@@ -79,6 +82,25 @@ Do in order; re-run `diagnose_retrieval.py` after each and compare **source-arti
 | **2.3 Hybrid retrieval (BM25 + dense)** | new `member3_backend/lexical_retriever.py`, `pipeline.py` | Add BM25 over the same corpus; fuse ranks (RRF) with dense. Dense misses exact entities/dates/numbers — exactly what claims hinge on. | Top-3 recall improves over dense-only, especially on numeric/date claims. |
 
 *Impact: highest technical lever. Prerequisite for "more sources".*
+
+> **Phase 2 outcome (measured — the premise above was wrong).**
+> Harness: `retrieval_eval.py` → `results/retrieval_comparison.md`, on all 417 gold claims whose
+> source article is in the corpus. Decision rule fixed before running: adopt only if R@3 gain has
+> a paired-bootstrap CI entirely above 0.
+> - Current XLM-R retrieval already finds the source article in the top 3 for **87.5%** of
+>   claims (top 10: 95%).
+> - 2.3 BM25 −0.101 and hybrid −0.034 (both CIs below 0) → **rejected**.
+> - 2.2 The threshold 0.3 filters nothing; the train-fitted 0.66 drops ~half the relevant
+>   evidence → **0.3 kept**, documented in `pipeline.py`.
+> - 2.1 Decided by `retrieval_bottleneck.py` → `results/retrieval_bottleneck.md`: even when NLI
+>   was given a passage from the claim's own source article, English NLI AUC is 0.568
+>   [0.429, 0.699] — not distinguishable from chance. Perfect retrieval would gain at most
+>   +0.03 AUC. **E5/LaBSE not pursued; no download needed.**
+>
+> **Implication:** the detector's limit is NLI's use of the evidence and the labels, not
+> retrieval. The levers that remain are calibration (Phase 3) and annotation + NLI fine-tuning
+> (Phase 5). Phase 4's gate is met at article level, but more sources must be re-measured with
+> `retrieval_eval.py` (distractors can lower recall).
 
 ## Phase 3 — Scoring & calibration (≈4–6 days)
 

@@ -240,7 +240,10 @@ app.add_middleware(
 # lazy-load their actual model/network resources on first real use), so
 # it's safe to always include them here rather than making them optional.
 _embedder = CrossLingualEmbedder()
-_retriever = FAISSRetriever(n_clusters=1)  # exact search: the corpus (~2.7k) is far below IVF's useful scale
+# PRD FR-03 IVF index, sized ~sqrt(N) clusters at load time (load_starter_corpus).
+# Measured on the demo corpus: identical source recall to exact search, ~7x
+# faster per query (results/ivf_vs_flat.md).
+_retriever = FAISSRetriever(n_clusters=1)
 _retriever_muril = FAISSRetriever(n_clusters=1)  # FR-02 MuRIL fallback index (loaded if built)
 _scorer = CMHSAScorer()
 _claim_extractor = ClaimExtractor()
@@ -298,6 +301,8 @@ def load_starter_corpus():
         passages = _json.loads(passages_path.read_text(encoding="utf-8"))
         vectors = np.load(vectors_path)
         if len(passages) == vectors.shape[0]:
+            import math as _math
+            _retriever.n_clusters = max(1, round(_math.sqrt(len(passages))))
             _retriever.build_index([p["id"] for p in passages],
                                    [p["text"] for p in passages], vectors)
             langs: dict[str, int] = {}
@@ -315,6 +320,7 @@ def load_starter_corpus():
                     and muril_v.exists():
                 mv = np.load(muril_v)
                 if mv.shape[0] == len(passages):
+                    _retriever_muril.n_clusters = _retriever.n_clusters
                     _retriever_muril.build_index([p["id"] for p in passages],
                                                  [p["text"] for p in passages], mv)
                     _pipeline.retriever_muril = _retriever_muril

@@ -3,7 +3,7 @@
 **Author:** Claude (Opus 4.8), from `FABLE_PLANNING_BRIEF.md`, verified against the code.
 **Status (2026-09-24):** Phase 0 done (`a31c411`). Phase 1 done (`ccad2e2`, `1f65a35`).
 Phase 2 done — **negative result: retrieval is not the bottleneck** (see the Phase 2 outcome
-below). Phase 3 done (see its outcome). Remaining: Phase 4 (more sources) and Phase 5 (annotation + NLI fine-tuning, team + GPU). The original plan text is kept below unedited; outcomes are added
+below). Phase 3 done (see its outcome). Phase 4 done (see its outcome). Remaining: Phase 5 (annotation + NLI fine-tuning, team + GPU). The original plan text is kept below unedited; outcomes are added
 beneath each phase.
 
 ## PRD traceability (checked against the PRD text, 2026-09-24)
@@ -12,7 +12,7 @@ beneath each phase.
 |---|---|---|
 | FR-01 extraction, coref, spans | Met; the Phase 1 safety net emits whole-sentence claims where splitting broke (less atomic) | `claim_extractor.py` |
 | FR-02 XLM-R primary + **MuRIL fallback** (transliterated Hindi) | Implemented compliantly (MuRIL queries search a MuRIL-embedded corpus, `build_muril_index.py`) but **off by default** (`SATYASCORE_MURIL_FALLBACK`): measured, MuRIL retrieval is far worse (Hindi R@3 0.575 vs 0.873, overall −0.194 [−0.240, −0.146], `results/retrieval_comparison.md`). Evidence-based deviation; measured on Devanagari Hindi (no transliterated eval set exists) | `embeddings.py`, `pipeline.py`, `api.py` |
-| FR-03 FAISS, Wikidata + English fallback, 24h cache | Met (index is the experiment/demo corpus, not Wikipedia-scale) | `faiss_retriever.py`, `wikidata_connector.py` |
+| FR-03 FAISS **IVF**, Wikidata + English fallback, 24h cache | Met: the API uses IVF (identical recall, ~7× faster, `results/ivf_vs_flat.md`); index is the demo corpus, not Wikipedia-scale | `faiss_retriever.py`, `wikidata_connector.py` |
 | FR-04 HalluScore **with confidence interval**, 3 tiers, threshold, ablation | Met: P(Verified) + 95% Wilson CI per claim, fitted on train (`results/calibration.md`) | `calibration.py`, `api.py` |
 | FR-05 REST API | Met | `api.py` |
 | FR-06 dashboard: red/amber/green, **bar chart, CSV/JSON export, .txt/.pdf upload** | Met in React (PRD says Streamlit). PDF needs `pdfminer.six` in the API's Python | `frontend/` |
@@ -151,6 +151,18 @@ Makes the 3-class output *mean* something.
 | **4.2 (Optional) live retrieval** | new module, `pipeline.py` | Query-time Wikipedia/web fetch for out-of-corpus claims, behind a flag. | Out-of-corpus claims get evidence; caching + timeout so latency stays bounded. |
 
 *Impact: coverage, not accuracy. Only pays off after Phase 2.*
+
+> **Phase 4 outcome (measured).**
+> - Distractor cost of the existing demo expansion (+6,677 passages, 74 topics;
+>   `results/retrieval_comparison_demo.md`): source-article R@3 0.875 → 0.775, R@1 0.767 → 0.602.
+> - Downstream (`demo_corpus_effect.py` → `results/demo_corpus_effect.md`): NLI AUC with the demo
+>   corpus's top-1 passage, English 0.552 → 0.526, ΔAUC −0.026 [−0.087, +0.036] → **no
+>   demonstrated harm** (26% of top-1 passages now come from new topics). More sources are
+>   acceptable for the demo, but any expansion must be re-measured with these two scripts.
+> - FR-03 IVF (`ivf_eval.py` → `results/ivf_vs_flat.md`): IVF (√N clusters) gives identical R@3
+>   (0.775, Δ 0.000) and is ~7× faster (0.23 vs 1.55 ms median) → **the API now uses IVF**.
+> - Further corpus growth needs bulk Wikipedia downloads (explicit permission), and a topic list
+>   chosen independently of the evaluation claims.
 
 ## Phase 5 — The ceiling-raiser (gated on annotation)
 

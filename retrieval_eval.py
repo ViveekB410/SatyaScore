@@ -89,11 +89,16 @@ class BM25:
 
 
 # ---------------------------------------------------------------- dense ------
-def corpus_vectors(tag: str, texts: list[str]) -> np.ndarray:
+CORPORA = {"experiment": ("corpus_passages.json", "corpus_vectors.npy"),
+           "demo": ("corpus_passages_demo.json", "corpus_vectors_demo.npy")}
+
+
+def corpus_vectors(tag: str, texts: list[str], corpus: str = "experiment") -> np.ndarray:
     if tag == "xlmr":  # the committed corpus vectors ARE the current encoder's
-        return np.load(ROOT / "corpus_vectors.npy")
+        return np.load(ROOT / CORPORA[corpus][1])
     CACHE.mkdir(parents=True, exist_ok=True)
-    path = CACHE / f"corpus_vectors_{tag}.npy"
+    suffix = "" if corpus == "experiment" else f"_{corpus}"
+    path = CACHE / f"corpus_vectors_{tag}{suffix}.npy"
     if path.exists():
         return np.load(path)
     v = encode(tag, texts, passage=True)
@@ -170,9 +175,11 @@ def calibrate_threshold(best_rel: np.ndarray, best_irr: np.ndarray, is_train: np
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--encoders", nargs="+", default=["xlmr"], choices=list(ENCODERS))
+    ap.add_argument("--corpus", choices=list(CORPORA), default="experiment",
+                    help="demo = experiment corpus + extra topics (tests distractor cost)")
     args = ap.parse_args()
 
-    passages = json.loads((ROOT / "corpus_passages.json").read_text(encoding="utf-8"))
+    passages = json.loads((ROOT / CORPORA[args.corpus][0]).read_text(encoding="utf-8"))
     texts = [p["text"] for p in passages]
     titles = np.array([p["title"] for p in passages])
 
@@ -190,7 +197,7 @@ def main() -> None:
     dense_scores: dict[str, np.ndarray] = {}
     for tag in args.encoders:
         print(f"dense:{tag} ...", flush=True)
-        V = corpus_vectors(tag, texts)
+        V = corpus_vectors(tag, texts, args.corpus)
         Q = encode(tag, ev["claim_text"].tolist(), passage=False)
         dense_scores[tag] = Q @ V.T
         orders[f"dense:{tag}"] = ranks_from_scores(dense_scores[tag])
@@ -277,7 +284,8 @@ def main() -> None:
           "- Any variant chosen after seeing these numbers (e.g. hybrid for English only) would be "
           "fitted to this evaluation and is not adopted here.\n"]
 
-    out = ROOT / "results" / "retrieval_comparison.md"
+    out = ROOT / "results" / ("retrieval_comparison.md" if args.corpus == "experiment"
+                               else f"retrieval_comparison_{args.corpus}.md")
     out.write_text("\n".join(L) + "\n", encoding="utf-8")
     sys.stdout.buffer.write(("\n".join(L) + "\n").encode("utf-8"))
 

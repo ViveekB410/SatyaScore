@@ -1,6 +1,8 @@
 # SatyaScore — Project Status
 
-**As of:** 2026-09-22 · **Overall PRD completion: ~60–65%**
+**As of:** 2026-09-24 · PRD status per requirement: see the traceability table in
+`IMPROVEMENT_PLAN.md` (FR-01–FR-06 met, with recorded deviations; FR-07 dataset and the
+accuracy goals not met).
 
 Claim-level, bilingual (English + Hindi) LLM hallucination detector using the CMHSA
 score (`HalluScore = α·SemSim + β·NLI + γ·KG`, per-language softmax weights; verdicts
@@ -10,84 +12,99 @@ Hallucinated / Uncertain / Verified). B.Tech capstone, 4 members.
 
 ## Headline
 
-The **system is built and tested; the scientific result is an honest negative one.** The
-detector's signals sit near chance because of the **dataset**, not the code — and the PRD
-pre-registered this outcome (§15) as acceptable. The defensible capstone is the working
-system + rigorous methodology + documented findings, all largely in place. The single
-highest-leverage lever left is **more annotated hallucinated claims, especially Hindi.**
+The **system is built and tested; the detection result is an honest negative one.** The
+signals sit near chance and no configuration beats an always-"Verified" baseline. The cause
+is **not proven**. The leading hypothesis is **label reliability**, supported by the IAA
+findings. Retrieval was tested as a cause (Phase 2) and is **not** the main limiter at the
+article level: the source article is in the top 3 for 87.5% of claims, yet English NLI stays
+near chance even when it sees that article. How well NLI uses the evidence remains open. The
+PRD pre-registered a negative result (§15) as acceptable.
 
 ---
 
 ## Status by workstream
 
-| Workstream | Owner | Done | Notes |
-| --- | --- | --- | --- |
-| **Backend / model** | Vivek (M1+M3) | **~92%** | Feature-complete, 114 tests green |
-| **Frontend** | teammate | **~85%** | Working React SPA; not yet deployed |
-| **Paper / patent** | teammate | — | Owner to report status |
-| **Dataset / annotation** | shared | see below | The real ceiling on results quality |
+| Workstream | Owner | Notes |
+| --- | --- | --- |
+| **Backend / model** | Vivek (M1+M3) | PRD FR-01–FR-05 met; 137 tests green |
+| **Frontend** | teammate | React dashboard with FR-06 features (PRD specifies Streamlit) |
+| **Paper / patent** | teammate | Owner to report status |
+| **Dataset / annotation** | shared | FR-07 not met — see below |
 
 ---
 
-## Backend — what's done (~92%)
+## Backend — what's done
 
-- CMHSA pipeline + `/detect` API on trained per-language weights; FR-04 threshold param.
-- Cross-claim **NLI batching**, stage timings, startup warm-up, and **fixed-size NLI
-  chunking** (bounds GPU memory — fixed a T4 OOM and a matching production risk).
-- FAISS retrieval; two separate corpora (experiment 2,674 passages / demo 9,351).
-- Bilingual signals recomputed in one XLM-R vector space; honest eval + ablation.
-- **IAA pilot**, provenance proof, data-quality flagging, Phase 3 retrieval diagnostic.
-- **C2-lite (sentence-level NLI premises)** evaluated on GPU and closed as a documented
-  negative result (see Findings).
-- Docker + docker-compose; Colab GPU runbook (secure token-header push); full README.
+- CMHSA pipeline + `/detect` API; three verdict tiers; threshold override; ablation mode.
+- **Whole-text verdict** (worst-claim rule) and per-claim scores in the API and UI.
+- **FR-04 confidence interval:** each claim returns P(Verified) with a 95% Wilson interval,
+  fitted on the train split (`results/calibration.md`).
+- **FR-06 dashboard:** red/amber/green highlighting, HalluScore bar chart, CSV/JSON export,
+  .txt/.pdf upload.
+- **English claim extraction fixed:** broken claims 14.3% → 0% on the source answers
+  (`results/extraction_quality.md`).
+- **Leak-free evaluation:** train/test grouped by source question (0 shared, was 43 of 52);
+  every metric carries its hallucinated count and a 95% CI.
+- NLI batching and chunking (bounds GPU memory), stage timings, warm-up; Docker; Colab runbook.
+- **Latency — met on median, on GPU:** median 104 ms/claim (target < 500 ms), 2,414 ms per
+  10-claim document (target < 3 s). The mean (1,171 ms) misses the target, driven by the KG
+  network call; NLI averages 80 ms.
 
-**Remaining (~8%, all non-blocking):** GPU deployment for the PRD latency target
-(<500ms/claim — code is ready, CPU is the only bottleneck); a few skipped items (fp16
-serving, env-driven CORS, KG on/off toggle); and the PRD's *fine-tuned* DeBERTa-on-IndicXNLI
-was never trained — we run a strong pretrained multilingual stand-in (one-line model swap
-when a checkpoint exists).
+**Remaining:** the PRD's *fine-tuned* DeBERTa on IndicXNLI was never trained (a pretrained
+multilingual stand-in is used; needs a GPU and more labels). FR-02's MuRIL fallback is built
+but **off by default**: measured, it retrieves far worse than XLM-R (`results/retrieval_comparison.md`).
 
 ---
 
-## Key findings (the story of the project)
+## Key findings
 
 - **Signals are near chance.** ROC-AUC ≈ 0.56–0.58 (EN), ≈ 0.42–0.51 (HI). No fusion
   configuration beats an always-"Verified" baseline; fusion collapses to NLI; KG is
   inapplicable (0% coverage on this data).
-- **C2-lite did not help.** Sentence-level premises: EN ΔAUC −0.012, paired-bootstrap 95%
-  CI [−0.121, +0.094] (straddles 0). Neutral rate even rose 0.67 → 0.80. Kept behind an
-  off-by-default switch as a recorded negative result.
-- **Extraction quality is itself a finding.** Rule-based English decomposition produces 44
-  broken fragments (17% of EN); Hindi (sentence-level) is clean. Report on the well-formed
-  412-claim subset.
+- **The test set is too small to measure detection:** 8 English and 2 Hindi hallucinated
+  test claims. Hallucination-F1 is reported but marked "too few positives to interpret".
+- **Retrieval is not the main limiter** (`results/retrieval_bottleneck.md`): English NLI AUC
+  when it saw the source article is 0.568 [0.429, 0.699]; BM25, hybrid and MuRIL all
+  retrieve worse than the current encoder.
+- **C2-lite did not help:** sentence-level premises, English ΔAUC −0.012, 95% CI
+  [−0.121, +0.094]. Kept behind an off-by-default switch.
+- **Calibration:** the score adds no information over the base rate on the test split
+  (Brier EN 0.217 vs 0.197), and the confidence intervals show it.
 
 ---
 
-## Dataset / annotation — the ceiling
+## Dataset / annotation
 
 - 456 gold claims: **EN** 193 Verified / 47 Hallucinated / 26 Uncertain; **HI** 163 / 9 / 18.
-- **Single annotator.** IAA pilot: binary "hallucination vs not" κ = **0.61** (well-formed)
-  — substantial and near the PRD target; 3-class κ = 0.15 (Verified/Uncertain boundary).
-- **Severe class imbalance — only 9 Hindi hallucinated claims.** This, more than anything,
-  caps how good the results can look.
+  All answers come from one LLM (`llama-3.3-70b-versatile`).
+- Protocol: every AI verdict was reviewed; 79% of labels are reviewed-and-agreed, reviewed
+  with the AI verdict visible (**anchoring**).
+- **IAA, round 1 (n = 56):** binary "hallucination vs not" **κ = 0.53** (the headline
+  figure; 0.61 on the well-formed subset, n = 49). 3-class κ = 0.15: annotator B never used
+  "Uncertain", so the annotators applied different label schemes.
+- **Round 2 (n = 50, blind):** where the two annotators agree, the gold label is reproduced
+  45/46 (98%). κ = 0.30 on a ~96%-Verified sample, where kappa is unstable.
+- **Severe class imbalance — only 9 Hindi hallucinated claims.**
 
 ---
 
 ## Risks & blockers
 
-1. **Results quality is data-bound, not code-bound.** More backend work will not move the
-   accuracy numbers.
-2. **Paper/patent status is unknown to the backend lane** — needs an owner update.
-3. **Nothing is deployed live** (frontend + API) — a demo needs a GPU host.
+1. **Detection accuracy is unproven either way on this data** — too few hallucinated test
+   claims to measure it. More balanced annotation is the lever that makes it measurable.
+2. **PRD novelty claim at risk:** the KG ablation (PRD: "crux of the novelty claim") cannot
+   pass with 0% KG coverage. The paper must report it honestly or the team must add coverage.
+3. **Paper/patent status is unknown to the backend lane** — needs an owner update.
+4. **Nothing is deployed live** (frontend + API) — a demo needs a GPU host for PRD latency.
 
-## Highest-leverage next steps (in order)
+## Next steps (in order)
 
-1. **Annotate more hallucinated claims, especially Hindi** (the one lever that moves results).
-2. Write the paper around the **honest methodology + negative result** (already defensible).
-3. GPU-host the API + frontend for a live demo.
+1. **Annotate more claims** toward FR-07: balanced, 2–3 annotators, especially Hindi hallucinations.
+2. Fine-tune NLI (DeBERTa + IndicXNLI) once labels exist — the remaining accuracy lever.
+3. Write the paper around the honest methodology and negative results.
+4. GPU-host the API + frontend for a live demo.
 
 ---
 
-_Numbers trace to: `gold_final.csv`, `RESULTS_SUMMARY.md`, `results/c2_lite_comparison.md`,
-`iaa/`, `ANNOTATION_PROVENANCE.md`, and the 114-test suite. Backend is reproducible from the
-README run-order._
+_Numbers trace to: `gold_final.csv`, `RESULTS_SUMMARY.md`, `results/*.md`, `iaa/`,
+`annotation_round2/`, `ANNOTATION_PROVENANCE.md`, and the 137-test suite._

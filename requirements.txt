@@ -27,3 +27,4 @@ wandb>=0.16.0
 pytest>=7.4.0
 
 matplotlib
+pdfminer.six>=20231228   # FR-06 .pdf upload (/extract-text)

@@ -78,3 +78,8 @@ The live system's settings: demo corpus, top-3 retrieval, relevance threshold 0.
   non-answers (a genuine unknown/unlinked is stable). Re-run: exactly that claim changed
   (unlinked → contradicted); NLI identical. Final KG status: supported 8, contradicted 5,
   unknown 15, unlinked 17 (KG answered 13 of 45).
+- **Annotation rules (fixed before labelling):** `round3/ANNOTATION_RULES.md` — decision
+  procedure (worst fact decides), containment rule for places, date and "founded by" rules,
+  literal reading of oddly worded claims, allowed sources (**no Wikidata**, since KG uses it; no
+  AI tools), and required evidence URL and notes. Its worked examples use claims outside the
+  pilot. It replaces the round-2 instructions for this round.

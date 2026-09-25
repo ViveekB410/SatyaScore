@@ -103,3 +103,13 @@ def test_calibration_bins_and_wilson_interval():
     assert low.p_verified == 0.0 and high.p_verified == 1.0
     assert high.ci95[0] > low.ci95[1]  # separated bins -> non-overlapping CIs
     assert low.n == 25
+
+
+
+def test_cors_origins_are_configurable_for_a_hosted_frontend():
+    from member3_backend.api import _CORS_ORIGINS, parse_cors_origins
+    assert parse_cors_origins(None) == ["http://localhost:5173"]
+    assert parse_cors_origins("") == ["http://localhost:5173"]
+    assert parse_cors_origins("http://localhost:5173, https://demo.lovable.app") == [
+        "http://localhost:5173", "https://demo.lovable.app"]
+    assert _CORS_ORIGINS  # the middleware is built from this list

@@ -227,9 +227,22 @@ app = FastAPI(
     description="Claim-level, multilingual hallucination detection and scoring.",
     version="0.1.0",
 )
+# Browser origins allowed to call the API. Default: the local Vite dev server.
+# Add others (e.g. a Lovable app) without code changes:
+#   $env:SATYASCORE_CORS_ORIGINS = "http://localhost:5173,https://your-app.lovable.app"
+import os as _os_cors
+
+
+def parse_cors_origins(value: str | None) -> list[str]:
+    """Comma-separated origins -> list; empty/unset -> the local Vite dev server."""
+    origins = [o.strip() for o in (value or "").split(",") if o.strip()]
+    return origins or ["http://localhost:5173"]
+
+
+_CORS_ORIGINS = parse_cors_origins(_os_cors.environ.get("SATYASCORE_CORS_ORIGINS"))
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

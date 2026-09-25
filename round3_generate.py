@@ -25,7 +25,6 @@ from pathlib import Path
 import pandas as pd
 
 from dataset_pipeline.response_collector import OpenAICompatibleGenerator
-from make_round2_set import write_xlsx
 from member2_data.entity_linker import EntityLinker
 from member3_backend.claim_extractor import ClaimExtractor
 
@@ -144,6 +143,7 @@ def main() -> None:
         df = df.sample(MAX_CLAIMS, random_state=SEED).sort_values("claim_id").reset_index(drop=True)
     df.to_csv(OUT / "claims_round3.csv", index=False, encoding="utf-8")
 
+    from make_round2_set import write_xlsx  # needs openpyxl (.venv); imported only here
     blind = df.assign(verdict="", evidence_url="", notes="")[COLS]
     for tag in ("A", "B"):
         write_xlsx(blind, OUT / f"round3_annotator_{tag}.xlsx", "round3")

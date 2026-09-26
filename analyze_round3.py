@@ -103,6 +103,10 @@ def main() -> None:
          "Pre-registered in `round3/PREREGISTRATION.md` (committed before any answer or label). "
          "Signals from `round3/signals_round3.csv`, computed before the labels existed.\n",
          "## Labels",
+         "> **Label provenance (Deviation 3):** both annotators used an AI assistant and then "
+         "checked each verdict themselves. Labels are *AI-assisted, annotator-verified*, not "
+         "independent human judgements; κ may be inflated by a shared tool. All results below "
+         "are suggestive only.\n",
          f"- {len(d)} claims labelled by both annotators. Gold (both agree, Verified or "
          f"Hallucinated): **{len(gold)}** — Verified {int(y.sum())}, **Hallucinated {n_h}**. "
          f"Excluded (disagreement or Uncertain): {len(excluded)}.",

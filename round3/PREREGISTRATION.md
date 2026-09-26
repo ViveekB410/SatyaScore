@@ -83,3 +83,24 @@ The live system's settings: demo corpus, top-3 retrieval, relevance threshold 0.
   literal reading of oddly worded claims, allowed sources (**no Wikidata**, since KG uses it; no
   AI tools), and required evidence URL and notes. Its worked examples use claims outside the
   pilot. It replaces the round-2 instructions for this round.
+
+## Deviation 3 — AI-assisted labels (recorded 2026-09-26, AFTER labels were returned and analysed)
+- **What happened:** the rules forbade AI tools. Both returned sheets had notes with AI-style
+  features (quoted text absent from the claim in 5 of A's notes; templated phrasing in both).
+  Asked, the annotators confirmed they **used an AI assistant and then checked every verdict
+  themselves** against the evidence.
+- **Timing, stated honestly:** the pre-registered analysis (`analyze_round3.py`) had already been
+  run once when this was recorded. The labels, the analysis and the decision rules were not
+  changed after seeing the results.
+- **Consequences:**
+  1. Labels are described everywhere as **AI-assisted, annotator-verified**, not independent
+     human judgements.
+  2. κ is not evidence of independent agreement: two annotators checking the output of the same
+     kind of tool can agree because of the tool.
+  3. The gold standard carries an unknown AI bias. The systems being evaluated are also LLM-based,
+     so the direction of that bias cannot be assumed.
+  4. H1–H3 are reported as **suggestive, not confirmed**, whatever the intervals show. The
+     primary H1 lower bound is +0.003, and the sensitivity analysis (Deviation 2) includes zero.
+- **Mitigation available:** a blind, no-AI audit of a random subset by a person who has not seen
+  the labels, comparing their verdicts with the gold (`round3/round3_audit_blind.xlsx`, 20 claims,
+  seed 7). If the audit is done, its agreement with the gold is reported next to this deviation.

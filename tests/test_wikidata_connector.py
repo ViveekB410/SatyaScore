@@ -139,3 +139,18 @@ def test_get_label_no_fallback_needed_when_native_label_exists():
     label, used_fallback = WikidataConnector(session=session).get_label("Q513", language="hi")
     assert label == "एवरेस्ट पर्वत"
     assert used_fallback is False
+
+# --- round-3 fix: a place is every item with exactly that name, never a non-place ---
+
+def test_ambiguous_place_name_is_supported_if_any_same_named_place_matches():
+    # "Ramanujan was born in Erode": top hit Erode = a given name; the town is an alternative
+    wd = WikidataConnector(session=_session({("Q83163", "P19"): ["Q9824"]}))
+    r = wd.verify_triple("Q83163", "P19", "Q3732439", alternatives=("Q15155", "Q9824"))
+    assert r.status == "supported"
+
+
+def test_alternatives_that_all_miss_still_contradict_a_birthplace():
+    wd = WikidataConnector(session=_session({("Q1001", "P19"): ["Q1934"],
+                                             ("Q1934", "P17"): ["Q668"]}))
+    r = wd.verify_triple("Q1001", "P19", "Q843", alternatives=("Q999",))
+    assert r.status == "contradicted"

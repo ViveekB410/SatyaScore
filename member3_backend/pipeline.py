@@ -372,5 +372,6 @@ class DetectionPipeline:
             property_pid=linked.property_pid,
             expected_value=linked.object_qid,
             language=language,
+            alternatives=linked.object_candidates,
         )
         return verification.confidence

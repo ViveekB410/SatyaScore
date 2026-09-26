@@ -41,7 +41,7 @@ def kg(claim: str, ce: ClaimExtractor, el: EntityLinker, wd: WikidataConnector):
     t = el.link_claim(claim_text=claim, subject_text=ents[0], object_text=ents[1], language="en")
     if not t.linkable:
         return None, "unlinked"
-    v = wd.verify_triple(t.subject_qid, t.property_pid, t.object_qid, "en")
+    v = wd.verify_triple(t.subject_qid, t.property_pid, t.object_qid, "en", t.object_candidates)
     return v.confidence, v.status
 
 

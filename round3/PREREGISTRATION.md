@@ -104,3 +104,15 @@ The live system's settings: demo corpus, top-3 retrieval, relevance threshold 0.
 - **Mitigation available:** a blind, no-AI audit of a random subset by a person who has not seen
   the labels, comparing their verdicts with the gold (`round3/round3_audit_blind.xlsx`, 20 claims,
   seed 7). If the audit is done, its agreement with the gold is reported next to this deviation.
+
+## Exploratory analysis 1 — KG place-linking fix (recorded 2026-09-26, after labels; NOT pre-registered)
+- **Diagnosis:** 4 of the 5 KG "contradicted" results came from linking the place to a wrong
+  Wikidata item (the top search hit): "Erode" → a given name, "Naigaon" → a monorail station
+  (both true birthplaces, wrongly contradicted), "Niphad" → an insect genus, "Bodua" → an
+  encyclopedia article (both false claims, contradicted only by luck).
+- **Fix:** for place relations (P19, P20, P131, P159) the object is the set of items whose name
+  is exactly the claimed place, excluding obvious non-places; supported if any of them is (or
+  contains) the true value, contradicted only if none is; no exactly-named place → unlinked.
+- **Re-run:** KG only (`round3_kg_fix.py` → `round3/signals_round3_kgfix.csv`,
+  `results/round3_kg_fix_exploratory.md`). The locked signals and the pre-registered result are
+  unchanged and remain the primary result; the re-run is reported as exploratory.

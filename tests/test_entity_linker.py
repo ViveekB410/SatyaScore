@@ -132,3 +132,41 @@ def test_office_claim_links_the_office_not_the_country():
         "Narendra Modi is the Prime Minister of India.", "Narendra Modi", "India")
     assert searched == ["Narendra Modi", "Prime Minister of India"]
     assert t.property_pid == "P39" and t.linkable
+
+# --- round-3 fix: place objects are linked by exact name, non-places dropped ---
+
+def _place_results():
+    return [
+        {"id": "Q63346704", "match": {"text": "Naigaon monorail station"}, "description": "Mumbai Monorail Station"},
+        {"id": "Q3732439", "match": {"text": "Naigaon"}, "description": "male given name"},
+        {"id": "Q6959545", "match": {"text": "Naigaon"}, "description": "village in Maharashtra, India"},
+        {"id": "Q19808368", "match": {"text": "naigaon"}, "description": "settlement in Maharashtra, India"},
+    ]
+
+
+def test_search_places_keeps_only_exactly_named_places():
+    session = MagicMock()
+    session.get.return_value = _mock_search_response(_place_results())
+    assert EntityLinker(session=session).search_places("Naigaon") == ("Q6959545", "Q19808368")
+
+
+def test_place_relation_links_all_same_named_places():
+    session = MagicMock()
+    session.get.side_effect = lambda url, params, headers, timeout: _mock_search_response(
+        _place_results() if params["search"] == "Naigaon"
+        else [{"id": "Q2645692", "label": "Savitribai Phule"}])
+    t = EntityLinker(session=session).link_claim(
+        "Savitribai Phule was born in Naigaon.", "Savitribai Phule", "Naigaon")
+    assert t.linkable and t.property_pid == "P19"
+    assert (t.object_qid, t.object_candidates) == ("Q6959545", ("Q6959545", "Q19808368"))
+
+
+def test_place_with_no_exactly_named_place_is_unlinked_not_contradicted():
+    # "Bodua": the only hits were an encyclopedia article and prefix matches
+    session = MagicMock()
+    session.get.side_effect = lambda url, params, headers, timeout: _mock_search_response(
+        [{"id": "Q19993965", "match": {"text": "Bodua (Pauly-Wissowa)"}, "description": "encyclopedic article"}]
+        if params["search"] == "Bodua" else [{"id": "Q6360441", "label": "Kanaklata Barua"}])
+    t = EntityLinker(session=session).link_claim(
+        "Kanaklata Barua was born in Bodua.", "Kanaklata Barua", "Bodua")
+    assert not t.linkable and t.object_candidates == ()

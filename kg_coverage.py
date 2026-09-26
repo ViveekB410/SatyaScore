@@ -72,7 +72,7 @@ def main() -> None:
         for claim, want in LIVE_CASES:
             ents = ce.extract_entities(claim, "en")
             t = el.link_claim(claim, ents[0], ents[1], "en") if len(ents) >= 2 else None
-            v = wd.verify_triple(t.subject_qid, t.property_pid, t.object_qid, "en") if t and t.linkable else None
+            v = wd.verify_triple(t.subject_qid, t.property_pid, t.object_qid, "en", t.object_candidates) if t and t.linkable else None
             got = v.status if v else "unlinked"
             ok += got == want
             L.append(f"| {claim} | {want} | {got} | {v.confidence if v else '—'} |")

@@ -104,8 +104,13 @@ class WikidataConnector:
         property_pid: str,
         expected_value: str,
         language: Language = "en",
+        alternatives: tuple[str, ...] = (),
     ) -> TripleVerification:
-        cache_key = f"{subject_qid}|{property_pid}|{expected_value}|{language}"
+        # `alternatives`: other items with the same name as expected_value (place
+        # relations, see EntityLinker.link_claim). Supported if ANY matches;
+        # contradicted only if none does.
+        targets = {expected_value, *alternatives}
+        cache_key = f"{subject_qid}|{property_pid}|{'+'.join(sorted(targets))}|{language}"
         cached = self._cache.get(cache_key)
         if cached is not None:
             # Return a copy with source="cache" — mutating `cached` directly
@@ -119,7 +124,7 @@ class WikidataConnector:
         # Hallucinated ("Modi is the Prime Minister of India" -> 0.0).
         used_fallback = False
         if expected_value.startswith("Q"):
-            found, has_value = self._entity_check(subject_qid, property_pid, expected_value)
+            found, has_value = self._entity_check(subject_qid, property_pid, targets)
         else:  # literal value (rare): SPARQL ASK, with the Hindi-label fallback
             query = self._build_ask_query(subject_qid, property_pid, expected_value)
             found, used_fallback = self._run_ask_with_fallback(
@@ -186,8 +191,8 @@ class WikidataConnector:
         self._cache.set(key, values)
         return values
 
-    def _reaches(self, start: set[str], target: str) -> bool | None:
-        """Is `target` an enclosing region of any of `start`, via country (P17,
+    def _reaches(self, start: set[str], targets: set[str]) -> bool | None:
+        """Is any of `targets` an enclosing region of any of `start`, via country (P17,
         checked first: usually one hop) and located-in (P131)? Breadth-first,
         bounded, stops as soon as the target is found. None if a lookup failed."""
         seen, frontier = set(start), list(start)
@@ -198,7 +203,7 @@ class WikidataConnector:
                     vals = self._claim_values(q, pid)
                     if vals is None:
                         return None
-                    if target in vals:
+                    if targets & vals:
                         return True
                     nxt += [v for v in vals if v not in seen]
                     seen |= vals
@@ -207,15 +212,15 @@ class WikidataConnector:
             frontier = nxt
         return False
 
-    def _entity_check(self, subject_qid: str, pid: str, object_qid: str) -> tuple[bool | None, bool | None]:
+    def _entity_check(self, subject_qid: str, pid: str, object_qids: set[str]) -> tuple[bool | None, bool | None]:
         """(found, has_value). found is None when a lookup failed."""
         values = self._claim_values(subject_qid, pid)
         if values is None:
             return None, None
-        if object_qid in values:
+        if object_qids & values:
             return True, True
         if pid in HIERARCHICAL_PIDS and values:
-            reached = self._reaches(values, object_qid)
+            reached = self._reaches(values, object_qids)
             if reached is None:
                 return None, True
             if reached:

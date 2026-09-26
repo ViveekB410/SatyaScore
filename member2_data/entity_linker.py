@@ -98,6 +98,19 @@ OFFICE_ROLES: dict[str, str] = {
 }
 
 
+# Place-valued relations. Their object is linked as the SET of Wikidata items
+# whose name is exactly the claimed place, not the top search hit: round 3 found
+# the top hit was often not a place ("Erode" -> a given name, "Naigaon" -> a
+# monorail station, "Niphad" -> an insect genus), so true birthplaces were
+# "contradicted" and false ones were contradicted only by luck.
+PLACE_PIDS = {"P19", "P20", "P131", "P159"}
+PLACE_SEARCH_LIMIT = 50  # the right "Naigaon" was hit 27 of 28
+# Exact-name hits whose description says they are not a place.
+_NOT_A_PLACE = ("given name", "family name", "surname", "genus", "species",
+                "disambiguation", "encyclopedic article", "scholarly article",
+                "film", "album", "song", "novel", "opera")
+
+
 @dataclass
 class EntityMatch:
     surface_text: str
@@ -112,6 +125,9 @@ class LinkedTriple:
     property_pid: str | None
     object_qid: str | None
     linkable: bool  # True only if all three parts resolved
+    # Place relations only: every place with exactly the claimed name
+    # (object_qid is the first of them). Empty for other relations.
+    object_candidates: tuple[str, ...] = ()
 
 
 class EntityLinker:
@@ -142,6 +158,27 @@ class EntityLinker:
             wikidata_label=top.get("label"),
             confidence=1.0,  # Wikidata returns results pre-ranked; we take rank-1 as-is
         )
+
+    def search_places(self, text: str, language: Language = "en") -> tuple[str, ...] | None:
+        """All items named exactly `text` (label or alias, any language, case-
+        insensitive) that are not obviously non-places. () if there are none,
+        None if the lookup failed."""
+        try:
+            response = polite_get(self._session, WIKIDATA_SEARCH_ENDPOINT, params={
+                    "action": "wbsearchentities",
+                    "search": text,
+                    "language": language,
+                    "format": "json",
+                    "limit": PLACE_SEARCH_LIMIT,
+                }, timeout=10)
+            results = response.json().get("search", [])
+        except (requests.RequestException, ValueError, KeyError):
+            return None
+        name = text.strip().casefold()
+        return tuple(
+            r["id"] for r in results
+            if r.get("match", {}).get("text", "").strip().casefold() == name
+            and not any(w in (r.get("description") or "").lower() for w in _NOT_A_PLACE))
 
     def find_relation_pid(self, claim_text: str) -> str | None:
         """Substring match against RELATION_TO_PID, case-insensitive. Tries the
@@ -186,12 +223,20 @@ class EntityLinker:
         if phrase in OFFICE_ROLES:
             object_text = f"{OFFICE_ROLES[phrase]} of {object_text}"
         subject_match = self.search_entity(subject_text, language)
-        object_match = self.search_entity(object_text, language)
+        candidates: tuple[str, ...] = ()
+        if pid in PLACE_PIDS:
+            # No exactly-named place (or a failed lookup) -> unlinked, i.e. no
+            # KG signal, rather than a wrong entity that can "contradict".
+            candidates = self.search_places(object_text, language) or ()
+            object_qid = candidates[0] if candidates else None
+        else:
+            object_qid = self.search_entity(object_text, language).qid
 
-        linkable = bool(pid and subject_match.qid and object_match.qid)
+        linkable = bool(pid and subject_match.qid and object_qid)
         return LinkedTriple(
             subject_qid=subject_match.qid,
             property_pid=pid,
-            object_qid=object_match.qid,
+            object_qid=object_qid,
             linkable=linkable,
+            object_candidates=candidates,
         )

@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-paper font-sans text-base text-ink antialiased;
+  }
+  /* Visible 2px navy focus ring on every control. */
+  :focus-visible {
+    outline: 2px solid theme('colors.navy');
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  /* Section labels: small caps with letter-spacing, not bold sans headings. */
+  .label-caps {
+    @apply text-[12px] font-medium uppercase tracking-[0.14em] text-muted;
+  }
+}
+
+@layer utilities {
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .animate-fade-in { animation: fade-in 180ms ease-out both; }
+
+  @keyframes soft-pulse {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 1; }
+  }
+  .animate-soft-pulse { animation: soft-pulse 1.2s ease-in-out infinite; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

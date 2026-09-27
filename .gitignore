@@ -20,3 +20,5 @@ instance/
 results/_nli_cache/
 # LLM verifier answer cache -- re-buildable: python llm_verifier_eval.py
 results/_llm_cache/
+# Wikipedia expansion article cache -- re-buildable: python wiki_expansion_eval.py
+results/_wiki_cache/

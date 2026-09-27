@@ -363,6 +363,15 @@ def load_starter_corpus():
                                                  [p["text"] for p in passages], mv)
                     _pipeline.retriever_muril = _retriever_muril
                     print(f"[api] MuRIL fallback index loaded ({muril_v.name})")
+            # On-demand Wikipedia expansion (FR-03 incremental indexing). OFF unless
+            # SATYASCORE_WIKI_EXPANSION=true: results/wiki_expansion.md did not meet
+            # its fixed adoption rule. Articles are cached under instance/wiki_cache.
+            if _os.environ.get("SATYASCORE_WIKI_EXPANSION", "false").lower() in ("1", "true", "yes"):
+                from member3_backend.wiki_expander import WikiExpander, indexed_titles_from_cache
+                _pipeline.expander = WikiExpander(
+                    _embedder, _retriever, base / "instance" / "wiki_cache",
+                    indexed=indexed_titles_from_cache(base / "evidence_corpus_cache.json"))
+                print("[api] on-demand Wikipedia expansion ON", flush=True)
             return
         print("[api] corpus cache size mismatch — falling back to Wikipedia fetch")
 

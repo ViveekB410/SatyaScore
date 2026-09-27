@@ -178,6 +178,7 @@ class DetectionPipeline:
         wikidata: WikidataConnector | None = None,
         nli_top_k: int = NLI_EVIDENCE_TOP_K,
         retriever_muril: FAISSRetriever | None = None,
+        expander=None,
     ):
         self.embedder = embedder
         self.retriever = retriever
@@ -193,6 +194,11 @@ class DetectionPipeline:
         # How many passages to check per claim. Default 3 (best accuracy, used
         # by the research/eval path); the live API sets 1 to cut latency ~3x.
         self.nli_top_k = nli_top_k
+        # Optional on-demand Wikipedia expansion (member3_backend/wiki_expander.py):
+        # adds the articles found by searching each claim to the index before
+        # retrieval. Off by default: results/wiki_expansion.md did not meet the
+        # fixed rule (train AUC did not improve), though verdict accuracy rose.
+        self.expander = expander
 
     def run(
         self,
@@ -206,7 +212,7 @@ class DetectionPipeline:
         every signal this pipeline instance is actually configured with.
         """
         timings = {k: 0.0 for k in
-                   ("claim_extraction", "embedding", "retrieval", "nli", "kg", "fusion", "total")}
+                   ("claim_extraction", "expansion", "embedding", "retrieval", "nli", "kg", "fusion", "total")}
         t_start = time.perf_counter()
 
         t = time.perf_counter()
@@ -218,6 +224,11 @@ class DetectionPipeline:
         claim_texts = [c.text for c in extracted]
         claim_ids = [f"claim_{i}" for i in range(len(claim_texts))]
         languages = [language] * len(claim_texts)
+
+        if self.expander is not None:
+            t = time.perf_counter()
+            self.expander.expand(list(zip(claim_texts, languages)))  # never raises; failures are skipped
+            timings["expansion"] = (time.perf_counter() - t) * 1000
 
         t = time.perf_counter()
         embedding_result = self.embedder.embed(

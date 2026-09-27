@@ -53,6 +53,7 @@ cd web; npm install
 | Knowledge graph | Wikidata: birthplace, place of death, capital, location, office, founder… English relation phrases and **Hindi relation templates**; place names (and all Hindi names) matched by exact name, so a place is never linked to a same-named non-place | `member2_data/entity_linker.py`, `member2_data/wikidata_connector.py` |
 | Scoring (CMHSA, FR-04) | **When the KG answers, it decides the claim**; otherwise the trained weighted fusion. Verdicts: < 0.35 Hallucinated, 0.35–0.65 Uncertain, > 0.65 Verified; calibrated P(Verified) with a 95% interval | `member1_model/cmhsa.py`, `member1_model/calibration.py` |
 | Whole text | Hallucinated if ≥ 1/3 of claims are Hallucinated; else Uncertain if any claim is Hallucinated or Uncertain; else Verified | `member1_model/cmhsa.py` (`aggregate_document`) |
+| Wikipedia expansion (optional) | Searches Wikipedia for each claim and adds new articles to the index without a rebuild (FR-03). **Off by default**: it did not meet its adoption rule (`results/wiki_expansion.md`). Switch on with `$env:SATYASCORE_WIKI_EXPANSION = "true"` before starting the API | `member3_backend/wiki_expander.py` |
 | Orchestration | Runs the stages per request and times them | `member3_backend/pipeline.py` |
 
 ## Web app and accounts
@@ -98,7 +99,7 @@ member3_backend/   API, accounts (auth.py), pipeline, claim extractor, FAISS ret
 web/               web app (current)            frontend/  earlier dashboard (fallback)
 round3/            pre-registration, questions, claims, annotator sheets, signals
 results/           every measured result (*.md, *.csv)
-tests/             179 tests
+tests/             184 tests
 ```
 
 ## Reproducing the results
@@ -114,6 +115,7 @@ python analyze_round3.py; python round3_kg_fix.py; python round3_kg_decides.py
 # model comparisons
 python nli_model_search.py          # GPU recommended
 python llm_verifier_eval.py         # needs GROQ_API_KEY in your own shell; resumable
+python wiki_expansion_eval.py       # Wikipedia index expansion; GPU recommended
 # the summary (reads everything above)
 .venv\Scripts\python.exe generate_results_summary.py
 ```

@@ -131,6 +131,7 @@ Verdict accuracy on the round-3 gold claims (thresholds 0.35 / 0.65; Uncertain c
 ## 10. Improving the judge (NLI model search, LLM verifier)
 
 - **NLI model search** (`results/nli_model_search.md`; 4 models incl. a FEVER-trained DeBERTa-large; chosen on train only). English AUC — current model: train 0.539 / test 0.428 / round 3 0.708; train-best (mdeberta_base_2mil7): train 0.602 [0.498, 0.700] vs current [0.430, 0.646] (overlapping) / test 0.489 / round 3 0.605. **No model change**: a stronger NLI model does not help, so NLI is not the bottleneck. Hindi has 7 Hallucinated train claims: not decidable.
+- **Wikipedia index expansion** (`member3_backend/wiki_expander.py`, FR-03 incremental indexing; `results/wiki_expansion.md`): searching Wikipedia for each claim grew the index 9,351 → 33,757 passages (+795 articles). Train NLI AUC 0.552 → 0.532 (Δ -0.020 [-0.072, +0.031]): **not adopted** under the fixed rule, so it is off by default (`SATYASCORE_WIKI_EXPANSION`). It did make NLI commit more often: correct verdicts on train 104 → 119 of 303; round 3 with the live KG rule 24 → 27 of 40 (report-only set). Better evidence did not improve ranking: consistent with NLI being the limit on descriptive claims.
 - **LLM verifier** (`member1_model/llm_verifier.py`, gpt-oss-120b judging claim + retrieved passages, grounded and open modes): evaluation **in progress** (paused on the provider's daily quota); decision rule fixed before running. Not used by the live system.
 
 ## 11. Defensible findings

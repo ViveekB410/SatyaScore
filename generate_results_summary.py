@@ -321,6 +321,24 @@ def models_block() -> list[str]:
               f"{tr_cur.hi:.3f}] (overlapping) / test {auc(best.model, best.variant, 'test')} / round 3 "
               f"{auc(best.model, best.variant, 'round3')}. **No model change**: a stronger NLI model does "
               f"not help, so NLI is not the bottleneck. Hindi has 7 Hallucinated train claims: not decidable."]
+    grow = _find("results/wiki_expansion.md",
+                 r"Demo corpus ([\d,]+) passages → \*\*([\d,]+)\*\* after expansion \(\+(\d+) Wikipedia articles")
+    dauc = _find("results/wiki_expansion.md",
+                 r"NLI AUC ([\d.]+) → ([\d.]+) \(Δ ([-+][\d.]+) \[([-+][\d.]+), ([-+][\d.]+)\]\)")
+    tr_acc = _find("results/wiki_expansion.md",
+                   r"Verdicts, baseline: (\d+)/(\d+) .*\n- Verdicts, expanded: (\d+)/\d+")
+    live = _find("results/wiki_expansion.md",
+                 r"KG decides, else NLI\), baseline: (\d+)/(\d+) .*\n- Live rule \(KG decides, else NLI\), expanded: (\d+)/\d+")
+    if grow and dauc and tr_acc and live:
+        L.append(f"- **Wikipedia index expansion** (`member3_backend/wiki_expander.py`, FR-03 incremental "
+                 f"indexing; `results/wiki_expansion.md`): searching Wikipedia for each claim grew the index "
+                 f"{grow.group(1)} → {grow.group(2)} passages (+{grow.group(3)} articles). Train NLI AUC "
+                 f"{dauc.group(1)} → {dauc.group(2)} (Δ {dauc.group(3)} [{dauc.group(4)}, {dauc.group(5)}]): "
+                 f"**not adopted** under the fixed rule, so it is off by default (`SATYASCORE_WIKI_EXPANSION`). "
+                 f"It did make NLI commit more often: correct verdicts on train {tr_acc.group(1)} → "
+                 f"{tr_acc.group(3)} of {tr_acc.group(2)}; round 3 with the live KG rule {live.group(1)} → "
+                 f"{live.group(3)} of {live.group(2)} (report-only set). Better evidence did not improve "
+                 f"ranking: consistent with NLI being the limit on descriptive claims.")
     L.append("- **LLM verifier** (`member1_model/llm_verifier.py`, gpt-oss-120b judging claim + retrieved "
              "passages, grounded and open modes): evaluation **in progress** (paused on the provider's daily "
              "quota); decision rule fixed before running. Not used by the live system.\n")

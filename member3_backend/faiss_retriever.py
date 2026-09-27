@@ -14,6 +14,7 @@ is separate for incremental additions afterward.
 
 from __future__ import annotations
 
+import threading
 import time
 from dataclasses import dataclass
 
@@ -56,6 +57,9 @@ class FAISSRetriever:
         self._passage_ids: list[str] = []
         self._passage_texts: dict[str, str] = {}
         self._is_trained = False
+        # Incremental adds (wiki_expander) can run while other requests search:
+        # FAISS indexes are not safe for concurrent add + search.
+        self._lock = threading.RLock()
 
     def build_index(
         self, passage_ids: list[str], texts: list[str], vectors: np.ndarray
@@ -90,10 +94,11 @@ class FAISSRetriever:
         if not self._is_trained:
             raise RuntimeError("Index must be built with build_index() before adding incrementally")
         vectors = np.ascontiguousarray(vectors, dtype=np.float32)
-        self._index.add(vectors)
-        self._passage_ids.extend(passage_ids)
-        for pid, text in zip(passage_ids, texts):
-            self._passage_texts[pid] = text
+        with self._lock:
+            self._index.add(vectors)
+            self._passage_ids.extend(passage_ids)
+            for pid, text in zip(passage_ids, texts):
+                self._passage_texts[pid] = text
 
     def retrieve(
         self, claim_id: str, query_vector: np.ndarray, top_k: int = DEFAULT_TOP_K
@@ -107,19 +112,18 @@ class FAISSRetriever:
         # nprobe controls how many IVF clusters are searched — higher = more
         # accurate but slower. Search all clusters for small indexes (cheap),
         # scale down the fraction for large ones to stay near the 100ms target.
-        self._index.nprobe = min(self.n_clusters, max(1, self.n_clusters // 4) or 1)
-
-        scores, indices = self._index.search(query, min(top_k, len(self._passage_ids)))
+        with self._lock:
+            self._index.nprobe = min(self.n_clusters, max(1, self.n_clusters // 4) or 1)
+            scores, indices = self._index.search(query, min(top_k, len(self._passage_ids)))
+            passages = []
+            for score, idx in zip(scores[0], indices[0]):
+                if idx == -1:  # FAISS pads with -1 when fewer than top_k results exist
+                    continue
+                pid = self._passage_ids[idx]
+                passages.append(
+                    RetrievedPassage(passage_id=pid, text=self._passage_texts[pid], score=float(score))
+                )
         latency_ms = (time.perf_counter() - start) * 1000
-
-        passages = []
-        for score, idx in zip(scores[0], indices[0]):
-            if idx == -1:  # FAISS pads with -1 when fewer than top_k results exist
-                continue
-            pid = self._passage_ids[idx]
-            passages.append(
-                RetrievedPassage(passage_id=pid, text=self._passage_texts[pid], score=float(score))
-            )
 
         return RetrievalResult(
             claim_id=claim_id,

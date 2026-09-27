@@ -18,3 +18,5 @@ corpus_vectors*_muril.npy
 instance/
 # NLI model-search probability cache -- re-buildable: python nli_model_search.py
 results/_nli_cache/
+# LLM verifier answer cache -- re-buildable: python llm_verifier_eval.py
+results/_llm_cache/

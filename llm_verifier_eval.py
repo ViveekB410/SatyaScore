@@ -14,12 +14,21 @@ DECISION RULE (fixed before running):
   - It is then used for Hindi too, unless its Hindi train AUC is below NLI's.
   - Test and round 3 are reported only, never used to choose.
 
+--evidence expanded (rule fixed 2026-09-28, before any expanded run): the LLM
+judges the passages retrieved AFTER on-demand Wikipedia expansion (the identical
+index as wiki_expansion_eval.py, built from its article cache). The reference is
+the LIVE system as it is now: NLI on the standard (demo) corpus. A mode is
+adopted only if its pooled EN+HI TRAIN AUC beats that reference with a paired
+bootstrap 95% CI entirely above 0 (if both modes do, the higher train AUC wins;
+Hindi rule as above). Adopting it switches on expansion together with the LLM.
+NLI on the expanded evidence is reported alongside.
+
 Run in YOUR PowerShell (the key stays in your shell; nothing prints it):
     $env:GROQ_API_KEY = "gsk_..."
-    .venv/Scripts/python.exe llm_verifier_eval.py
+    .venv/Scripts/python.exe llm_verifier_eval.py [--evidence expanded] [--modes open grounded]
 Resumable: answers are cached in results/_llm_cache/ (git-ignored). If Groq's
 daily limit is reached the run stops cleanly; run the same command later.
-Writes results/llm_verifier.md and results/llm_verifier.csv.
+Writes results/llm_verifier[_expanded].md and .csv.
 """
 from __future__ import annotations
 import argparse
@@ -110,16 +119,30 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default=DEFAULT_MODEL)
     ap.add_argument("--modes", nargs="+", default=["grounded", "open"], choices=["grounded", "open"])
+    ap.add_argument("--evidence", choices=["demo", "expanded"], default="demo")
     args = ap.parse_args()
 
+    def nli_on(texts: dict) -> dict:
+        out = {}
+        for name, df in sets.items():
+            prem = [p for e in texts[name] for p in e]
+            hyp = [c for c, e in zip(df.claim_text, texts[name]) for _ in e]
+            out[name] = claim_scores(texts[name], probs("mdeberta_base_xnli", prem, hyp))["net"]
+        return out
+
     sets = load_sets()
-    ev = {name: evidence(df) for name, df in sets.items()}
-    # current NLI score on the same evidence (cached by nli_model_search.probs)
-    nli = {}
-    for name, df in sets.items():
-        prem = [p for e in ev[name] for p in e]
-        hyp = [c for c, e in zip(df.claim_text, ev[name]) for _ in e]
-        nli[name] = claim_scores(ev[name], probs("mdeberta_base_xnli", prem, hyp))["net"]
+    extra = {}  # other reference scores, reported only
+    if args.evidence == "demo":
+        ev = {name: evidence(df) for name, df in sets.items()}
+        nli = nli_on(ev)  # the reference: NLI on the same evidence
+        ref_label, suffix = "NLI (current)", ""
+    else:
+        from wiki_expansion_eval import build_evidence
+        base, exp, totals, n0, n1 = build_evidence(sets)
+        ev = {n: [[t for _, t, _ in e] for e in exp[n]] for n in sets}
+        nli = nli_on({n: [[t for _, t, _ in e] for e in base[n]] for n in sets})  # the live system now
+        extra["NLI on expanded evidence"] = nli_on(ev)
+        ref_label, suffix = "Live system now (NLI, standard corpus)", "_expanded"
 
     llm, finished = {}, {}
     for mode in args.modes:
@@ -129,18 +152,25 @@ def main() -> None:
             sys.exit(f"Stopping: {e}")
 
     kg3 = pd.read_csv(ROOT / "round3" / "signals_round3_kgfix.csv").set_index("claim_id").kg_conf
-    rows, L = [], [f"# LLM verifier vs NLI ({args.model})\n",
-                   "Same claims and evidence as the live system (demo corpus, top-3 passages). "
-                   "Verdict accuracy counts Uncertain as not correct. **Decision rule (fixed before "
-                   "running):** pooled EN+HI TRAIN AUC; a mode replaces NLI only if ΔAUC vs NLI has a "
-                   "95% CI entirely above 0. Test and round 3 are reported only.\n"]
+    evidence_note = ("Same claims and evidence as the live system (demo corpus, top-3 passages)."
+                     if args.evidence == "demo" else
+                     f"The LLM judges evidence retrieved AFTER on-demand Wikipedia expansion (index "
+                     f"{n0:,} → {n1:,} passages, +{totals['articles']} articles). The reference is the live "
+                     f"system as it is now (NLI on the standard corpus).")
+    rows, L = [], [f"# LLM verifier vs {ref_label} ({args.model}, evidence: {args.evidence})\n",
+                   f"{evidence_note} Verdict accuracy counts Uncertain as not correct. **Decision rule "
+                   f"(fixed before running):** pooled EN+HI TRAIN AUC; a mode is adopted only if ΔAUC vs "
+                   f"{ref_label} has a 95% CI entirely above 0. Test and round 3 are reported only.\n"]
     decision_rows = {}
     for name in SET_ORDER:
         df = sets[name]
         y = (df.gold_verdict == "Verified").astype(int).to_numpy()
         gold = df.gold_verdict.to_numpy()
         L += [f"## {name} (n = {len(df)}, Hallucinated {int((y == 0).sum())})", ""]
-        L.append(f"- NLI (current): AUC {roc_auc_score(y, nli[name]):.3f}; verdicts {accuracy(gold, tier(nli[name]))}")
+        L.append(f"- {ref_label}: AUC {roc_auc_score(y, nli[name]):.3f}; verdicts {accuracy(gold, tier(nli[name]))}")
+        for label, sc in extra.items():
+            L.append(f"- {label} (reported only): AUC {roc_auc_score(y, sc[name]):.3f}; "
+                     f"verdicts {accuracy(gold, tier(sc[name]))}")
         for mode, cache in llm.items():
             recs = [cache.get(_key(args.model, mode, c, e)) for c, e in zip(df.claim_text, ev[name])]
             if any(r is None for r in recs):
@@ -149,7 +179,7 @@ def main() -> None:
             p = np.array([r["p_true"] if r["p_true"] is not None else 0.5 for r in recs])
             v = np.array([r["verdict"] or "Uncertain" for r in recs])
             d, lo, hi = paired_auc(y, nli[name], p)
-            L.append(f"- LLM {mode}: AUC {roc_auc_score(y, p):.3f} (Δ vs NLI {d:+.3f} [{lo:+.3f}, {hi:+.3f}]); "
+            L.append(f"- LLM {mode}: AUC {roc_auc_score(y, p):.3f} (Δ vs reference {d:+.3f} [{lo:+.3f}, {hi:+.3f}]); "
                      f"verdicts {accuracy(gold, v)}; unparsable {sum(r['verdict'] is None for r in recs)}")
             for lang in ("en", "hi"):
                 m = (df.language == lang).to_numpy()
@@ -167,7 +197,7 @@ def main() -> None:
                 L += [f"  - system with KG: current (KG else NLI) {accuracy(gold, cur)}",
                       f"  - system with KG: new (KG else LLM {mode}) {accuracy(gold, new)}"]
         L.append("")
-    pd.DataFrame(rows).to_csv(ROOT / "results" / "llm_verifier.csv", index=False)
+    pd.DataFrame(rows).to_csv(ROOT / "results" / f"llm_verifier{suffix}.csv", index=False)
 
     L.append("## Decision")
     if len(decision_rows) < len(args.modes) or not all(finished.values()):
@@ -176,7 +206,7 @@ def main() -> None:
     else:
         passing = {m: r for m, r in decision_rows.items() if r[1] > 0}
         if not passing:
-            L.append("- **Not adopted:** no mode beats NLI on train with a CI above 0.")
+            L.append(f"- **Not adopted:** no mode beats {ref_label} on train with a CI above 0.")
         else:
             best = max(passing, key=lambda m: passing[m][3])
             d, lo, hi, a = passing[best]
@@ -186,7 +216,7 @@ def main() -> None:
                 L.append("- Hindi keeps NLI (its Hindi train AUC is below NLI's).")
             else:
                 L.append("- Used for Hindi too (Hindi train AUC not below NLI's).")
-    out = ROOT / "results" / "llm_verifier.md"
+    out = ROOT / "results" / f"llm_verifier{suffix}.md"
     out.write_text("\n".join(L) + "\n", encoding="utf-8")
     sys.stdout.buffer.write(("\n".join(L) + "\n").encode("utf-8"))
 

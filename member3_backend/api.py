@@ -372,6 +372,17 @@ def load_starter_corpus():
                     _embedder, _retriever, base / "instance" / "wiki_cache",
                     indexed=indexed_titles_from_cache(base / "evidence_corpus_cache.json"))
                 print("[api] on-demand Wikipedia expansion ON", flush=True)
+            # Optional LLM judge (SATYASCORE_LLM_VERIFIER = grounded | open). OFF by
+            # default: adopted only if llm_verifier_eval.py meets its fixed rule. Needs
+            # GROQ_API_KEY in the server's environment (never logged).
+            llm_mode = _os.environ.get("SATYASCORE_LLM_VERIFIER", "").lower()
+            if llm_mode in ("grounded", "open"):
+                from member1_model.llm_verifier import LLMVerifier
+                _pipeline.llm_verifier = LLMVerifier(
+                    mode=llm_mode, min_interval_s=float(_os.environ.get("SATYASCORE_LLM_MIN_INTERVAL", "2.2")))
+                has_key = bool(_os.environ.get("GROQ_API_KEY"))
+                print(f"[api] LLM judge ON ({llm_mode}); GROQ_API_KEY "
+                      f"{'set' if has_key else 'MISSING: claims will fall back to NLI'}", flush=True)
             return
         print("[api] corpus cache size mismatch — falling back to Wikipedia fetch")
 

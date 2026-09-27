@@ -84,8 +84,10 @@ def paired(y, a, b):
     return roc_auc_score(y, b) - roc_auc_score(y, a), lo, hi
 
 
-def main() -> None:
-    sets = load_sets()
+def build_evidence(sets: dict) -> tuple[dict, dict, dict, int, int]:
+    """(baseline evidence, expanded evidence, totals, index size before, after).
+    Shared with llm_verifier_eval.py so both evaluate the identical expanded index
+    (same claim order and batches; articles come from the disk cache)."""
     embedder = CrossLingualEmbedder()
     retriever = build_retriever()
     n0 = len(retriever)
@@ -105,10 +107,16 @@ def main() -> None:
         print(f"expanded {min(k + BATCH, len(claims))}/{len(claims)} claims; +{totals['articles']} articles, "
               f"+{totals['passages']} passages, {totals['failures']} failed lookups", flush=True)
     exp = {name: evidence(retriever, vecs[name]) for name in sets}
+    return base, exp, totals, n0, len(retriever)
+
+
+def main() -> None:
+    sets = load_sets()
+    base, exp, totals, n0, n1 = build_evidence(sets)
 
     kg3 = pd.read_csv(ROOT / "round3" / "signals_round3_kgfix.csv").set_index("claim_id").kg_conf
     L = ["# Wikipedia index expansion (FR-03 incremental indexing)\n",
-         f"Demo corpus {n0:,} passages → **{len(retriever):,}** after expansion "
+         f"Demo corpus {n0:,} passages → **{n1:,}** after expansion "
          f"(+{totals['articles']} Wikipedia articles, +{totals['passages']:,} passages; "
          f"{totals['failures']} failed lookups). Same embedder, index type, top-3 and relevance cut "
          f"({MIN_RELEVANCE_THRESHOLD}) in both conditions; NLI = current model (net). "

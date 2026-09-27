@@ -41,7 +41,8 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 from member1_model.cmhsa import (
-    CMHSAScorer, ClaimScore, ClaimSubScores, DocumentSummary, Verdict, aggregate_document,
+    HALLUCINATED_THRESHOLD, KG_NOTE, VERIFIED_THRESHOLD, CMHSAScorer, ClaimScore, ClaimSubScores,
+    DocumentSummary, Verdict, aggregate_document,
 )
 from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
@@ -179,6 +180,7 @@ class DetectionPipeline:
         nli_top_k: int = NLI_EVIDENCE_TOP_K,
         retriever_muril: FAISSRetriever | None = None,
         expander=None,
+        llm_verifier=None,
     ):
         self.embedder = embedder
         self.retriever = retriever
@@ -199,6 +201,11 @@ class DetectionPipeline:
         # retrieval. Off by default: results/wiki_expansion.md did not meet the
         # fixed rule (train AUC did not improve), though verdict accuracy rose.
         self.expander = expander
+        # Optional LLM judge (member1_model/llm_verifier.py): for every claim the KG
+        # did not decide, the LLM's verdict and P(true) on the same passages replace
+        # the NLI-based result. Off by default; adopted only if llm_verifier_eval.py
+        # meets its fixed rule. On any LLM failure the claim keeps its NLI result.
+        self.llm_verifier = llm_verifier
 
     def run(
         self,
@@ -212,7 +219,8 @@ class DetectionPipeline:
         every signal this pipeline instance is actually configured with.
         """
         timings = {k: 0.0 for k in
-                   ("claim_extraction", "expansion", "embedding", "retrieval", "nli", "kg", "fusion", "total")}
+                   ("claim_extraction", "expansion", "embedding", "retrieval", "nli", "kg", "llm",
+                    "fusion", "total")}
         t_start = time.perf_counter()
 
         t = time.perf_counter()
@@ -268,7 +276,8 @@ class DetectionPipeline:
                 kg_conf = self._try_kg_verification(claim_id, claim_text, language)
                 timings["kg"] += (time.perf_counter() - t) * 1000
 
-            per_claim.append({"sem_sim": sem_sim, "nli_prob": None, "kg_conf": kg_conf})
+            per_claim.append({"sem_sim": sem_sim, "nli_prob": None, "kg_conf": kg_conf,
+                              "passages": [p.text for p in relevant_passages]})
             if "nli" in enabled and self.nli_scorer and relevant_passages:
                 # C2-lite: each passage becomes one-or-more premise units
                 # (sentences when the switch is on; otherwise the whole passage,
@@ -325,6 +334,12 @@ class DetectionPipeline:
                     active_signals=[],
                     note="insufficient evidence: no sufficiently relevant passage found in the corpus",
                 ))
+        if self.llm_verifier is not None:
+            t_llm = time.perf_counter()
+            scores = [s if s.note == KG_NOTE else self._llm_judge(s, claim_texts[i], per_claim[i]["passages"])
+                      for i, s in enumerate(scores)]
+            timings["llm"] = (time.perf_counter() - t_llm) * 1000
+
         # overall_score (mean) is kept for backward compatibility; `document`
         # is the whole-text verdict and should be what a reader looks at.
         overall_score = sum(s.hallu_score for s in scores) / len(scores)
@@ -341,6 +356,27 @@ class DetectionPipeline:
             timings_ms=timings,
             document=document,
         )
+
+    def _llm_judge(self, score: ClaimScore, claim_text: str, passages: list[str]) -> ClaimScore:
+        """The LLM's verdict for one claim (the KG did not decide it). Falls back to
+        the NLI-based score, with a note, if the LLM is unavailable or unparsable."""
+        model = getattr(self.llm_verifier, "model", "LLM")
+        try:
+            j = self.llm_verifier.verify(claim_text, passages)
+        except Exception:
+            return ClaimScore(claim_id=score.claim_id, hallu_score=score.hallu_score, verdict=score.verdict,
+                              active_signals=score.active_signals,
+                              note="LLM judge unavailable (key, quota or network); NLI result used")
+        if j.p_true is None:
+            return score
+        verdict = Verdict(j.verdict) if j.verdict else (
+            Verdict.HALLUCINATED if j.p_true < HALLUCINATED_THRESHOLD else
+            Verdict.VERIFIED if j.p_true > VERIFIED_THRESHOLD else Verdict.UNCERTAIN)
+        note = f"judged by LLM ({model}) from the retrieved passages"
+        if j.reason:
+            note += f": {j.reason}"
+        return ClaimScore(claim_id=score.claim_id, hallu_score=float(j.p_true), verdict=verdict,
+                          active_signals=[*score.active_signals, "llm"], note=note)
 
     def _extract_claims(self, text: str, language: Language) -> list[ExtractedClaim]:
         if self.claim_extractor is not None:

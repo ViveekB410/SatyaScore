@@ -107,20 +107,49 @@ hi       Hallucinated    0.717     0.536
 - **C2-lite (sentence-level NLI premises):** English ΔAUC -0.012, 95% CI [-0.121, +0.094] — no significant change; the switch stays off by default.
 - **Contradiction as its own signal (English):** AUC 0.629 for 1 − P(contradiction) vs 0.552 for the current net score (entailment alone 0.492); ΔAUC +0.078, 95% CI [-0.013, +0.173]. Suggestive, not established — not adopted under the fixed rule; re-test with more annotated hallucinations.
 
-## 9. Defensible findings
+## 9. Round 3 — relational claims and the knowledge graph
 
-1. Multi-signal fusion does **not** beat NLI alone for this task/data.
-2. Knowledge-graph verification **cannot be evaluated on this dataset**: 0 of 456 gold claims contain a relation the KG can link (the claims are descriptive; `results/kg_ablation.md`), so the PRD's KG ablation is not measurable here. On relational claims the fixed verifier is correct (7/7 live).
-3. Semantic similarity measures **topicality, not truth** (below chance in Hindi).
-4. Detecting **naturally-occurring** hallucinations is hard; no configuration clears a trivial majority baseline on this data.
+Relational claims (birthplace, capital, location, …) the KG can check: 31 fixed questions answered by two LLMs, pre-registered in `round3/PREREGISTRATION.md` before any answer or label.
+
+- Gold: **40** claims (Verified 25, Hallucinated 15); binary κ = 0.86 [0.67, 1.00].
+- **Label provenance (Deviation 3):** both annotators used an AI assistant and then checked every verdict. Labels are *AI-assisted, annotator-verified*; κ may be inflated by the shared tool, so all round-3 results are **suggestive, not confirmed**.
+- **Pre-registered H1 (KG ablation):** ΔAUC fused − NLI = +0.080 [+0.003, +0.189]; without the 3 coreference-garbled claims +0.062 [-0.009, +0.161] (CI includes 0: not robust).
+- **Exploratory 1 — place-linking fix** (4 of 5 KG contradictions came from linking a place name to a non-place): KG supported → Verified 10/10, contradicted → Hallucinated 2/2; ΔAUC fused − NLI +0.144 [+0.044, +0.275].
+- **Exploratory 2 — the KG decides when it answers** (now live): where KG and NLI disagreed by ≥ 0.5 the KG was right 9/9; ΔAUC vs fusion +0.024 [-0.000, +0.083] (not established).
+
+Verdict accuracy on the round-3 gold claims (thresholds 0.35 / 0.65; Uncertain counts as not correct):
+
+| Rule (n = 40; Hallucinated 15) | Correct | Wrong | Uncertain | Accuracy when it commits |
+|---|---|---|---|---|
+| NLI only | 14 (35%) | 17 | 9 | 14/31 (45%) |
+| NLI + KG fused 50/50 | 17 (42%) | 10 | 13 | 17/27 (63%) |
+| **KG decides, else NLI (live)** | 24 (60%) | 10 | 6 | 24/34 (71%) |
+
+- The KG answered 12 of 40 claims and was right on 12; every remaining error comes from claims NLI decided. Always-Verified would score 62%.
+- **Hindi KG path** (template-based relations, exact Hindi-name Wikidata linking) exists but cannot be evaluated on existing labels: no Hindi gold claim is relational.
+
+## 10. Improving the judge (NLI model search, LLM verifier)
+
+- **NLI model search** (`results/nli_model_search.md`; 4 models incl. a FEVER-trained DeBERTa-large; chosen on train only). English AUC — current model: train 0.539 / test 0.428 / round 3 0.708; train-best (mdeberta_base_2mil7): train 0.602 [0.498, 0.700] vs current [0.430, 0.646] (overlapping) / test 0.489 / round 3 0.605. **No model change**: a stronger NLI model does not help, so NLI is not the bottleneck. Hindi has 7 Hallucinated train claims: not decidable.
+- **LLM verifier** (`member1_model/llm_verifier.py`, gpt-oss-120b judging claim + retrieved passages, grounded and open modes): evaluation **in progress** (paused on the provider's daily quota); decision rule fixed before running. Not used by the live system.
+
+## 11. Defensible findings
+
+1. On descriptive claims (the 456-claim set), multi-signal fusion does **not** beat NLI alone, and nothing clears a trivial majority baseline: naturally-occurring hallucinations in explanatory text are hard to detect.
+2. On relational claims (round 3), the **knowledge graph is the reliable signal**: when it answers it is right, and letting it decide lifts verdict accuracy well above NLI alone (section 9) — but overall accuracy is still only around the always-Verified rate, because the claims the KG cannot answer are left to NLI. Suggestive only: 40 claims, AI-assisted labels, post-hoc fixes reported as exploratory. On the 456-claim set the KG cannot be evaluated (0 linkable claims).
+3. A stronger or fact-checking NLI model does not help (section 10): the judge is not the bottleneck; evidence coverage and claim type are.
+4. Semantic similarity measures **topicality, not truth** (below chance in Hindi).
 5. Rule-based English claim decomposition produced broken fragments; a sentence-level safety net removes them (section 3).
 
-## 10. Limitations
+## 12. Limitations
 
 - The grouped test split has only **EN 8, HI 2** Hallucinated claims — too few to interpret Hallucinated-F1 in either language.
-- All responses were generated by a single LLM (llama-3.3-70b-versatile), which limits generalisation to other models.
+- The 456-claim set was generated by a single LLM (llama-3.3-70b-versatile); round 3 adds gpt-oss-120b and qwen3.8-27b, but only 40 gold claims.
+- Round-3 labels are AI-assisted, annotator-verified (Deviation 3); the KG fixes were made after labels were seen and are reported as exploratory.
+- The KG checks one relation per claim; other facts in the same claim are not checked when it decides. It covers people, places and capitals only.
+- Hindi has too few Hallucinated claims (9 in the gold set) to evaluate any Hindi change.
 - Label reliability: single primary annotator, anchored review (section 2); round-1 3-class agreement is low because the annotators used different label schemes; binary kappa is the reliable figure.
 - Dataset small (456) vs the PRD's 3,000; Verified-heavy.
-- NLI is a pretrained mDeBERTa stand-in, not the PRD's DeBERTa-v3 + IndicXNLI fine-tune.
+- NLI is a pretrained mDeBERTa stand-in, not the PRD's DeBERTa-v3 + IndicXNLI fine-tune (stronger pretrained candidates were tested and did not help; section 10).
 - KG signal non-functional on this claim type; Marathi out of scope; baseline suite partial.
 

@@ -8,7 +8,10 @@ them (and nothing is hand-typed). Reads:
   annotation_round2/round2_annotator_A.xlsx + _B.xlsx (round-2 blind re-labelling),
   results/ablation_clean_no_semsim.json, results/latency_benchmark.md,
   results/retrieval_diagnostic.csv, results/c2_lite_comparison.md,
-  results/extraction_quality.md.
+  results/extraction_quality.md,
+  results/round3_kg_pilot.md, round3_kg_fix_exploratory.md, round3_kg_decides.md,
+  round3/round3_annotator_A.xlsx + _B.xlsx + signals_round3_kgfix.csv (round 3),
+  results/nli_model_search.csv (NLI model search).
 
 Needs openpyxl for the .xlsx sheets (run with .venv/Scripts/python.exe). Any
 section whose inputs are missing says so instead of failing.
@@ -18,6 +21,7 @@ import json
 import re
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from sklearn.metrics import cohen_kappa_score, confusion_matrix, roc_auc_score
 
@@ -215,6 +219,114 @@ def phase3_block() -> list[str]:
     return L + [""]
 
 
+def _find(path: str, pattern: str, nth: int = 0):
+    """nth regex match in a results file (None if the file or match is missing)."""
+    p = Path(path)
+    if not p.exists():
+        return None
+    found = list(re.finditer(pattern, p.read_text(encoding="utf-8")))
+    return found[nth] if len(found) > nth else None
+
+
+def _round3_accuracy() -> list[str]:
+    """Verdict accuracy of the live rule (KG decides, else NLI) vs 50/50 fusion and
+    NLI alone, recomputed from the round-3 sheets and KG-fixed signals."""
+    sig = pd.read_csv("round3/signals_round3_kgfix.csv").set_index("claim_id")
+    A, B = _sheet("round3/round3_annotator_A.xlsx"), _sheet("round3/round3_annotator_B.xlsx")
+    d = pd.DataFrame({"a": A, "b": B}).dropna()
+    g = d[(d.a == d.b) & d.a.isin(["Verified", "Hallucinated"])].join(sig)
+    nli = g.nli_net.fillna(0.5).to_numpy()
+    kg = g.kg_conf.to_numpy(dtype=float)
+    has = ~np.isnan(kg)
+    y = g.a.to_numpy()
+
+    def tier(s):
+        return np.where(s < 0.35, "Hallucinated", np.where(s > 0.65, "Verified", "Uncertain"))
+
+    L = [f"| Rule (n = {len(y)}; Hallucinated {int((y == 'Hallucinated').sum())}) | Correct | Wrong | "
+         f"Uncertain | Accuracy when it commits |", "|---|---|---|---|---|"]
+    for name, s in (("NLI only", nli), ("NLI + KG fused 50/50", np.where(has, (nli + np.nan_to_num(kg)) / 2, nli)),
+                    ("**KG decides, else NLI (live)**", np.where(has, np.nan_to_num(kg), nli))):
+        v = tier(s)
+        right, unc = int((v == y).sum()), int((v == "Uncertain").sum())
+        L.append(f"| {name} | {right} ({right / len(y):.0%}) | {len(y) - right - unc} | {unc} | "
+                 f"{right}/{len(y) - unc} ({right / max(len(y) - unc, 1):.0%}) |")
+    kv = tier(np.nan_to_num(kg[has]))
+    L.append(f"\n- The KG answered {int(has.sum())} of {len(y)} claims and was right on "
+             f"{int((kv == y[has]).sum())}; every remaining error comes from claims NLI decided. "
+             f"Always-Verified would score {(y == 'Verified').mean():.0%}.")
+    return L
+
+
+def round3_block() -> list[str]:
+    n_q = len(json.loads(Path("round3/questions.json").read_text(encoding="utf-8")))
+    L = [f"Relational claims (birthplace, capital, location, …) the KG can check: {n_q} fixed questions "
+         "answered by two LLMs, pre-registered in `round3/PREREGISTRATION.md` before any answer or label.\n"]
+    k = _find("results/round3_kg_pilot.md", r"Gold \(both agree.*?\): \*\*(\d+)\*\* — Verified (\d+), \*\*Hallucinated (\d+)")
+    kappa = _find("results/round3_kg_pilot.md", r"binary κ = ([\d.]+) \[([\d.]+), ([\d.]+)\]")
+    if k and kappa:
+        L.append(f"- Gold: **{k.group(1)}** claims (Verified {k.group(2)}, Hallucinated {k.group(3)}); binary "
+                 f"κ = {kappa.group(1)} [{kappa.group(2)}, {kappa.group(3)}].")
+    L.append("- **Label provenance (Deviation 3):** both annotators used an AI assistant and then checked "
+             "every verdict. Labels are *AI-assisted, annotator-verified*; κ may be inflated by the shared "
+             "tool, so all round-3 results are **suggestive, not confirmed**.")
+    pre = _find("results/round3_kg_pilot.md", r"ΔAUC fused − NLI = ([-+][\d.]+) \[([-+][\d.]+), ([-+][\d.]+)\]")
+    sens = _find("results/round3_kg_pilot.md", r"ΔAUC fused − NLI = ([-+][\d.]+) \[([-+][\d.]+), ([-+][\d.]+)\]", 1)
+    if pre and sens:
+        L.append(f"- **Pre-registered H1 (KG ablation):** ΔAUC fused − NLI = {pre.group(1)} "
+                 f"[{pre.group(2)}, {pre.group(3)}]; without the 3 coreference-garbled claims "
+                 f"{sens.group(1)} [{sens.group(2)}, {sens.group(3)}] (CI includes 0: not robust).")
+    fix = _find("results/round3_kg_fix_exploratory.md", r"ΔAUC fused − NLI = ([-+][\d.]+) \[([-+][\d.]+), ([-+][\d.]+)\]")
+    sup = _find("results/round3_kg_fix_exploratory.md", r"KG \*\*supported\*\* → gold Verified: (\d+)/(\d+)")
+    con = _find("results/round3_kg_fix_exploratory.md", r"KG \*\*contradicted\*\* → gold Hallucinated: (\d+)/(\d+)")
+    if fix and sup and con:
+        L.append(f"- **Exploratory 1 — place-linking fix** (4 of 5 KG contradictions came from linking a place "
+                 f"name to a non-place): KG supported → Verified {sup.group(1)}/{sup.group(2)}, contradicted → "
+                 f"Hallucinated {con.group(1)}/{con.group(2)}; ΔAUC fused − NLI {fix.group(1)} "
+                 f"[{fix.group(2)}, {fix.group(3)}].")
+    dec = _find("results/round3_kg_decides.md", r"kg_decides − fused \(current\): ΔAUC ([-+][\d.]+) \[([-+][\d.]+), ([-+][\d.]+)\]")
+    dis = _find("results/round3_kg_decides.md", r"disagreed by ≥ 0.5: (\d+); the KG was right on (\d+)")
+    if dec and dis:
+        L.append(f"- **Exploratory 2 — the KG decides when it answers** (now live): where KG and NLI disagreed "
+                 f"by ≥ 0.5 the KG was right {dis.group(2)}/{dis.group(1)}; ΔAUC vs fusion {dec.group(1)} "
+                 f"[{dec.group(2)}, {dec.group(3)}] (not established).")
+    try:
+        L += ["", "Verdict accuracy on the round-3 gold claims (thresholds 0.35 / 0.65; Uncertain counts as "
+                  "not correct):\n"] + _round3_accuracy()
+    except Exception as e:
+        L.append(f"- (round-3 accuracy not computed: {e})")
+    L.append("- **Hindi KG path** (template-based relations, exact Hindi-name Wikidata linking) exists but "
+             "cannot be evaluated on existing labels: no Hindi gold claim is relational.\n")
+    return L
+
+
+def models_block() -> list[str]:
+    L = []
+    p = Path("results/nli_model_search.csv")
+    if p.exists():
+        r = pd.read_csv(p)
+        en = r[r.lang == "en"]
+
+        def auc(model, variant, s):
+            x = en[(en.model == model) & (en.variant == variant) & (en.set == s)]
+            return f"{x.auc.iloc[0]:.3f}" if len(x) else "—"
+        best = en[en.set == "train"].sort_values("auc", ascending=False).iloc[0]
+        tr_best = en[(en.model == best.model) & (en.variant == best.variant) & (en.set == "train")].iloc[0]
+        tr_cur = en[(en.model == "mdeberta_base_xnli") & (en.variant == "net") & (en.set == "train")].iloc[0]
+        L += [f"- **NLI model search** (`results/nli_model_search.md`; {r.model.nunique()} models incl. a "
+              f"FEVER-trained DeBERTa-large; chosen on train only). English AUC — current model: train "
+              f"{auc('mdeberta_base_xnli', 'net', 'train')} / test {auc('mdeberta_base_xnli', 'net', 'test')} / "
+              f"round 3 {auc('mdeberta_base_xnli', 'net', 'round3')}; train-best ({best.model}): train "
+              f"{tr_best.auc:.3f} [{tr_best.lo:.3f}, {tr_best.hi:.3f}] vs current [{tr_cur.lo:.3f}, "
+              f"{tr_cur.hi:.3f}] (overlapping) / test {auc(best.model, best.variant, 'test')} / round 3 "
+              f"{auc(best.model, best.variant, 'round3')}. **No model change**: a stronger NLI model does "
+              f"not help, so NLI is not the bottleneck. Hindi has 7 Hallucinated train claims: not decidable."]
+    L.append("- **LLM verifier** (`member1_model/llm_verifier.py`, gpt-oss-120b judging claim + retrieved "
+             "passages, grounded and open modes): evaluation **in progress** (paused on the provider's daily "
+             "quota); decision rule fixed before running. Not used by the live system.\n")
+    return L
+
+
 def extraction_block(q: pd.DataFrame) -> list[str]:
     n_en = int((q.language == "en").sum())
     nb = int(((q.language == "en") & (q.quality_flag == "broken")).sum())
@@ -337,19 +449,29 @@ def main() -> None:
     L.append("## 8. Phase 3 diagnostics\n")
     L += phase3_block()
 
-    L.append("## 9. Defensible findings\n")
-    L.append("1. Multi-signal fusion does **not** beat NLI alone for this task/data.\n"
-             "2. Knowledge-graph verification **cannot be evaluated on this dataset**: 0 of 456 gold claims "
-             "contain a relation the KG can link (the claims are descriptive; `results/kg_ablation.md`), so "
-             "the PRD's KG ablation is not measurable here. On relational claims the fixed verifier is "
-             "correct (7/7 live).\n"
-             "3. Semantic similarity measures **topicality, not truth** (below chance in Hindi).\n"
-             "4. Detecting **naturally-occurring** hallucinations is hard; no configuration clears a "
-             "trivial majority baseline on this data.\n"
+    L.append("## 9. Round 3 — relational claims and the knowledge graph\n")
+    L += round3_block()
+
+    L.append("## 10. Improving the judge (NLI model search, LLM verifier)\n")
+    L += models_block()
+
+    L.append("## 11. Defensible findings\n")
+    L.append("1. On descriptive claims (the 456-claim set), multi-signal fusion does **not** beat NLI alone, "
+             "and nothing clears a trivial majority baseline: naturally-occurring hallucinations in "
+             "explanatory text are hard to detect.\n"
+             "2. On relational claims (round 3), the **knowledge graph is the reliable signal**: when it "
+             "answers it is right, and letting it decide lifts verdict accuracy well above NLI alone "
+             "(section 9) — but overall accuracy is still only around the always-Verified rate, because "
+             "the claims the KG cannot answer are left to NLI. Suggestive only: 40 claims, AI-assisted "
+             "labels, post-hoc fixes reported as exploratory. On the 456-claim set the KG cannot be "
+             "evaluated (0 linkable claims).\n"
+             "3. A stronger or fact-checking NLI model does not help (section 10): the judge is not the "
+             "bottleneck; evidence coverage and claim type are.\n"
+             "4. Semantic similarity measures **topicality, not truth** (below chance in Hindi).\n"
              "5. Rule-based English claim decomposition produced broken fragments; a sentence-level safety "
              "net removes them (section 3).\n")
 
-    L.append("## 10. Limitations\n")
+    L.append("## 12. Limitations\n")
     try:
         te = pd.read_csv("gold_test_clean.csv")
         counts = ", ".join(f"{lang.upper()} {int(((te.language == lang) & (te.gold_verdict == 'Hallucinated')).sum())}"
@@ -358,13 +480,20 @@ def main() -> None:
                  f"interpret Hallucinated-F1 in either language.")
     except Exception:
         pass
-    L.append(f"- All responses were generated by a single LLM ({', '.join(llms) or 'n/a'}), which limits "
-             f"generalisation to other models.\n"
+    L.append(f"- The 456-claim set was generated by a single LLM ({', '.join(llms) or 'n/a'}); round 3 "
+             f"adds gpt-oss-120b and qwen3.8-27b, but only 40 gold claims.\n"
+             "- Round-3 labels are AI-assisted, annotator-verified (Deviation 3); the KG fixes were made "
+             "after labels were seen and are reported as exploratory.\n"
+             "- The KG checks one relation per claim; other facts in the same claim are not checked when "
+             "it decides. It covers people, places and capitals only.\n"
+             f"- Hindi has too few Hallucinated claims ({int(((gold.language == 'hi') & (gold.gold_verdict == 'Hallucinated')).sum())} "
+             f"in the gold set) to evaluate any Hindi change.\n"
              "- Label reliability: single primary annotator, anchored review (section 2); round-1 3-class "
              "agreement is low because the annotators used different label schemes; binary kappa is the "
              "reliable figure.\n"
              "- Dataset small (456) vs the PRD's 3,000; Verified-heavy.\n"
-             "- NLI is a pretrained mDeBERTa stand-in, not the PRD's DeBERTa-v3 + IndicXNLI fine-tune.\n"
+             "- NLI is a pretrained mDeBERTa stand-in, not the PRD's DeBERTa-v3 + IndicXNLI fine-tune "
+             "(stronger pretrained candidates were tested and did not help; section 10).\n"
              "- KG signal non-functional on this claim type; Marathi out of scope; baseline suite partial.\n")
 
     Path("RESULTS_SUMMARY.md").write_text("\n".join(L) + "\n", encoding="utf-8")

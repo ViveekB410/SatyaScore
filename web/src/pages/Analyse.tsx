@@ -115,11 +115,18 @@ export default function Analyse() {
     }
   }
 
+  // Empty the text box and start fresh (language back to auto-detect).
+  function clearPassage() {
+    setText('')
+    setLangMode('auto')
+    setError(null)
+    setPhase('input')
+    requestAnimationFrame(() => textArea.current?.focus())
+  }
+
   function checkAnother() {
     setParams({}, { replace: true })
-    setPhase('input')
-    setError(null)
-    requestAnimationFrame(() => textArea.current?.focus())
+    clearPassage()
   }
 
   async function onFile(file: File) {
@@ -307,6 +314,9 @@ export default function Analyse() {
           />
           <Button variant="outline" size="sm" disabled={busy} onClick={() => fileInput.current?.click()}>
             Upload .txt / .pdf
+          </Button>
+          <Button variant="ghost" size="sm" disabled={busy || !text} onClick={clearPassage}>
+            Clear
           </Button>
           <span className={cn('ml-auto text-[13px] tabular-nums', over ? 'font-medium text-flag-no' : 'text-muted')}>
             {text.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}

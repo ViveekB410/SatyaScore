@@ -1,0 +1,106 @@
+"""
+How per-passage NLI results become ONE score for a claim.
+
+Diagnosis (results/diagnosis_true_claims.md): on TRUE statements the live rule
+("the most decisive passage wins") produced false alarms, 41% of English claims
+on unseen topics. The NLI model outputs "contradiction" when a passage is simply
+about a DIFFERENT thing (a football passage "contradicts" a cricket claim; the
+prime minister of India "contradicts" one about Canada), and the most decisive
+passage then overrode passages that supported the claim. Missing evidence was
+being read as contradiction.
+
+`gated` rule:
+  1. support first: if any passage entails the claim (P(entail) >= 0.5), the
+     claim is supported: score 0.5 + 0.5 * max entailment;
+  2. otherwise only an ON-TOPIC passage may contradict it: a passage whose
+     Wikipedia article title appears in the claim (a cricket claim can be
+     contradicted by the "Cricket" article, never by "Association football");
+  3. otherwise there is no usable evidence either way: the score stays near 0.5
+     (Uncertain, "not enough evidence"), never Hallucinated.
+`legacy` is the previous rule, kept for comparison.
+"""
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+
+ENTAIL_WINS = 0.5
+_PAREN = re.compile(r"\s*\([^)]*\)")
+# punctuation to spaces; keeps letters AND combining marks (Devanagari matras)
+_PUNCT = re.compile(r"[\s.,;:!?\"'“”‘’()\[\]{}\-–—/|।॥]+")
+
+
+def _norm(s: str) -> str:
+    return " ".join(_PUNCT.sub(" ", s.casefold()).split())
+
+
+def title_forms(title: str) -> list[str]:
+    """Names that identify an article in a claim: the title without a
+    parenthetical qualifier or trailing ", place" ("Chief Minister (India)" ->
+    "chief minister"), plus its last word if that is a distinctive head noun or
+    surname of 4+ letters ("Mahatma Gandhi" -> "gandhi", "Association football"
+    -> "football")."""
+    base = _norm(_PAREN.sub("", title).split(",")[0])
+    if not base:
+        return []
+    forms = [base]
+    words = base.split()
+    if len(words) > 1 and len(words[-1]) >= 4:
+        forms.append(words[-1])
+    return forms
+
+
+class SubjectIndex:
+    """Which article a passage comes from, in the claim's terms. Passage ids are
+    "<English title>::<lang>::<n>" (demo corpus) or "wiki:<lang>:<title>::<n>"
+    (expansion). Hindi demo passages carry the English title; their Hindi title
+    comes from evidence_corpus_cache.json."""
+
+    def __init__(self, hi_titles: dict[str, str] | None = None):
+        self.hi_titles = hi_titles or {}
+
+    @classmethod
+    def from_cache(cls, path: Path | str) -> "SubjectIndex":
+        p = Path(path)
+        if not p.exists():
+            return cls()
+        cache = json.loads(p.read_text(encoding="utf-8"))
+        return cls({(e.get("en_title") or k): e["hi_title"] for k, e in cache.items() if e.get("hi_title")})
+
+    def names(self, passage_id: str) -> list[str]:
+        if passage_id.startswith("wiki:"):
+            _, _, rest = passage_id.split(":", 2)
+            return title_forms(rest.rsplit("::", 1)[0])
+        parts = passage_id.split("::")
+        title = parts[0]
+        forms = title_forms(title)
+        if len(parts) > 1 and parts[1] == "hi" and title in self.hi_titles:
+            forms += title_forms(self.hi_titles[title])
+        return forms
+
+    def on_topic(self, claim: str, passage_id: str) -> bool:
+        c = f" {_norm(claim)} "
+        return any(f" {f} " in c for f in self.names(passage_id))
+
+
+def aggregate(rows: list[tuple[float, float, bool]]) -> float:
+    """rows: (P(entail), P(contradict), on_topic) per premise. See module doc."""
+    if not rows:
+        return 0.5
+    max_e = max(e for e, _, _ in rows)
+    if max_e >= ENTAIL_WINS:
+        return 0.5 + 0.5 * max_e
+    on_topic_c = [c for _, c, t in rows if t]
+    return 0.5 + 0.5 * (max_e - (max(on_topic_c) if on_topic_c else 0.0))
+
+
+def aggregate_legacy(rows: list[tuple[float, float, bool]]) -> float:
+    """Previous rule: the most decisive passage's 0.5 + 0.5 * (e - c)."""
+    if not rows:
+        return 0.5
+    nets = [0.5 + 0.5 * (e - c) for e, c, _ in rows]
+    return max(nets, key=lambda s: abs(s - 0.5))
+
+
+RULES = {"gated": aggregate, "legacy": aggregate_legacy}

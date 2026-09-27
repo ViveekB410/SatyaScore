@@ -127,10 +127,22 @@ def test_percent_sign_is_kept_so_the_claim_keeps_its_meaning(extractor):
 
 def test_appositive_claim_uses_the_full_subject_phrase(extractor):
     claims = extractor.extract(
-        "The Universal Immunization Programme (UIP) is a vaccination programme "
-        "launched by the Government of India in 1985.", "en")
+        "The Universal Immunization Programme, a vaccination programme, was launched by the "
+        "Government of India in 1985.", "en")
     appos = next(c for c in claims if c.extraction_method == "decomposed_appos")
-    assert appos.text == "The Universal Immunization Programme is UIP."
+    assert appos.text == "The Universal Immunization Programme is a vaccination programme."
+
+
+def test_bracketed_asides_do_not_become_claims(extractor):
+    # They used to: "X (UIP) is ..." gave "X is UIP." and life dates gave "Ambedkar is 14.",
+    # nonsense claims that turned TRUE text into false alarms (diagnosis_true_claims.md).
+    text = ("Bhimrao Ramji Ambedkar (14 April 1891 – 6 December 1956) was an Indian jurist. "
+            "The Universal Immunization Programme (UIP) is a vaccination programme.")
+    claims = extractor.extract(text, "en")
+    assert [c.text for c in claims] == ["Bhimrao Ramji Ambedkar was an Indian jurist.",
+                                        "The Universal Immunization Programme is a vaccination programme."]
+    first = claims[0]
+    assert text[first.start_char:first.end_char].startswith("Bhimrao Ramji Ambedkar (14 April")  # offsets intact
 
 
 def test_existential_there_sentence_is_a_claim(extractor):

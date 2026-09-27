@@ -49,6 +49,7 @@ from member1_model.nli_scorer import NLIScorer
 from member2_data.entity_linker import EntityLinker
 from member2_data.wikidata_connector import WikidataConnector
 from member3_backend.claim_extractor import ClaimExtractor, ExtractedClaim
+from member3_backend.evidence_rules import RULES as AGGREGATION_RULES, SubjectIndex
 from member3_backend.faiss_retriever import FAISSRetriever
 
 Language = Literal["en", "hi", "mr"]
@@ -181,6 +182,8 @@ class DetectionPipeline:
         retriever_muril: FAISSRetriever | None = None,
         expander=None,
         llm_verifier=None,
+        aggregation: str = "legacy",
+        subjects: SubjectIndex | None = None,
     ):
         self.embedder = embedder
         self.retriever = retriever
@@ -206,6 +209,13 @@ class DetectionPipeline:
         # the NLI-based result. Off by default; adopted only if llm_verifier_eval.py
         # meets its fixed rule. On any LLM failure the claim keeps its NLI result.
         self.llm_verifier = llm_verifier
+        # How per-passage NLI becomes one claim score (member3_backend/evidence_rules.py):
+        # "legacy" = the most decisive passage wins; "gated" = support first, and only
+        # an on-topic passage (its article title appears in the claim) may contradict.
+        if aggregation not in AGGREGATION_RULES:
+            raise ValueError(f"aggregation must be one of {list(AGGREGATION_RULES)}")
+        self.aggregation = aggregation
+        self.subjects = subjects or SubjectIndex()
 
     def run(
         self,
@@ -253,6 +263,7 @@ class DetectionPipeline:
         # changing any score (each pair is still scored independently).
         per_claim: list[dict] = []
         nli_pairs: list[tuple[int, str, str, str]] = []  # (claim_idx, claim_id, premise, hypothesis)
+        on_topic: list[bool] = []  # per NLI pair: is its passage about the claim's subject?
         for i, claim_id in enumerate(claim_ids):
             claim_text = claim_texts[i]
             t = time.perf_counter()
@@ -286,8 +297,10 @@ class DetectionPipeline:
                 # claim, so a claim with many sentence-premises is unchanged in
                 # how its final nli_prob is chosen.
                 for p in relevant_passages:
+                    topical = self.subjects.on_topic(claim_text, p.passage_id)
                     for premise in passage_to_premises(p.text):
                         nli_pairs.append((i, claim_id, premise, claim_text))
+                        on_topic.append(topical)
 
         # --- Phase B: a SINGLE batched NLI call over every claim's pairs, then regroup ---
         if nli_pairs:
@@ -300,16 +313,14 @@ class DetectionPipeline:
             timings["nli"] = (time.perf_counter() - t) * 1000
 
             grouped: dict[int, list] = defaultdict(list)
-            for (idx, _, _, _), res in zip(nli_pairs, nli_results):
-                grouped[idx].append(res)
-            for idx, results in grouped.items():
-                # CRITICAL (unchanged): nli_prob reflects BOTH directions of
-                # evidence. Net score: 1.0 = strongly entailed, 0.0 = strongly
-                # contradicted, 0.5 = neutral/unaddressed. We pick the MOST
-                # DECISIVE passage (furthest from 0.5), not max entailment --
-                # this and the formula are identical to the pre-batching code.
-                net_scores = [0.5 + 0.5 * (r.entailment_prob - r.contradiction_prob) for r in results]
-                per_claim[idx]["nli_prob"] = max(net_scores, key=lambda s: abs(s - 0.5))
+            for (idx, _, _, _), res, topical in zip(nli_pairs, nli_results, on_topic):
+                grouped[idx].append((res.entailment_prob, res.contradiction_prob, topical))
+            rule = AGGREGATION_RULES[self.aggregation]
+            for idx, rows in grouped.items():
+                # nli_prob reflects both directions of evidence: 1.0 = entailed,
+                # 0.0 = contradicted, 0.5 = neutral / not addressed. How the
+                # passages combine is the aggregation rule (evidence_rules.py).
+                per_claim[idx]["nli_prob"] = rule(rows)
 
         # --- Phase C: assemble sub-scores (original claim order) + fuse ---
         sub_scores_list = [

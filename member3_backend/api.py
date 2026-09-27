@@ -40,6 +40,7 @@ from member2_data.entity_linker import EntityLinker
 from member2_data.wikidata_connector import WikidataConnector
 from member3_backend import auth
 from member3_backend.claim_extractor import ClaimExtractor
+from member3_backend.evidence_rules import SubjectIndex
 from member3_backend.faiss_retriever import FAISSRetriever
 from member3_backend.pipeline import DetectionPipeline
 
@@ -319,6 +320,10 @@ _pipeline = DetectionPipeline(
     entity_linker=_entity_linker,
     wikidata=_wikidata,
     nli_top_k=3,  # top-3 for accuracy — batched NLI (one forward pass) keeps it fast
+    # Evidence aggregation (member3_backend/evidence_rules.py): SATYASCORE_AGGREGATION
+    # = legacy | gated. The default is set by aggregation_eval.py's fixed rule.
+    aggregation=_os_cors.environ.get("SATYASCORE_AGGREGATION", "legacy"),
+    subjects=SubjectIndex.from_cache(_Path(__file__).resolve().parent.parent / "evidence_corpus_cache.json"),
 )
 @app.on_event("startup")
 def load_starter_corpus():

@@ -119,6 +119,21 @@ def _blank_markdown_artifacts(text: str) -> str:
     text = text.replace("**", "  ").replace("*", " ")
     return text
 
+
+# Bracketed asides: life dates, abbreviations, pronunciations, translations.
+# Parsed as part of the sentence they produced nonsense claims from TRUE text:
+# "Bhimrao Ramji Ambedkar (14 April 1891 – 6 December 1956) was ..." gave
+# "Bhimrao Ramji Ambedkar is 14." and "Peripheral artery disease (PAD) is ..." gave
+# "Peripheral artery disease is PAD." (results/diagnosis_true_claims.md).
+_BRACKETED = re.compile(r"\([^()\n]{0,200}\)|\[[^\[\]\n]{0,200}\]")
+
+
+def _blank_bracketed(text: str) -> str:
+    """Blank bracketed asides with spaces of the same width (LENGTH-PRESERVING,
+    like _blank_markdown_artifacts, so claim offsets still point into the
+    original text). The aside's content is not checked as a claim."""
+    return _BRACKETED.sub(lambda m: " " * len(m.group(0)), text)
+
 _nlp_cache: dict[str, SpacyLanguage] = {}
 
 
@@ -210,7 +225,7 @@ class ClaimExtractor:
         if word_count > MAX_WORDS:
             raise ValueError(f"Input has {word_count} words, exceeds FR-01's {MAX_WORDS}-word limit")
 
-        text = _blank_markdown_artifacts(text)
+        text = _blank_bracketed(_blank_markdown_artifacts(text))
 
         if language == "en":
             return self._extract_english(text)
@@ -541,7 +556,9 @@ class ClaimExtractor:
             claims.append(
                 ExtractedClaim(
                     claim_id=f"claim_{i}",
-                    text=sentence,
+                    # blanked asides leave runs of spaces: collapse them in the claim
+                    # text only (the offsets above still index the original input)
+                    text=" ".join(sentence.split()),
                     start_char=start,
                     end_char=end,
                     extraction_method="sentence_level",

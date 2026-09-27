@@ -321,8 +321,11 @@ _pipeline = DetectionPipeline(
     wikidata=_wikidata,
     nli_top_k=3,  # top-3 for accuracy — batched NLI (one forward pass) keeps it fast
     # Evidence aggregation (member3_backend/evidence_rules.py): SATYASCORE_AGGREGATION
-    # = legacy | gated. The default is set by aggregation_eval.py's fixed rule.
-    aggregation=_os_cors.environ.get("SATYASCORE_AGGREGATION", "legacy"),
+    # = gated | legacy. Default "gated" is a PRODUCT choice recorded in
+    # results/aggregation_eval.md: it cut false alarms on fresh true statements
+    # 33 -> 8 of 99 but failed the pre-fixed non-inferiority check (c) and catches
+    # far fewer real hallucinations (train 11 -> 3 of 45). "legacy" restores the old rule.
+    aggregation=_os_cors.environ.get("SATYASCORE_AGGREGATION", "gated"),
     subjects=SubjectIndex.from_cache(_Path(__file__).resolve().parent.parent / "evidence_corpus_cache.json"),
 )
 @app.on_event("startup")

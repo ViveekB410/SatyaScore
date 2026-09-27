@@ -86,8 +86,10 @@ def _pipeline_with(llm, kg_conf):
     claim = MagicMock()
     claim.text = "Paris is the capital of France."
     extractor.extract.return_value = [claim]
+    # legacy aggregation: this fixture's one passage is not titled after the claim's
+    # subject, so under "gated" it could not contradict; these tests need NLI to say No
     p = DetectionPipeline(embedder=embedder, retriever=retriever, scorer=scorer, claim_extractor=extractor,
-                          nli_scorer=nli, llm_verifier=llm)
+                          nli_scorer=nli, llm_verifier=llm, aggregation="legacy")
     p._try_kg_verification = lambda *a, **k: kg_conf
     p.entity_linker, p.wikidata = MagicMock(), MagicMock()
     return p

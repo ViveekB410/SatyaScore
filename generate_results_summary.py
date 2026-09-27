@@ -339,6 +339,18 @@ def models_block() -> list[str]:
                  f"{tr_acc.group(3)} of {tr_acc.group(2)}; round 3 with the live KG rule {live.group(1)} → "
                  f"{live.group(3)} of {live.group(2)} (report-only set). Better evidence did not improve "
                  f"ranking: consistent with NLI being the limit on descriptive claims.")
+    fresh = _find("results/aggregation_eval.md", r"\| gated \|[^\n]*\*\*(\d+)\*\* \((\d+)%\)[^\n]*\n\| legacy \|[^\n]*\*\*(\d+)\*\* \((\d+)%\)")
+    caught = _find("results/aggregation_eval.md", r"## train[^\n]*\n\n- ROC-AUC legacy ([\d.]+) → gated ([\d.]+) \(Δ ([-+][\d.]+) \[([-+][\d.]+), ([-+][\d.]+)\]\)"
+                   r"[\s\S]*?\| gated \| [^|]+\| [^|]+\| (\d+)/(\d+)[^\n]*\n\| legacy \| [^|]+\| [^|]+\| (\d+)/\d+")
+    if fresh and caught:
+        L.append(f"- **False alarms on true text** (`diagnose_true_claims.py`, `results/aggregation_eval.md`): the "
+                 f"NLI model reads a passage about another subject as a contradiction, and the old rule let the "
+                 f"most decisive passage win. The `gated` evidence rule (support first; only an on-topic passage "
+                 f"may contradict) cut false alarms on fresh true statements {fresh.group(3)} → {fresh.group(1)} "
+                 f"of 99, but real hallucinations caught on train fell {caught.group(8)} → {caught.group(6)} of "
+                 f"{caught.group(7)} (ΔAUC {caught.group(3)} [{caught.group(4)}, {caught.group(5)}]), failing the "
+                 f"pre-fixed non-inferiority check. **Adopted as the live default as a recorded product choice** "
+                 f"(prefer \"Uncertain\" over wrongly accusing genuine text); `legacy` remains available.")
     L.append("- **LLM verifier** (`member1_model/llm_verifier.py`, gpt-oss-120b judging claim + retrieved "
              "passages, grounded and open modes): evaluation **in progress** (paused on the provider's daily "
              "quota); decision rule fixed before running. Not used by the live system.\n")

@@ -49,7 +49,8 @@ cd web; npm install
 |---|---|---|
 | Claim extraction (FR-01) | English: dependency-parse decomposition + coreference, with a sentence-level safety net. Hindi: sentence-level | `member3_backend/claim_extractor.py` |
 | Retrieval (FR-02/03) | XLM-R embeddings; FAISS IVF index over **9,351 Wikipedia passages** (7,361 EN, 1,990 HI, 245 articles); top-3 passages above a relevance cut | `member1_model/embeddings.py`, `member3_backend/faiss_retriever.py` |
-| NLI | `mDeBERTa-v3-base-mnli-xnli` judges each claim against its passages (the most decisive passage counts) | `member1_model/nli_scorer.py` |
+| NLI | `mDeBERTa-v3-base-mnli-xnli` judges each claim against each passage | `member1_model/nli_scorer.py` |
+| Evidence rule | **Support first; only an on-topic passage (its article title appears in the claim) may contradict; no usable evidence → Uncertain.** Stops "about something else" being read as "false" (false alarms on fresh true statements 33 → 8 of 99), at the cost of catching fewer real hallucinations until the LLM verifier is added — a recorded product choice, `results/aggregation_eval.md`. `SATYASCORE_AGGREGATION=legacy` restores the old rule | `member3_backend/evidence_rules.py` |
 | Knowledge graph | Wikidata: birthplace, place of death, capital, location, office, founder… English relation phrases and **Hindi relation templates**; place names (and all Hindi names) matched by exact name, so a place is never linked to a same-named non-place | `member2_data/entity_linker.py`, `member2_data/wikidata_connector.py` |
 | Scoring (CMHSA, FR-04) | **When the KG answers, it decides the claim**; otherwise the trained weighted fusion. Verdicts: < 0.35 Hallucinated, 0.35–0.65 Uncertain, > 0.65 Verified; calibrated P(Verified) with a 95% interval | `member1_model/cmhsa.py`, `member1_model/calibration.py` |
 | Whole text | Hallucinated if ≥ 1/3 of claims are Hallucinated; else Uncertain if any claim is Hallucinated or Uncertain; else Verified | `member1_model/cmhsa.py` (`aggregate_document`) |
@@ -99,7 +100,7 @@ member3_backend/   API, accounts (auth.py), pipeline, claim extractor, FAISS ret
 web/               web app (current)            frontend/  earlier dashboard (fallback)
 round3/            pre-registration, questions, claims, annotator sheets, signals
 results/           every measured result (*.md, *.csv)
-tests/             184 tests
+tests/             193 tests
 ```
 
 ## Reproducing the results

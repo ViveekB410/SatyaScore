@@ -182,7 +182,7 @@ class DetectionPipeline:
         retriever_muril: FAISSRetriever | None = None,
         expander=None,
         llm_verifier=None,
-        aggregation: str = "legacy",
+        aggregation: str = "gated",
         subjects: SubjectIndex | None = None,
     ):
         self.embedder = embedder

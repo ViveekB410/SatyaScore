@@ -32,7 +32,9 @@ from retrieval_eval import corpus_vectors, encode
 
 ROOT = Path(__file__).resolve().parent
 CACHE = ROOT / "results" / "_nli_cache"
-MAXLEN, BS = 256, 8
+MAXLEN = 256
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+BS = 32 if DEVICE == "cuda" else 8  # fp32 either way: same numbers on GPU and CPU
 N_BOOT, SEED = 2000, 42
 
 MODELS = {  # key -> (hub id, languages it may judge)
@@ -78,19 +80,22 @@ def probs(key: str, premises: list[str], hypotheses: list[str]) -> np.ndarray:
         return np.load(path)
     hub, _ = MODELS[key]
     tok = AutoTokenizer.from_pretrained(hub)
-    model = AutoModelForSequenceClassification.from_pretrained(hub).eval()
+    model = AutoModelForSequenceClassification.from_pretrained(hub).to(DEVICE).eval()
     lab = {v.lower(): k for k, v in model.config.id2label.items()}
     order = [lab["entailment"], lab["neutral"], lab["contradiction"]]
     out = []
     for i in range(0, len(premises), BS):
         enc = tok(premises[i:i + BS], hypotheses[i:i + BS], return_tensors="pt",
-                  truncation="only_first", max_length=MAXLEN, padding=True)
+                  truncation="only_first", max_length=MAXLEN, padding=True).to(DEVICE)
         with torch.no_grad():
-            p = torch.softmax(model(**enc).logits, dim=-1).numpy()
+            p = torch.softmax(model(**enc).logits, dim=-1).cpu().numpy()
         out.append(p[:, order])
         if (i // BS) % 25 == 0:
             print(f"  {key}: {min(i + BS, len(premises))}/{len(premises)}", flush=True)
     arr = np.concatenate(out) if out else np.zeros((0, 3))
+    model.to("cpu")  # release GPU memory before the next candidate loads
+    if DEVICE == "cuda":
+        torch.cuda.empty_cache()
     CACHE.mkdir(parents=True, exist_ok=True)
     np.save(path, arr)
     return arr
@@ -128,6 +133,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--models", nargs="+", default=list(MODELS))
     args = ap.parse_args()
+    print(f"device: {DEVICE}", flush=True)
     sets = load_sets()
     ev = {name: evidence(df) for name, df in sets.items()}
     rows = []

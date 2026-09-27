@@ -176,6 +176,18 @@ class WikiExpander:
         return stats
 
 
+def indexed_titles_from_passages(passages: list[dict]) -> set[tuple[str, str]]:
+    """(lang, title) of articles added by expansion or build_corpus_expanded.py
+    (passage ids "wiki:<lang>:<title>::<n>")."""
+    out = set()
+    for p in passages:
+        pid = p.get("id", "")
+        if pid.startswith("wiki:"):
+            _, lang, rest = pid.split(":", 2)
+            out.add((lang, rest.rsplit("::", 1)[0]))
+    return out
+
+
 def indexed_titles_from_cache(cache_path: Path | str) -> set[tuple[str, str]]:
     """(lang, title) pairs already in the demo corpus, from evidence_corpus_cache.json."""
     p = Path(cache_path)

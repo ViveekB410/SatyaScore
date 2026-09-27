@@ -117,3 +117,9 @@ def test_pipeline_expands_before_retrieval_only_when_switched_on():
     off, _ = _pipeline(None)
     assert off.expander is None
     off.run("Gandhi was born in Porbandar.", "en")  # runs without any expansion
+
+def test_titles_already_in_a_loaded_corpus_are_known():
+    from member3_backend.wiki_expander import indexed_titles_from_passages
+    passages = [{"id": "Cricket::en::0"}, {"id": "wiki:en:Porbandar::3"}, {"id": "wiki:hi:पोरबंदर::0"},
+                {"id": "wiki:en:Porbandar::4"}]
+    assert indexed_titles_from_passages(passages) == {("en", "Porbandar"), ("hi", "पोरबंदर")}

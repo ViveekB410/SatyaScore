@@ -35,18 +35,27 @@ def _norm(s: str) -> str:
     return " ".join(_PUNCT.sub(" ", s.casefold()).split())
 
 
-def title_forms(title: str) -> list[str]:
+_FUNCTION_WORDS = {"of", "and", "in", "the", "for", "on", "at", "to", "a", "an", "by", "with", "from",
+                   "vs", "versus", "list", "comparison", "history", "outline", "glossary", "rules"}
+
+
+def title_forms(title: str, strict: bool = False) -> list[str]:
     """Names that identify an article in a claim: the title without a
     parenthetical qualifier or trailing ", place" ("Chief Minister (India)" ->
     "chief minister"), plus its last word if that is a distinctive head noun or
     surname of 4+ letters ("Mahatma Gandhi" -> "gandhi", "Association football"
-    -> "football")."""
+    -> "football"). strict: the last-word shortcut only for short name-like titles
+    (<= 3 words, no function words), so "Comparison of baseball and cricket" is
+    not "cricket" and "Prime Minister of India" is not "india"."""
     base = _norm(_PAREN.sub("", title).split(",")[0])
     if not base:
         return []
     forms = [base]
     words = base.split()
-    if len(words) > 1 and len(words[-1]) >= 4:
+    shortcut = len(words) > 1 and len(words[-1]) >= 4
+    if strict:
+        shortcut = shortcut and len(words) <= 3 and not (set(words) & _FUNCTION_WORDS)
+    if shortcut:
         forms.append(words[-1])
     return forms
 
@@ -57,26 +66,28 @@ class SubjectIndex:
     (expansion). Hindi demo passages carry the English title; their Hindi title
     comes from evidence_corpus_cache.json."""
 
-    def __init__(self, hi_titles: dict[str, str] | None = None):
+    def __init__(self, hi_titles: dict[str, str] | None = None, strict: bool = False):
         self.hi_titles = hi_titles or {}
+        self.strict = strict
 
     @classmethod
-    def from_cache(cls, path: Path | str) -> "SubjectIndex":
+    def from_cache(cls, path: Path | str, strict: bool = False) -> "SubjectIndex":
         p = Path(path)
         if not p.exists():
-            return cls()
+            return cls(strict=strict)
         cache = json.loads(p.read_text(encoding="utf-8"))
-        return cls({(e.get("en_title") or k): e["hi_title"] for k, e in cache.items() if e.get("hi_title")})
+        return cls({(e.get("en_title") or k): e["hi_title"] for k, e in cache.items() if e.get("hi_title")},
+                   strict=strict)
 
     def names(self, passage_id: str) -> list[str]:
         if passage_id.startswith("wiki:"):
             _, _, rest = passage_id.split(":", 2)
-            return title_forms(rest.rsplit("::", 1)[0])
+            return title_forms(rest.rsplit("::", 1)[0], self.strict)
         parts = passage_id.split("::")
         title = parts[0]
-        forms = title_forms(title)
+        forms = title_forms(title, self.strict)
         if len(parts) > 1 and parts[1] == "hi" and title in self.hi_titles:
-            forms += title_forms(self.hi_titles[title])
+            forms += title_forms(self.hi_titles[title], self.strict)
         return forms
 
     def on_topic(self, claim: str, passage_id: str) -> bool:

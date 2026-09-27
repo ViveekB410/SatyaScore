@@ -332,9 +332,13 @@ _pipeline = DetectionPipeline(
 def load_starter_corpus():
     import numpy as np
     base = _Path(__file__).resolve().parent.parent
-    # Prefer the bigger demo corpus if built; else the experiment corpus.
+    # Prefer the largest corpus that is built: expanded (build_corpus_expanded.py:
+    # demo + downloaded articles + Wikipedia Vital Articles) > demo > experiment.
+    exp_p, exp_v = base / "corpus_passages_expanded.json", base / "corpus_vectors_expanded.npy"
     demo_p, demo_v = base / "corpus_passages_demo.json", base / "corpus_vectors_demo.npy"
-    if demo_p.exists() and demo_v.exists():
+    if exp_p.exists() and exp_v.exists():
+        passages_path, vectors_path = exp_p, exp_v
+    elif demo_p.exists() and demo_v.exists():
         passages_path, vectors_path = demo_p, demo_v
     else:
         passages_path = base / "corpus_passages.json"
@@ -377,10 +381,13 @@ def load_starter_corpus():
             # hallucinations caught 3 -> 3). SATYASCORE_WIKI_EXPANSION=false turns it off.
             # Needs internet; a failed lookup is skipped. Articles cached in instance/wiki_cache.
             if _os.environ.get("SATYASCORE_WIKI_EXPANSION", "true").lower() in ("1", "true", "yes"):
-                from member3_backend.wiki_expander import WikiExpander, indexed_titles_from_cache
+                from member3_backend.wiki_expander import (WikiExpander, indexed_titles_from_cache,
+                                                           indexed_titles_from_passages)
                 _pipeline.expander = WikiExpander(
                     _embedder, _retriever, base / "instance" / "wiki_cache",
-                    indexed=indexed_titles_from_cache(base / "evidence_corpus_cache.json"))
+                    # articles already in the loaded corpus are never added twice
+                    indexed=indexed_titles_from_cache(base / "evidence_corpus_cache.json")
+                    | indexed_titles_from_passages(passages))
                 print("[api] on-demand Wikipedia expansion ON", flush=True)
             # Optional LLM judge (SATYASCORE_LLM_VERIFIER = grounded | open). OFF by
             # default: adopted only if llm_verifier_eval.py meets its fixed rule. Needs

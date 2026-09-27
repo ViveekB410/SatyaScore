@@ -115,6 +115,27 @@ def accuracy(gold: np.ndarray, verdicts: np.ndarray) -> str:
             f"when it commits {right}/{committed} ({right / max(committed, 1):.0%})")
 
 
+def gated_on(sets: dict, evid: dict) -> dict:
+    """Scores under the gated evidence rule (member3_backend/evidence_rules.py) for
+    evidence given as (passage_id, text, similarity) per claim."""
+    from member3_backend.evidence_rules import SubjectIndex, aggregate
+    subjects = SubjectIndex.from_cache(ROOT / "evidence_corpus_cache.json")
+    out = {}
+    for name, df in sets.items():
+        ev_n = evid[name]
+        prem = [t for e in ev_n for _, t, _ in e]
+        hyp = [c for c, e in zip(df.claim_text, ev_n) for _ in e]
+        P = probs("mdeberta_base_xnli", prem, hyp)
+        scores, k = [], 0
+        for claim, e in zip(df.claim_text, ev_n):
+            rows = [(float(P[k + j, 0]), float(P[k + j, 2]), subjects.on_topic(claim, pid))
+                    for j, (pid, _, _) in enumerate(e)]
+            k += len(e)
+            scores.append(aggregate(rows))
+        out[name] = np.array(scores)
+    return out
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default=DEFAULT_MODEL)
@@ -140,8 +161,12 @@ def main() -> None:
         from wiki_expansion_eval import build_evidence
         base, exp, totals, n0, n1 = build_evidence(sets)
         ev = {n: [[t for _, t, _ in e] for e in exp[n]] for n in sets}
-        nli = nli_on({n: [[t for _, t, _ in e] for e in base[n]] for n in sets})  # the live system now
+        nli = nli_on({n: [[t for _, t, _ in e] for e in base[n]] for n in sets})  # live system when the rule was fixed
         extra["NLI on expanded evidence"] = nli_on(ev)
+        # Added 2026-09-28 after the live default changed to the gated evidence rule:
+        # REPORTED ONLY; the decision reference above stays as fixed.
+        extra["Gated rule, standard corpus"] = gated_on(sets, base)
+        extra["Live system after 2026-09-28 (gated rule + Wikipedia expansion)"] = gated_on(sets, exp)
         ref_label, suffix = "Live system now (NLI, standard corpus)", "_expanded"
 
     llm, finished = {}, {}

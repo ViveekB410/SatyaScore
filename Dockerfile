@@ -30,6 +30,8 @@ COPY member3_backend ./member3_backend
 # The API prefers the bigger demo corpus (corpus_*_demo.*) when present.
 COPY corpus_passages.json corpus_vectors.npy weights_en.json weights_hi.json ./
 COPY corpus_passages_demo.json corpus_vectors_demo.npy ./
+# evidence rule: Hindi article titles (member3_backend/evidence_rules.py); FR-04 P(Verified) tables
+COPY evidence_corpus_cache.json calibration_en.json calibration_hi.json ./
 
 ENV HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TOKENIZERS_PARALLELISM=false
 EXPOSE 8000

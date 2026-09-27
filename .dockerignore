@@ -9,9 +9,14 @@ iaa/
 figures/
 results/
 tests/
-# large/irrelevant data — the API only needs corpus_*.json/npy + weights_*.json (copied explicitly)
+# large/irrelevant data (evidence_corpus_cache.json is NOT ignored: the evidence rule needs its Hindi titles)
+# — the API only needs corpus_*.json/npy + weights_*.json (copied explicitly)
 *.csv
 raw_responses.json
-evidence_corpus_cache.json
 prd_extracted.txt
 *.ipynb
+# never bake user accounts, sessions or history into an image
+instance/
+# front-end dependencies/builds are not part of the API image
+web/
+frontend/

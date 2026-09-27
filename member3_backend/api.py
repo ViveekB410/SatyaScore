@@ -33,7 +33,7 @@ from pydantic import BaseModel, Field
 from starlette.middleware.cors import CORSMiddleware
 
 from member1_model.calibration import load_table, lookup
-from member1_model.cmhsa import CMHSAScorer, aggregate_document
+from member1_model.cmhsa import KG_NOTE, CMHSAScorer, aggregate_document
 from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
 from member2_data.entity_linker import EntityLinker
@@ -371,10 +371,12 @@ def load_starter_corpus():
                                                  [p["text"] for p in passages], mv)
                     _pipeline.retriever_muril = _retriever_muril
                     print(f"[api] MuRIL fallback index loaded ({muril_v.name})")
-            # On-demand Wikipedia expansion (FR-03 incremental indexing). OFF unless
-            # SATYASCORE_WIKI_EXPANSION=true: results/wiki_expansion.md did not meet
-            # its fixed adoption rule. Articles are cached under instance/wiki_cache.
-            if _os.environ.get("SATYASCORE_WIKI_EXPANSION", "false").lower() in ("1", "true", "yes"):
+            # On-demand Wikipedia expansion (FR-03 incremental indexing). ON by default:
+            # with the gated evidence rule it met its fixed adoption rule
+            # (results/unseen_eval.md: train correct 110 -> 125 of 303, false alarms 8 -> 8,
+            # hallucinations caught 3 -> 3). SATYASCORE_WIKI_EXPANSION=false turns it off.
+            # Needs internet; a failed lookup is skipped. Articles cached in instance/wiki_cache.
+            if _os.environ.get("SATYASCORE_WIKI_EXPANSION", "true").lower() in ("1", "true", "yes"):
                 from member3_backend.wiki_expander import WikiExpander, indexed_titles_from_cache
                 _pipeline.expander = WikiExpander(
                     _embedder, _retriever, base / "instance" / "wiki_cache",
@@ -454,6 +456,11 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
 
     def _calib(score):
         if table is None or not score.active_signals:  # no evidence -> no calibrated reading
+            return {}
+        # The table is fitted on NLI-rule scores. A score set by the KG (1.0 / 0.0) or by
+        # the LLM judge is on a different scale: looking it up would show e.g. a KG-caught
+        # hallucination with "P(Verified) 0.73". No calibrated reading for those.
+        if score.note and (score.note == KG_NOTE or score.note.startswith("judged by LLM")):
             return {}
         c = lookup(score.hallu_score, table)
         return {"p_verified": c.p_verified, "p_verified_ci95": list(c.ci95), "calibration_n": c.n}

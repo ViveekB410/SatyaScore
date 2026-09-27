@@ -334,11 +334,11 @@ def models_block() -> list[str]:
                  f"indexing; `results/wiki_expansion.md`): searching Wikipedia for each claim grew the index "
                  f"{grow.group(1)} → {grow.group(2)} passages (+{grow.group(3)} articles). Train NLI AUC "
                  f"{dauc.group(1)} → {dauc.group(2)} (Δ {dauc.group(3)} [{dauc.group(4)}, {dauc.group(5)}]): "
-                 f"**not adopted** under the fixed rule, so it is off by default (`SATYASCORE_WIKI_EXPANSION`). "
-                 f"It did make NLI commit more often: correct verdicts on train {tr_acc.group(1)} → "
-                 f"{tr_acc.group(3)} of {tr_acc.group(2)}; round 3 with the live KG rule {live.group(1)} → "
-                 f"{live.group(3)} of {live.group(2)} (report-only set). Better evidence did not improve "
-                 f"ranking: consistent with NLI being the limit on descriptive claims.")
+                 f"not adopted under that first rule (AUC, legacy evidence rule). It did make NLI commit more "
+                 f"often: correct verdicts on train {tr_acc.group(1)} → {tr_acc.group(3)} of {tr_acc.group(2)}; "
+                 f"round 3 with the live KG rule {live.group(1)} → {live.group(3)} of {live.group(2)} "
+                 f"(report-only set). Better evidence did not improve ranking: consistent with NLI being the "
+                 f"limit on descriptive claims. Re-evaluated with the gated rule below.")
     fresh = _find("results/aggregation_eval.md", r"\| gated \|[^\n]*\*\*(\d+)\*\* \((\d+)%\)[^\n]*\n\| legacy \|[^\n]*\*\*(\d+)\*\* \((\d+)%\)")
     caught = _find("results/aggregation_eval.md", r"## train[^\n]*\n\n- ROC-AUC legacy ([\d.]+) → gated ([\d.]+) \(Δ ([-+][\d.]+) \[([-+][\d.]+), ([-+][\d.]+)\]\)"
                    r"[\s\S]*?\| gated \| [^|]+\| [^|]+\| (\d+)/(\d+)[^\n]*\n\| legacy \| [^|]+\| [^|]+\| (\d+)/\d+")
@@ -351,6 +351,25 @@ def models_block() -> list[str]:
                  f"{caught.group(7)} (ΔAUC {caught.group(3)} [{caught.group(4)}, {caught.group(5)}]), failing the "
                  f"pre-fixed non-inferiority check. **Adopted as the live default as a recorded product choice** "
                  f"(prefer \"Uncertain\" over wrongly accusing genuine text); `legacy` remains available.")
+    p = Path("results/unseen_eval.md")
+    if p.exists():
+        text = p.read_text(encoding="utf-8")
+
+        def row(section: str, cfg: str):
+            m = re.search(re.escape(section) + r"[\s\S]*?\| " + re.escape(cfg) + r" \| (\d+)/(\d+) \((\d+)%\) \| "
+                          r"(\d+)/(\d+) \| \*\*(\d+)/\d+\*\* \([^)]*\) \| ([^|]+) \|", text)
+            return m.groups() if m else None
+        g, e = row("## train", "gated"), row("## train", "gated + expansion")
+        fg, fe = row("fresh", "gated"), row("fresh", "gated + expansion")
+        adopted = "Switch expansion on by default" in text
+        if g and e and fg and fe:
+            L.append(f"- **Unseen data** (`unseen_eval.py`, `results/unseen_eval.md`; rule fixed before running): "
+                     f"with the gated rule, Wikipedia expansion raised correct verdicts on train {g[0]} → {e[0]} "
+                     f"of {g[1]} with false alarms {g[5]} → {e[5]} and real hallucinations caught {g[6].strip()} → "
+                     f"{e[6].strip()}; on fresh true Wikipedia sentences, Verified {fg[3]} → {fe[3]} of {fg[4]} "
+                     f"and false alarms {fg[5]} → {fe[5]} (verbatim Wikipedia text, so flattering). "
+                     + ("**Adopted: expansion is on by default.** " if adopted else "Not adopted. ")
+                     + "Real hallucinations caught stay low: detection power is the LLM verifier's job.")
     L.append("- **LLM verifier** (`member1_model/llm_verifier.py`, gpt-oss-120b judging claim + retrieved "
              "passages, grounded and open modes): evaluation **in progress** (paused on the provider's daily "
              "quota); decision rule fixed before running. Not used by the live system.\n")

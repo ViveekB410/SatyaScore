@@ -201,8 +201,8 @@ class DetectionPipeline:
         self.nli_top_k = nli_top_k
         # Optional on-demand Wikipedia expansion (member3_backend/wiki_expander.py):
         # adds the articles found by searching each claim to the index before
-        # retrieval. Off by default: results/wiki_expansion.md did not meet the
-        # fixed rule (train AUC did not improve), though verdict accuracy rose.
+        # retrieval. The API switches it on by default (results/unseen_eval.md); a
+        # pipeline built without an expander does not expand.
         self.expander = expander
         # Optional LLM judge (member1_model/llm_verifier.py): for every claim the KG
         # did not decide, the LLM's verdict and P(true) on the same passages replace

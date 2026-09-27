@@ -27,7 +27,7 @@ import requests
 from collections import defaultdict
 from typing import Literal
 
-from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile, status
+from fastapi import Depends, FastAPI, File, Header, HTTPException, Request, UploadFile, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from starlette.middleware.cors import CORSMiddleware
@@ -38,36 +38,57 @@ from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
 from member2_data.entity_linker import EntityLinker
 from member2_data.wikidata_connector import WikidataConnector
+from member3_backend import auth
 from member3_backend.claim_extractor import ClaimExtractor
 from member3_backend.faiss_retriever import FAISSRetriever
 from member3_backend.pipeline import DetectionPipeline
 
-# --- Auth & rate limiting (dev-grade in-memory implementation) --------------
-# NOTE: intentionally simple (hardcoded keys, in-memory rate limit state)
-# for local dev/demo. Before deployment, swap VALID_API_KEYS for a real
-# store, and the rate limiter for something that survives a restart and
-# works across multiple worker processes (e.g. Redis).
+# --- Access & rate limiting -------------------------------------------------
+# Three kinds of caller:
+#   - scripts / tests: X-API-Key header (never sent by the web app);
+#   - signed-in web users: session cookie (member3_backend/auth.py); their
+#     analyses are saved to their own history;
+#   - anonymous web users: no key, no cookie; allowed, with a lower per-IP limit.
+# Rate-limit state is in-memory (one process). A multi-worker deployment needs a
+# shared store (e.g. Redis) instead.
 VALID_API_KEYS = {"dev-key-satyascore-2026"}
-RATE_LIMIT_PER_MINUTE = 100
+RATE_LIMIT_PER_MINUTE = 100          # per API key or per signed-in user
+ANON_RATE_LIMIT_PER_MINUTE = 20      # per IP, anonymous
 _request_log: dict[str, list[float]] = defaultdict(list)
+
+
+def _rate_limit(key: str, limit: int) -> None:
+    now = time.time()
+    _request_log[key] = [t for t in _request_log[key] if t > now - 60]
+    if len(_request_log[key]) >= limit:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Rate limit exceeded: {limit} requests/minute",
+        )
+    _request_log[key].append(now)
 
 
 def require_api_key(x_api_key: str = Header(..., description="API key for authentication")) -> str:
     if x_api_key not in VALID_API_KEYS:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key")
-
-    now = time.time()
-    window_start = now - 60
-    _request_log[x_api_key] = [t for t in _request_log[x_api_key] if t > window_start]
-
-    if len(_request_log[x_api_key]) >= RATE_LIMIT_PER_MINUTE:
-        raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail=f"Rate limit exceeded: {RATE_LIMIT_PER_MINUTE} requests/minute",
-        )
-
-    _request_log[x_api_key].append(now)
+    _rate_limit(x_api_key, RATE_LIMIT_PER_MINUTE)
     return x_api_key
+
+
+def resolve_caller(
+    request: Request,
+    x_api_key: str | None = Header(None, description="Optional API key (scripts); browsers use the session"),
+) -> dict | None:
+    """Returns the signed-in user, or None for an API-key or anonymous caller."""
+    if x_api_key is not None:
+        require_api_key(x_api_key)
+        return None
+    user = auth.current_user(request)
+    if user is not None:
+        _rate_limit(f"user:{user['id']}", RATE_LIMIT_PER_MINUTE)
+    else:
+        _rate_limit(f"ip:{auth.client_ip(request)}", ANON_RATE_LIMIT_PER_MINUTE)
+    return user
 
 
 # --- Request / response schemas ---------------------------------------------
@@ -105,8 +126,9 @@ class ClaimResult(BaseModel):
 
 
 class DocumentResult(BaseModel):
-    """Whole-text verdict: judged by the worst claim (any Hallucinated claim ->
-    Hallucinated; else any Uncertain -> Uncertain; else Verified)."""
+    """Whole-text verdict by share (member1_model/cmhsa.aggregate_document):
+    >= 1/3 of claims Hallucinated -> Hallucinated; else any Hallucinated or
+    Uncertain claim -> Uncertain; else Verified."""
     verdict: str
     n_claims: int
     n_verified: int
@@ -240,6 +262,9 @@ def parse_cors_origins(value: str | None) -> list[str]:
 
 
 _CORS_ORIGINS = parse_cors_origins(_os_cors.environ.get("SATYASCORE_CORS_ORIGINS"))
+# Accounts, sessions, per-user history, CSRF guard and security headers. Installed
+# before CORS so CORS stays the outermost layer (error responses keep CORS headers).
+auth.install(app, _CORS_ORIGINS)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_CORS_ORIGINS,
@@ -375,7 +400,7 @@ def _warmup_models() -> None:
 
 
 @app.post("/detect", response_model=DetectResponse)
-def detect(request: DetectRequest, api_key: str = Depends(require_api_key)) -> DetectResponse:
+def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) -> DetectResponse:
     if _retriever._index is None or len(_retriever) == 0:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -434,9 +459,16 @@ def detect(request: DetectRequest, api_key: str = Depends(require_api_key)) -> D
         overall_score=result.overall_score,
         processing_time_ms=result.processing_time_ms,
     )
+    extra: dict = {}
+    if user is not None:
+        # Signed-in web user: save to their history (server-side, owner-only).
+        extra["analysis_id"] = auth.save_analysis(user["id"], request.text, request.language,
+                                                  response.model_dump())
     if request.include_timings:
-        # Opt-in only, so the default response is byte-identical for existing consumers.
-        return JSONResponse(content={**response.model_dump(), "timings_ms": result.timings_ms})
+        extra["timings_ms"] = result.timings_ms
+    if extra:
+        # Only then: the default API-key response stays byte-identical for existing consumers.
+        return JSONResponse(content={**response.model_dump(), **extra})
     return response
 
 
@@ -444,7 +476,7 @@ MAX_UPLOAD_BYTES = 5 * 1024 * 1024
 
 
 @app.post("/extract-text")
-async def extract_text(file: UploadFile = File(...), api_key: str = Depends(require_api_key)) -> dict:
+async def extract_text(file: UploadFile = File(...), user: dict | None = Depends(resolve_caller)) -> dict:
     """FR-06 file upload: return the plain text of an uploaded .txt or .pdf so
     the dashboard can analyse it. PDF needs pdfminer.six in the API's Python."""
     data = await file.read()

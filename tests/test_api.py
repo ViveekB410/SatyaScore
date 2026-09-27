@@ -31,11 +31,21 @@ def test_health_endpoint_no_auth_required():
     assert response.json()["status"] == "ok"
 
 
-def test_detect_without_api_key_rejected():
+def test_detect_without_api_key_is_allowed_as_anonymous():
+    # Policy change (web login is optional): a request with no key and no session
+    # is an anonymous caller. It is not rejected for auth; here it reaches the
+    # "no index built" check. Anonymous callers get the lower per-IP rate limit.
     response = client.post("/detect", json={"text": "The sky is blue.", "language": "en"})
-    # Missing required header -> FastAPI returns 422, not 401, since the
-    # header itself is absent rather than present-but-invalid.
-    assert response.status_code == 422
+    assert response.status_code == 503
+
+
+def test_anonymous_callers_have_a_lower_rate_limit():
+    from member3_backend.api import ANON_RATE_LIMIT_PER_MINUTE
+    assert ANON_RATE_LIMIT_PER_MINUTE < RATE_LIMIT_PER_MINUTE
+    for _ in range(ANON_RATE_LIMIT_PER_MINUTE):
+        client.post("/detect", json={"text": "x", "language": "en"})
+    r = client.post("/detect", json={"text": "x", "language": "en"})
+    assert r.status_code == 429
 
 
 def test_detect_with_invalid_api_key_rejected():

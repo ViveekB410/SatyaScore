@@ -14,3 +14,7 @@ results/_vector_cache/
 
 # MuRIL fallback vectors (FR-02) -- re-buildable: python build_muril_index.py
 corpus_vectors*_muril.npy
+# user accounts / sessions / history database (never commit)
+instance/
+# NLI model-search probability cache -- re-buildable: python nli_model_search.py
+results/_nli_cache/

@@ -36,7 +36,7 @@ PRD pre-registered a negative result (§15) as acceptable.
 ## Backend — what's done
 
 - CMHSA pipeline + `/detect` API; three verdict tiers; threshold override; ablation mode.
-- **Whole-text verdict** (worst-claim rule) and per-claim scores in the API and UI.
+- **Whole-text verdict** (Hallucinated if ≥ 1/3 of claims are hallucinated; never Verified if any is) and per-claim scores in the API and UI.
 - **FR-04 confidence interval:** each claim returns P(Verified) with a 95% Wilson interval,
   fitted on the train split (`results/calibration.md`).
 - **FR-06 dashboard:** red/amber/green highlighting, HalluScore bar chart, CSV/JSON export,

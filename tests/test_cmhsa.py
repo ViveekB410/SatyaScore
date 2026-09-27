@@ -51,3 +51,21 @@ def test_no_active_signals_raises(scorer):
 def test_invalid_weight_sum_rejected(scorer):
     with pytest.raises(ValueError):
         scorer.load_weights("en", alpha=0.5, beta=0.5, gamma=0.5)
+
+# --- the KG decides when it answers (member1_model/cmhsa.KG_DECIDES) -------------
+
+def test_kg_supported_decides_over_a_contradicting_nli(scorer):
+    # "Gandhi was born in Porbandar": Wikidata supports it, NLI wrongly contradicts
+    s = scorer.score_claim(ClaimSubScores(claim_id="g", sem_sim=0.6, nli_prob=0.1, kg_conf=1.0), "en")
+    assert s.verdict is Verdict.VERIFIED and s.hallu_score == 1.0
+    assert s.note and "knowledge graph" in s.note
+
+
+def test_kg_contradiction_decides_over_a_supporting_nli(scorer):
+    s = scorer.score_claim(ClaimSubScores(claim_id="b", sem_sim=0.9, nli_prob=0.95, kg_conf=0.0), "hi")
+    assert s.verdict is Verdict.HALLUCINATED and s.hallu_score == 0.0
+
+
+def test_without_a_kg_answer_the_weighted_fusion_is_unchanged(scorer):
+    s = scorer.score_claim(ClaimSubScores(claim_id="n", sem_sim=0.2, nli_prob=0.8, kg_conf=None), "en")
+    assert s.hallu_score == pytest.approx(0.5 * 0.2 + 0.5 * 0.8) and s.note is None

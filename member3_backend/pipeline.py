@@ -163,7 +163,7 @@ class PipelineResult:
     processing_time_ms: float
     # Per-stage timings (ms): claim_extraction, embedding, retrieval, nli, kg, fusion, total.
     timings_ms: dict[str, float] = field(default_factory=dict)
-    document: DocumentSummary | None = None  # whole-text verdict (worst-claim rule)
+    document: DocumentSummary | None = None  # whole-text verdict (hallucinated-share rule)
 
 
 class DetectionPipeline:
@@ -351,6 +351,8 @@ class DetectionPipeline:
         """Returns kg_conf if the claim's entities+relation could be
         resolved to a Wikidata triple, else None (handled gracefully by
         the scorer's renormalisation — see module docstring)."""
+        if language == "hi":
+            return self._try_kg_verification_hi(claim_text)
         if self.claim_extractor is None:
             return None
         # No known relation phrase -> the claim can never link. Return before
@@ -375,3 +377,19 @@ class DetectionPipeline:
             alternatives=linked.object_candidates,
         )
         return verification.confidence
+
+    def _try_kg_verification_hi(self, claim_text: str) -> float | None:
+        """Hindi: template-based relation + exact Hindi-name linking
+        (EntityLinker.link_hindi_claim). The first same-named subject with a
+        definite answer is used; a namesake with no value gives no signal."""
+        from member2_data.entity_linker import hindi_relation_candidates
+        if not hindi_relation_candidates(claim_text):  # no template fits: no network call
+            return None
+        for linked in self.entity_linker.link_hindi_claim(claim_text):
+            v = self.wikidata.verify_triple(
+                subject_qid=linked.subject_qid, property_pid=linked.property_pid,
+                expected_value=linked.object_qid, language="hi",
+                alternatives=linked.object_candidates)
+            if v.status in ("supported", "contradicted"):
+                return v.confidence
+        return None

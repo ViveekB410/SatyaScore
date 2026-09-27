@@ -6,12 +6,20 @@ from member1_model import embeddings as emb
 from member1_model.cmhsa import Verdict, aggregate_document
 
 
-# --- 0.2 whole-text verdict (worst-claim rule) -------------------------------
+# --- 0.2 whole-text verdict (hallucinated-share rule, cut-off 1/3) -----------
 
-def test_any_hallucinated_claim_makes_the_document_hallucinated():
+def test_a_third_or_more_hallucinated_makes_the_document_hallucinated():
+    V, U, H = Verdict.VERIFIED, Verdict.UNCERTAIN, Verdict.HALLUCINATED
+    assert aggregate_document([V, V, H]).document_verdict is H        # exactly 1/3
+    assert aggregate_document([V, H, H, U]).document_verdict is H     # 1/2
+    assert aggregate_document([H]).document_verdict is H              # single claim
+    assert aggregate_document([V, V, V, H]).document_verdict is U     # 1/4: below the cut-off
+
+
+def test_a_few_hallucinated_claims_never_leave_the_document_verified():
     d = aggregate_document([Verdict.VERIFIED] * 9 + [Verdict.HALLUCINATED])
-    # a mean would call this ~90% fine; the document verdict must not hide it
-    assert d.document_verdict is Verdict.HALLUCINATED
+    # 1 in 10 is below the one-third cut-off, but the text is still not Verified
+    assert d.document_verdict is Verdict.UNCERTAIN
     assert (d.n_claims, d.n_verified, d.n_hallucinated) == (10, 9, 1)
     assert d.supported_fraction == pytest.approx(0.9)
 

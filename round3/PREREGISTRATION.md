@@ -116,3 +116,16 @@ The live system's settings: demo corpus, top-3 retrieval, relevance threshold 0.
 - **Re-run:** KG only (`round3_kg_fix.py` → `round3/signals_round3_kgfix.csv`,
   `results/round3_kg_fix_exploratory.md`). The locked signals and the pre-registered result are
   unchanged and remain the primary result; the re-run is reported as exploratory.
+
+## Exploratory analysis 2 — the KG decides when it answers (recorded 2026-09-27; NOT pre-registered)
+- **Change:** when the KG answers (supported / contradicted), its answer is the claim's score;
+  the NLI/KG fusion is used only when it has none (`member1_model/cmhsa.py`, `KG_DECIDES`).
+- **Evidence** (`round3_kg_decides.py` → `results/round3_kg_decides.md`, KG signals after
+  Exploratory analysis 1): in the 9 gold claims where KG and NLI disagreed by ≥ 0.5, the KG was
+  right 9 times. AUC vs 50/50 fusion: 0.848 → 0.872, ΔAUC +0.024 [−0.000, +0.083] (not
+  established); Hallucinated-F1 unchanged (0.649).
+- **Hindi KG path added:** Hindi relation templates (birth, death, capital, location) with
+  exact Hindi-name Wikidata linking; 11/11 live spot checks as expected. It cannot be
+  evaluated on existing labels: 0 of 190 Hindi gold claims (and 0 of 456 overall) are relational.
+- **Limit:** the KG checks one relation; other facts in the same claim are not checked when it
+  decides.

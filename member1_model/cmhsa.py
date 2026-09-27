@@ -65,12 +65,19 @@ class DocumentSummary:
     supported_fraction: float  # share of claims Verified
 
 
+# Whole-text rule: a text is Hallucinated when at least this share of its claims
+# is Hallucinated. (Earlier rule, changed on request: ANY Hallucinated claim made
+# the whole text Hallucinated, so nearly every long text was Hallucinated.)
+DOC_HALLUCINATED_SHARE = 1 / 3
+
+
 def aggregate_document(verdicts: list[Verdict | str]) -> DocumentSummary:
-    """Judge the whole text by its WORST claim -- the same rule annotators use
-    for a claim that bundles several facts: any Hallucinated claim makes the
-    text Hallucinated; otherwise any Uncertain claim makes it Uncertain;
-    otherwise Verified. A mean score would let one false claim among many true
-    ones average away, which is exactly what a hallucination check must not do.
+    """Whole-text verdict from the per-claim verdicts, by share:
+      - Hallucinated claims >= DOC_HALLUCINATED_SHARE of all claims -> Hallucinated;
+      - otherwise any Hallucinated or Uncertain claim -> Uncertain;
+      - otherwise (every claim Verified) -> Verified.
+    A text containing a hallucinated claim is therefore never Verified: one false
+    claim among many true ones cannot average away, as it would with a mean score.
     """
     if not verdicts:
         raise ValueError("aggregate_document needs at least one claim verdict")
@@ -78,9 +85,9 @@ def aggregate_document(verdicts: list[Verdict | str]) -> DocumentSummary:
     n_v = sum(v is Verdict.VERIFIED for v in vs)
     n_u = sum(v is Verdict.UNCERTAIN for v in vs)
     n_h = sum(v is Verdict.HALLUCINATED for v in vs)
-    if n_h:
+    if n_h and n_h * 3 >= len(vs):  # exact integer form of n_h / n >= 1/3
         doc = Verdict.HALLUCINATED
-    elif n_u:
+    elif n_h or n_u:
         doc = Verdict.UNCERTAIN
     else:
         doc = Verdict.VERIFIED
@@ -112,11 +119,24 @@ class _SoftmaxWeightModel(nn.Module):
         return sub_scores @ w
 
 
+# When the knowledge graph gives an answer (supported / contradicted), it decides
+# the claim; the weighted fusion is used only when it has none. Measured on the
+# round-3 relational pilot (results/round3_kg_decides.md, exploratory): in the 9
+# claims where the KG and NLI disagreed by >= 0.5 the KG was right 9 times; AUC
+# 0.848 -> 0.872 [-0.000, +0.083] vs 50/50 fusion. Language-neutral: applies to
+# any claim the KG can check (English and Hindi relation patterns).
+# Known limit: the KG checks one relation; other facts in the same claim are not
+# checked when it decides.
+KG_DECIDES = True
+KG_NOTE = "decided by the knowledge graph (Wikidata)"
+
+
 class CMHSAScorer:
     """
     Fuses SemSim, NLI_prob, and KG_conf into one HalluScore per claim, with
     language-specific weight sets and support for ablation mode (dropping
     one or more signals and re-normalising over whatever remains active).
+    If KG_DECIDES and the KG answered, the KG answer is the score.
     """
 
     def __init__(self):
@@ -159,8 +179,13 @@ class CMHSAScorer:
         if not active:
             raise ValueError(f"claim {sub_scores.claim_id}: no active signals to score")
 
-        weight_sum = sum(w for w, _ in active.values())
-        hallu_score = sum((w / weight_sum) * v for w, v in active.values())
+        note = None
+        if KG_DECIDES and "kg" in active:
+            hallu_score = float(sub_scores.kg_conf)
+            note = KG_NOTE
+        else:
+            weight_sum = sum(w for w, _ in active.values())
+            hallu_score = sum((w / weight_sum) * v for w, v in active.values())
         hallu_score = float(np.clip(hallu_score, 0.0, 1.0))
 
         return ClaimScore(
@@ -168,6 +193,7 @@ class CMHSAScorer:
             hallu_score=hallu_score,
             verdict=self._verdict(hallu_score),
             active_signals=list(active.keys()),
+            note=note,
         )
 
     def score_batch(

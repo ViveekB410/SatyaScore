@@ -67,9 +67,14 @@ def test_load_training_rows_raises_when_no_rows_for_language(tmp_path):
         load_training_rows(path, "mr")
 
 
-def test_fused_scores_matches_scorer_full_and_partial():
+def test_fused_scores_matches_scorer_full_and_partial(monkeypatch):
     """The whole point of the fix: training-time fusion == inference-time fusion,
-    including the renormalisation over present signals when one is missing."""
+    including the renormalisation over present signals when one is missing.
+    At inference a KG answer now overrides the fusion (cmhsa.KG_DECIDES), so the
+    fusion itself is compared with that rule switched off; the KG-missing row is
+    fused the same way either way."""
+    from member1_model import cmhsa
+    monkeypatch.setattr(cmhsa, "KG_DECIDES", False)
     scorer = CMHSAScorer()
     scorer.load_weights("en", alpha=0.5, beta=0.3, gamma=0.2)
     model = scorer._models["en"]  # reuse the exact same weights the scorer uses

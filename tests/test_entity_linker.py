@@ -170,3 +170,29 @@ def test_place_with_no_exactly_named_place_is_unlinked_not_contradicted():
     t = EntityLinker(session=session).link_claim(
         "Kanaklata Barua was born in Bodua.", "Kanaklata Barua", "Bodua")
     assert not t.linkable and t.object_candidates == ()
+
+# --- Hindi relation templates (no Hindi NER: the patterns find the spans) ----------
+
+from member2_data.entity_linker import hindi_relation_candidates
+
+
+def test_hindi_templates_read_birth_death_capital_and_location():
+    assert hindi_relation_candidates("महात्मा गांधी का जन्म 2 अक्टूबर 1869 को पोरबंदर में हुआ था।")[0] == (
+        "महात्मा गांधी", "पोरबंदर", "P19")
+    assert hindi_relation_candidates("स्वामी विवेकानंद का निधन कोलकाता में हुआ।")[0][2] == "P20"
+    assert hindi_relation_candidates("जापान की राजधानी टोक्यो है।") == [("जापान", "टोक्यो", "P36")]
+    assert hindi_relation_candidates("नई दिल्ली भारत की राजधानी है।") == [
+        ("नई", "दिल्ली भारत", "P1376"), ("नई दिल्ली", "भारत", "P1376")]
+    assert hindi_relation_candidates("पेरिस, फ्रांस की राजधानी है") == [("पेरिस", "फ्रांस", "P1376")]
+    assert hindi_relation_candidates("ताजमहल आगरा में स्थित है।") == [("ताजमहल", "आगरा", "P131")]
+    assert hindi_relation_candidates("सूर्य एक तारा है।") == []
+
+
+def test_hindi_linking_uses_only_a_split_where_both_names_match_exactly():
+    exact = {"नई दिल्ली": "Q987", "भारत": "Q668"}  # "नई" and "दिल्ली भारत" match nothing
+    session = MagicMock()
+    session.get.side_effect = lambda url, params, headers, timeout: _mock_search_response(
+        [{"id": exact[params["search"]], "match": {"text": params["search"]}, "description": "place"}]
+        if params["search"] in exact else [])
+    triples = EntityLinker(session=session).link_hindi_claim("नई दिल्ली भारत की राजधानी है।")
+    assert [(t.subject_qid, t.property_pid, t.object_qid) for t in triples] == [("Q987", "P1376", "Q668")]

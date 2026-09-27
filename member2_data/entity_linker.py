@@ -24,6 +24,7 @@ Expanding relation coverage is a good, scoped task for later — see the
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Literal
 
@@ -111,6 +112,44 @@ _NOT_A_PLACE = ("given name", "family name", "surname", "genus", "species",
                 "film", "album", "song", "novel", "opera")
 
 
+# Hindi relation templates. No Hindi NER model is wired in, so the patterns find
+# the subject and object spans themselves. Each yields (subject, object, PID)
+# candidates; ambiguous word boundaries give several, and only a split where BOTH
+# sides match a Wikidata item by exact Hindi name is used.
+_HI_PUNCT = re.compile(r"[\s।.!?]+$")
+_HI_LIFE = re.compile(r"^(.+?) (का जन्म|का निधन|की मृत्यु) (.+?) में (?:हुआ|हुई)")
+_HI_CAPITAL_OF = re.compile(r"^(.+?) की राजधानी (.+?) है$")      # "X की राजधानी Y है": country P36 city
+_HI_IS_CAPITAL = re.compile(r"^(.+) की राजधानी है$")               # "Y (,) X की राजधानी है": city P1376 country
+_HI_LOCATED = re.compile(r"^(.+) में स्थित (?:है|था|थी)$")          # "X Y में स्थित है": P131
+MAX_HI_CANDIDATES = 4
+
+
+def _splits(span: str, pid: str) -> list[tuple[str, str, str]]:
+    if "," in span:
+        s, o = span.split(",", 1)
+        return [(s.strip(), o.strip(), pid)]
+    toks = span.split()
+    return [(" ".join(toks[:k]), " ".join(toks[k:]), pid) for k in range(1, len(toks))]
+
+
+def hindi_relation_candidates(claim_text: str) -> list[tuple[str, str, str]]:
+    """(subject, object, PID) readings of a Hindi claim; empty if no template fits."""
+    t = _HI_PUNCT.sub("", " ".join(claim_text.split()))
+    out: list[tuple[str, str, str]] = []
+    if m := _HI_LIFE.match(t):
+        pid = "P19" if m.group(2) == "का जन्म" else "P20"
+        before = m.group(3).replace(",", " ").split()
+        # the place is the last word(s) before "में": "... 1869 को पोरबंदर में हुआ"
+        out += [(m.group(1), " ".join(before[-k:]), pid) for k in (1, 2) if len(before) >= k]
+    elif m := _HI_CAPITAL_OF.match(t):
+        out.append((m.group(1), m.group(2), "P36"))
+    elif m := _HI_IS_CAPITAL.match(t):
+        out += _splits(m.group(1), "P1376")
+    elif m := _HI_LOCATED.match(t):
+        out += _splits(m.group(1), "P131")
+    return [c for c in out if c[0] and c[1]][:MAX_HI_CANDIDATES]
+
+
 @dataclass
 class EntityMatch:
     surface_text: str
@@ -161,8 +200,9 @@ class EntityLinker:
 
     def search_places(self, text: str, language: Language = "en") -> tuple[str, ...] | None:
         """All items named exactly `text` (label or alias, any language, case-
-        insensitive) that are not obviously non-places. () if there are none,
-        None if the lookup failed."""
+        insensitive) that are not obviously non-places (the same filter also
+        suits people and countries). () if there are none, None if the lookup
+        failed."""
         try:
             response = polite_get(self._session, WIKIDATA_SEARCH_ENDPOINT, params={
                     "action": "wbsearchentities",
@@ -179,6 +219,24 @@ class EntityLinker:
             r["id"] for r in results
             if r.get("match", {}).get("text", "").strip().casefold() == name
             and not any(w in (r.get("description") or "").lower() for w in _NOT_A_PLACE))
+
+    def link_hindi_claim(self, claim_text: str) -> list[LinkedTriple]:
+        """Hindi path: the first template reading whose subject and object both
+        match Wikidata items by exact Hindi name. Returns one triple per
+        same-named subject (at most 3), so the caller can skip a namesake that
+        has no value for the property. Empty if nothing links."""
+        for subj, obj, pid in hindi_relation_candidates(claim_text):
+            subjects = self.search_places(subj, "hi")
+            if not subjects:
+                continue
+            objects = self.search_places(obj, "hi")
+            if not objects:
+                continue
+            place = pid in PLACE_PIDS
+            return [LinkedTriple(subject_qid=s, property_pid=pid, object_qid=objects[0], linkable=True,
+                                 object_candidates=objects if place else ())
+                    for s in subjects[:3]]
+        return []
 
     def find_relation_pid(self, claim_text: str) -> str | None:
         """Substring match against RELATION_TO_PID, case-insensitive. Tries the

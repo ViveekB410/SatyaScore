@@ -370,6 +370,18 @@ def models_block() -> list[str]:
                      f"and false alarms {fg[5]} → {fe[5]} (verbatim Wikipedia text, so flattering). "
                      + ("**Adopted: expansion is on by default.** " if adopted else "Not adopted. ")
                      + "Real hallucinations caught stay low: detection power is the LLM verifier's job.")
+    p = Path("results/topk_eval.md")
+    if p.exists():
+        t = p.read_text(encoding="utf-8")
+        cur = re.search(r"## train[\s\S]*?\| current \(top-3, loose\) \| (\d+)/(\d+) \([^)]*\) \| (\d+)/\d+ \| \*\*(\d+)/(\d+)\*\* \([^)]*\) \| (\d+)/(\d+)", t)
+        cand = re.search(r"## train[\s\S]*?\| candidate \(top-10, strict\) \| (\d+)/\d+ \([^)]*\) \| (\d+)/\d+ \| \*\*(\d+)/\d+\*\* \([^)]*\) \| (\d+)/\d+", t)
+        if cur and cand:
+            L.append(f"- **102,069-passage index** (`build_corpus_expanded.py`: base corpus + Wikipedia Vital Articles with "
+                     f"Hindi versions + expansion articles) and **top-10 passages per claim with strict title matching** "
+                     f"(`results/topk_eval.md`): on train, correct verdicts {cur.group(1)} → {cand.group(1)} of {cur.group(2)}, "
+                     f"true claims Verified {cur.group(3)} → {cand.group(2)}, real hallucinations caught {cur.group(6)} → "
+                     f"{cand.group(4)} of {cur.group(7)}, but false alarms {cur.group(4)} → {cand.group(3)} of {cur.group(5)}, "
+                     f"failing the pre-fixed check; **adopted as a recorded product choice**.")
     L.append("- **LLM verifier** (`member1_model/llm_verifier.py`, gpt-oss-120b judging claim + retrieved "
              "passages, grounded and open modes): evaluation **in progress** (paused on the provider's daily "
              "quota); decision rule fixed before running. Not used by the live system.\n")

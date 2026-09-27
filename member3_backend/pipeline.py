@@ -215,7 +215,7 @@ class DetectionPipeline:
         if aggregation not in AGGREGATION_RULES:
             raise ValueError(f"aggregation must be one of {list(AGGREGATION_RULES)}")
         self.aggregation = aggregation
-        self.subjects = subjects or SubjectIndex()
+        self.subjects = subjects or SubjectIndex(strict=True)
 
     def run(
         self,

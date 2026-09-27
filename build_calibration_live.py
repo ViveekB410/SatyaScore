@@ -23,7 +23,8 @@ import numpy as np
 from aggregation_eval import rows_for
 from member1_model.calibration import fit_bins, lookup
 from member3_backend.evidence_rules import RULES
-from member3_backend.wiki_expander import WikiExpander, indexed_titles_from_cache
+from member3_backend.wiki_expander import (WikiExpander, indexed_titles_from_cache,
+                                           indexed_titles_from_passages)
 from nli_model_search import load_sets
 
 ROOT = Path(__file__).resolve().parent
@@ -42,8 +43,11 @@ def main() -> None:
     sets = load_sets()
     train, test = sets["train"], sets["test"]
     if args.expansion:
+        # as the API: articles already in the loaded corpus must not be added again
+        # (without this the 102,069-passage corpus gained ~22,700 duplicate passages)
+        loaded = indexed_titles_from_passages([{"id": pid} for pid in api._retriever._passage_ids])
         ex = WikiExpander(api._embedder, api._retriever, ROOT / "results" / "_wiki_cache",
-                          indexed=indexed_titles_from_cache(ROOT / "evidence_corpus_cache.json"))
+                          indexed=indexed_titles_from_cache(ROOT / "evidence_corpus_cache.json") | loaded)
         claims = [(c, l) for df in (train, test) for c, l in zip(df.claim_text, df.language)]
         for k in range(0, len(claims), BATCH):
             ex.expand(claims[k:k + BATCH])
@@ -51,7 +55,9 @@ def main() -> None:
     for df in (train, test):
         df["score"] = [rule(r) for r in rows_for(api, df.claim_text.tolist(), df.language.tolist())]
 
-    config = f"live pipeline: aggregation={args.aggregation}, expansion={'on' if args.expansion else 'off'}"
+    config = (f"live pipeline: aggregation={args.aggregation}, expansion={'on' if args.expansion else 'off'}, "
+              f"top-{api._pipeline.nli_top_k} passages, strict titles={api._pipeline.subjects.strict}, "
+              f"index {len(api._retriever):,} passages")
     L = ["# Calibration — FR-04 confidence interval (live scores)\n",
          f"Scores from the {config} (retrieval, NLI, evidence rule exactly as the API). Each HalluScore "
          "is reported with **P(Verified)** and a **95% Wilson interval**: the share of TRAIN claims in the "

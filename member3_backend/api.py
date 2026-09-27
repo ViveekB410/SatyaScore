@@ -319,14 +319,17 @@ _pipeline = DetectionPipeline(
     nli_scorer=_nli_scorer,
     entity_linker=_entity_linker,
     wikidata=_wikidata,
-    nli_top_k=3,  # top-3 for accuracy — batched NLI (one forward pass) keeps it fast
+    # Passages NLI reads per claim. 10 on the 102,069-passage index: a recorded product
+    # choice (results/topk_eval.md): train correct 130 -> 170 of 303, false alarms 8 -> 11.
+    nli_top_k=int(_os_cors.environ.get("SATYASCORE_NLI_TOP_K", "10")),
     # Evidence aggregation (member3_backend/evidence_rules.py): SATYASCORE_AGGREGATION
     # = gated | legacy. Default "gated" is a PRODUCT choice recorded in
     # results/aggregation_eval.md: it cut false alarms on fresh true statements
     # 33 -> 8 of 99 but failed the pre-fixed non-inferiority check (c) and catches
     # far fewer real hallucinations (train 11 -> 3 of 45). "legacy" restores the old rule.
     aggregation=_os_cors.environ.get("SATYASCORE_AGGREGATION", "gated"),
-    subjects=SubjectIndex.from_cache(_Path(__file__).resolve().parent.parent / "evidence_corpus_cache.json"),
+    subjects=SubjectIndex.from_cache(_Path(__file__).resolve().parent.parent / "evidence_corpus_cache.json",
+                                     strict=True),  # results/topk_eval.md
 )
 @app.on_event("startup")
 def load_starter_corpus():

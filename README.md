@@ -25,7 +25,8 @@ Ready when it prints `Application startup complete`. API docs: http://localhost:
 cd web
 npm run dev
 ```
-Open **http://localhost:5173** — the status pill should read *Online · 9,351 passages*.
+Open **http://localhost:5173** — the status pill should read *Online · 102,069 passages* (or *9,351* if the
+expanded corpus has not been built on this machine; see First-time setup).
 
 Internet is needed for Wikidata (knowledge-graph checks) and web fonts; without it the app still
 runs, with no KG verdicts. With an NVIDIA GPU and the CUDA build of PyTorch, a check takes a few
@@ -38,7 +39,9 @@ python -m venv .venv
 .venv\Scripts\python.exe -m spacy download en_core_web_sm
 # optional GPU: CUDA build of PyTorch (match your installed torch version)
 .venv\Scripts\python.exe -m pip install "torch==<version>" --index-url https://download.pytorch.org/whl/cu130
-cd web; npm install
+cd web; npm install; cd ..
+# the 102,069-passage index (git-ignored, ~380 MB; ~45 min, mostly polite Wikipedia downloads)
+.venv\Scripts\python.exe build_corpus_expanded.py
 ```
 
 ---
@@ -48,9 +51,9 @@ cd web; npm install
 | Stage | What it does | Code |
 |---|---|---|
 | Claim extraction (FR-01) | English: dependency-parse decomposition + coreference, with a sentence-level safety net. Hindi: sentence-level | `member3_backend/claim_extractor.py` |
-| Retrieval (FR-02/03) | XLM-R embeddings; FAISS IVF index over **9,351 Wikipedia passages** (7,361 EN, 1,990 HI, 245 articles); top-3 passages above a relevance cut | `member1_model/embeddings.py`, `member3_backend/faiss_retriever.py` |
+| Retrieval (FR-02/03) | XLM-R embeddings; FAISS IVF index over **102,069 Wikipedia passages** (89,594 EN, 12,475 HI): the 245-article base corpus + 3,021 more articles (Wikipedia Vital Articles and their Hindi versions, plus articles fetched by expansion) built by `build_corpus_expanded.py`; **top-10 passages** per claim above a relevance cut (a recorded product choice, `results/topk_eval.md`) | `member1_model/embeddings.py`, `member3_backend/faiss_retriever.py` |
 | NLI | `mDeBERTa-v3-base-mnli-xnli` judges each claim against each passage | `member1_model/nli_scorer.py` |
-| Evidence rule | **Support first; only an on-topic passage (its article title appears in the claim) may contradict; no usable evidence → Uncertain.** Stops "about something else" being read as "false" (false alarms on fresh true statements 33 → 8 of 99), at the cost of catching fewer real hallucinations until the LLM verifier is added — a recorded product choice, `results/aggregation_eval.md`. `SATYASCORE_AGGREGATION=legacy` restores the old rule | `member3_backend/evidence_rules.py` |
+| Evidence rule | **Support first; only an on-topic passage (its article title appears in the claim; long titles such as "Comparison of X and Y" must match in full) may contradict; no usable evidence → Uncertain.** Stops "about something else" being read as "false" (false alarms on fresh true statements 33 → 8 of 99), at the cost of catching fewer real hallucinations until the LLM verifier is added — a recorded product choice, `results/aggregation_eval.md`. `SATYASCORE_AGGREGATION=legacy` restores the old rule | `member3_backend/evidence_rules.py` |
 | Knowledge graph | Wikidata: birthplace, place of death, capital, location, office, founder… English relation phrases and **Hindi relation templates**; place names (and all Hindi names) matched by exact name, so a place is never linked to a same-named non-place | `member2_data/entity_linker.py`, `member2_data/wikidata_connector.py` |
 | Scoring (CMHSA, FR-04) | **When the KG answers, it decides the claim**; otherwise the trained weighted fusion. Verdicts: < 0.35 Hallucinated, 0.35–0.65 Uncertain, > 0.65 Verified; calibrated P(Verified) with a 95% interval | `member1_model/cmhsa.py`, `member1_model/calibration.py` |
 | Whole text | Hallucinated if ≥ 1/3 of claims are Hallucinated; else Uncertain if any claim is Hallucinated or Uncertain; else Verified | `member1_model/cmhsa.py` (`aggregate_document`) |
@@ -117,6 +120,8 @@ python analyze_round3.py; python round3_kg_fix.py; python round3_kg_decides.py
 python nli_model_search.py          # GPU recommended
 python llm_verifier_eval.py         # needs GROQ_API_KEY in your own shell; resumable
 python wiki_expansion_eval.py       # Wikipedia index expansion; GPU recommended
+python diagnose_true_claims.py; python aggregation_eval.py; python unseen_eval.py; python topk_eval.py
+python build_calibration_live.py --expansion   # P(Verified) tables on live scores
 # the summary (reads everything above)
 .venv\Scripts\python.exe generate_results_summary.py
 ```

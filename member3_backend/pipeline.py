@@ -225,8 +225,8 @@ class DetectionPipeline:
         self.subjects = subjects or SubjectIndex(strict=True)
         # Optional professional fact-checks (member2_data/factcheck.py): a fact-check
         # of THE SAME claim with a clear rating decides it (member3_backend/
-        # factcheck_rules.py), for every claim the KG did not decide. Off by default;
-        # adopted only if factcheck_eval.py meets its fixed rule.
+        # factcheck_rules.py), for every claim the KG did not decide. None here; the
+        # API switches it on (it met its fixed rule, results/factcheck_eval.md).
         self.fact_checker = fact_checker
 
     def run(

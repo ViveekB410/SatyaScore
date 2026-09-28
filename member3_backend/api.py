@@ -418,10 +418,12 @@ def load_starter_corpus():
                 has_key = bool(_os.environ.get("GROQ_API_KEY"))
                 print(f"[api] LLM judge ON ({llm_mode}); GROQ_API_KEY "
                       f"{'set' if has_key else 'MISSING: claims will fall back to NLI'}", flush=True)
-            # Optional professional fact-checks (Google Fact Check Tools API). OFF by
-            # default: adopted only if factcheck_eval.py meets its fixed rule. Needs
-            # GOOGLE_FACTCHECK_KEY in the server's environment (never logged).
-            if _os.environ.get("SATYASCORE_FACTCHECK", "false").lower() in ("1", "true", "yes"):
+            # Professional fact-checks (Google Fact Check Tools API). ON by default: met
+            # its fixed adoption rule (results/factcheck_eval.md: 0 wrong decisions on all
+            # sets; rumours caught 3 -> 10 of 25; true claims marked Hallucinated 1 -> 1 of
+            # 15). SATYASCORE_FACTCHECK=false turns it off. Needs GOOGLE_FACTCHECK_KEY in
+            # the server's environment (never logged); without it no fact-check is found.
+            if _os.environ.get("SATYASCORE_FACTCHECK", "true").lower() in ("1", "true", "yes"):
                 from member2_data.factcheck import FactChecker
                 _pipeline.fact_checker = FactChecker(cache_dir=base / "instance" / "factcheck_cache")
                 print(f"[api] fact-checks ON; GOOGLE_FACTCHECK_KEY "

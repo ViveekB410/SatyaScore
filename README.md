@@ -29,7 +29,9 @@ Open **http://localhost:5173** — the status pill should read *Online · 102,06
 expanded corpus has not been built on this machine; see First-time setup).
 
 Internet is needed for Wikidata (knowledge-graph checks) and web fonts; without it the app still
-runs, with no KG verdicts. With an NVIDIA GPU and the CUDA build of PyTorch, a check takes a few
+runs, with no KG verdicts. Professional fact-checks need a free Google API key with the
+"Fact Check Tools API" enabled, set in the backend's terminal before starting it (never commit or
+share it): `$env:GOOGLE_FACTCHECK_KEY = "..."`; without it the app runs with no fact-checks. With an NVIDIA GPU and the CUDA build of PyTorch, a check takes a few
 seconds; on CPU about 25 s per short passage.
 
 ### First-time setup
@@ -55,6 +57,7 @@ cd web; npm install; cd ..
 | NLI | `mDeBERTa-v3-base-mnli-xnli` judges each claim against each passage | `member1_model/nli_scorer.py` |
 | Evidence rule | **Support first; only an on-topic passage (its article title appears in the claim; long titles such as "Comparison of X and Y" must match in full) may contradict; no usable evidence → Uncertain.** Stops "about something else" being read as "false" (false alarms on fresh true statements 33 → 8 of 99), at the cost of catching fewer real hallucinations until the LLM verifier is added — a recorded product choice, `results/aggregation_eval.md`. `SATYASCORE_AGGREGATION=legacy` restores the old rule | `member3_backend/evidence_rules.py` |
 | Knowledge graph | Wikidata: birthplace, place of death, capital, location, office, founder… English relation phrases and **Hindi relation templates**; place names (and all Hindi names) matched by exact name, so a place is never linked to a same-named non-place | `member2_data/entity_linker.py`, `member2_data/wikidata_connector.py` |
+| Professional fact-checks | **On by default** (needs `GOOGLE_FACTCHECK_KEY`, see below). Google Fact Check Tools API (PIB, Factly, Vishvas News, BOOM, AFP, Snopes…). A fact-check decides a claim only if its rating logically carries over, judged by NLI: rated False → our claim must entail the checked claim; rated True → the checked claim must entail ours; any contradiction (e.g. a negation) or a qualified rating ("Misleading", "Partly false") → no decision. Met its fixed rule: 0 wrong decisions on all sets, rumours caught 3 → 10 of 25 (`results/factcheck_eval.md`). `$env:SATYASCORE_FACTCHECK = "false"` turns it off | `member2_data/factcheck.py`, `member3_backend/factcheck_rules.py` |
 | Scoring (CMHSA, FR-04) | **When the KG answers, it decides the claim**; otherwise the trained weighted fusion. Verdicts: < 0.35 Hallucinated, 0.35–0.65 Uncertain, > 0.65 Verified; calibrated P(Verified) with a 95% interval | `member1_model/cmhsa.py`, `member1_model/calibration.py` |
 | Whole text | Hallucinated if ≥ 1/3 of claims are Hallucinated; else Uncertain if any claim is Hallucinated or Uncertain; else Verified | `member1_model/cmhsa.py` (`aggregate_document`) |
 | Wikipedia expansion | **On by default.** Searches Wikipedia for each claim and adds the articles it finds to the index without a rebuild (FR-03), so topics outside the 245-article corpus get real evidence. With the evidence rule it raised correct verdicts on train 110 → 125 of 303 with no more false alarms, and on fresh true Wikipedia sentences 43% → 78% Verified (`results/unseen_eval.md`). Needs internet; a failed lookup is skipped; a first-time topic adds a few seconds. `$env:SATYASCORE_WIKI_EXPANSION = "false"` turns it off | `member3_backend/wiki_expander.py` |
@@ -99,12 +102,12 @@ AI-assisted and annotator-verified. Every figure, with confidence intervals and 
 
 ```
 member1_model/     embeddings, NLI, CMHSA scoring + calibration, LLM verifier (under evaluation)
-member2_data/      Wikidata connector, entity linker (EN + HI), annotation schema, IAA
+member2_data/      Wikidata connector, entity linker (EN + HI), fact-check client, annotation schema, IAA
 member3_backend/   API, accounts (auth.py), pipeline, claim extractor, FAISS retriever
 web/               web app (current)            frontend/  earlier dashboard (fallback)
 round3/            pre-registration, questions, claims, annotator sheets, signals
 results/           every measured result (*.md, *.csv)
-tests/             193 tests
+tests/             206 tests
 ```
 
 ## Reproducing the results
@@ -121,6 +124,7 @@ python analyze_round3.py; python round3_kg_fix.py; python round3_kg_decides.py
 python nli_model_search.py          # GPU recommended
 python llm_verifier_eval.py         # needs GROQ_API_KEY in your own shell; resumable
 python wiki_expansion_eval.py       # Wikipedia index expansion; GPU recommended
+python factcheck_eval.py            # professional fact-checks; needs GOOGLE_FACTCHECK_KEY in your own shell
 python diagnose_true_claims.py; python aggregation_eval.py; python unseen_eval.py; python topk_eval.py
 python build_calibration_live.py --expansion   # P(Verified) tables on live scores
 # the summary (reads everything above)

@@ -10,8 +10,8 @@ made, what the results are, and what its limits are. Every number here comes fro
 
 Large language models (ChatGPT-style chatbots) often state false facts confidently — this is called
 **hallucination**. **SatyaScore** takes an AI-generated answer in **English or Hindi**, splits it into
-individual factual **claims**, checks each claim against **Wikipedia** passages and the **Wikidata**
-knowledge graph, and marks every claim **Verified**, **Uncertain** or **Hallucinated** — highlighted
+individual factual **claims**, checks each claim against **Wikipedia** passages, the **Wikidata**
+knowledge graph and **professional fact-checks**, and marks every claim **Verified**, **Uncertain** or **Hallucinated** — highlighted
 in place in the original text, with a verdict for the whole text and a link to the source that
 decided each claim. It runs as a full web application with accounts and history, on a laptop GPU,
 in a few seconds per check.
@@ -61,11 +61,14 @@ with 11 players per team. The capital of Japan is Beijing. Mahatma Gandhi was bo
                                       6. Evidence rule ........... combine passages safely
                                       7. Knowledge graph ......... Wikidata check (people,
                                                                    places, capitals…)
+                                      7b. Fact-checks ............ professional fact-checks of
+                                                                   the same claim (Google API)
                                       8. Scoring (CMHSA) ......... claim verdict
                                       9. Whole-text verdict, P(Verified), sources
  highlighted text, verdicts,  ◄──────
  sources, history, export             Sources: 102,069 Wikipedia passages (EN + HI, on disk)
                                                + live Wikipedia + live Wikidata
+                                               + professional fact-checks
 ```
 
 Code map: `member1_model/` (embeddings, NLI, scoring, calibration, LLM verifier) ·
@@ -159,6 +162,24 @@ of 99 (`results/aggregation_eval.md`).
 **Why:** it is structured, curated data — in the round-3 study it was right on every claim it
 answered (12/12), while NLI was wrong on 9 claims where they disagreed (`results/round3_kg_decides.md`).
 
+### Step 7b — Professional fact-checks (`member2_data/factcheck.py`, `member3_backend/factcheck_rules.py`)
+**What:** each claim the KG did not decide is searched in the **Google Fact Check Tools API**, which
+collects verdicts published by professional fact-checkers (PIB Fact Check, Factly, Vishvas News,
+BOOM, AFP, Snopes…), in English and Hindi. A fact-check decides the claim only when its rating
+logically carries over, judged by the NLI model:
+- rated **False** → our claim must *entail* the checked claim (if ours implies a false statement, ours is false);
+- rated **True** → the checked claim must entail ours;
+- **no contradiction** in either direction, so "hot water does **not** cure COVID" is never marked
+  false because "hot water cures COVID" was;
+- qualified ratings ("Misleading", "Partly false", "Mostly true") and disagreeing fact-checks decide nothing.
+
+**Why:** Wikipedia rarely discusses viral rumours, so the NLI step leaves them Uncertain; fact-checkers
+exist for exactly these. **Measured** (`results/factcheck_eval.md`, rule fixed before running):
+0 wrong decisions on every set (including 8 negated true claims with 7–10 fact-checks found each);
+rumours caught **3 → 10 of 25**; true claims marked Hallucinated unchanged (1 of 15). On the annotated
+chatbot claims no fact-check applied (they are not rumours), so those results are unchanged.
+Needs a free Google API key in the backend's environment (`GOOGLE_FACTCHECK_KEY`).
+
 ### Step 8 — Scoring (CMHSA, `member1_model/cmhsa.py`)
 The PRD formula: **HalluScore = α·SemSim + β·NLI + γ·KG**, weights learned per language
 (`weights_en.json`, `weights_hi.json`). Training set α (semantic similarity) to **0**: similarity
@@ -173,7 +194,7 @@ measures *topic*, not *truth* (below chance in Hindi). When the KG answers, it o
 - **P(Verified) with a 95% interval** (PRD FR-04; `member1_model/calibration.py`): the share of
   training claims with a similar score that were truly Verified. Honestly reported: for English the
   score adds little beyond the base rate (`results/calibration.md`).
-- **Sources:** each claim shows the article (or Wikidata) that decided it, linked.
+- **Sources:** each claim shows the article, Wikidata check or fact-check that decided it, linked.
 
 ### Optional, not yet switched on — LLM verifier (`member1_model/llm_verifier.py`)
 A large language model (gpt-oss-120b via Groq) reads the claim and its passages and gives a verdict.
@@ -209,7 +230,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 | Data | SQLite (`instance/satyascore.db`, never committed): users, sessions, each user's saved checks |
 | Rate limits | 100 checks/min per signed-in user or API key; 20/min per network when anonymous |
 | Speed | NVIDIA GPU (RTX 4050): typically **1–5 s per check**; a topic seen for the first time can take 10–15 s (live Wikipedia/Wikidata lookups) |
-| Quality | **200 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
+| Quality | **206 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
 
 ---
 
@@ -231,6 +252,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 |---|---|---|
 | **Wikipedia (English + Hindi)** | evidence passages (102,069 stored + live search) | largest open, multilingual, citable encyclopedia; covers Hindi; free official API; the PRD names it |
 | **Wikidata** | knowledge-graph facts (birthplace, capital, location, office, founder…) | structured, curated facts with Hindi labels; free official API; the PRD names it |
+| **Google Fact Check Tools API** | professional fact-checks of viral claims (EN + HI) | verdicts by accredited fact-checkers (PIB, Factly, Vishvas News, AFP…) in the open ClaimReview standard; free official API; each result links to the fact-check article |
 | **Wikipedia Vital Articles** | which articles to pre-load | ~1,000 core topics chosen by Wikipedia editors: broad, neutral coverage |
 | Groq (llama-3.3-70b, gpt-oss-120b, qwen3.8-27b) | generating the chatbot answers used as **test data** | real LLM output, as the system will see in use |
 

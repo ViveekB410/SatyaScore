@@ -1,0 +1,41 @@
+claim_id,language,claim_text,gold_verdict,basis
+r_en_01,en,Drinking hot water kills the coronavirus.,Hallucinated,WHO COVID-19 myth busters; widely fact-checked
+r_en_02,en,5G mobile networks spread COVID-19.,Hallucinated,WHO COVID-19 myth busters
+r_en_03,en,The new 2000 rupee note contains a GPS nano chip.,Hallucinated,RBI; widely fact-checked in India (2016)
+r_en_04,en,UNESCO declared Jana Gana Mana the best national anthem in the world.,Hallucinated,widely fact-checked hoax
+r_en_05,en,Eating garlic prevents infection with the coronavirus.,Hallucinated,WHO COVID-19 myth busters
+r_en_06,en,Holding your breath for ten seconds without coughing shows that you do not have COVID-19.,Hallucinated,WHO COVID-19 myth busters
+r_en_07,en,UNESCO declared Narendra Modi the best prime minister in the world.,Hallucinated,widely fact-checked hoax
+r_en_08,en,COVID-19 vaccines contain microchips.,Hallucinated,widely fact-checked conspiracy claim
+r_en_09,en,COVID-19 vaccines make people magnetic.,Hallucinated,widely fact-checked claim
+r_en_10,en,Drinking cow urine cures COVID-19.,Hallucinated,widely fact-checked claim; no evidence
+r_en_11,en,Spraying alcohol on your body kills the coronavirus inside your body.,Hallucinated,WHO COVID-19 myth busters
+r_en_12,en,Mosquito bites spread the coronavirus.,Hallucinated,WHO COVID-19 myth busters
+r_en_13,en,Taking a hot bath prevents COVID-19.,Hallucinated,WHO COVID-19 myth busters
+r_en_14,en,Drinking alcohol protects you against COVID-19.,Hallucinated,WHO COVID-19 myth busters
+r_en_15,en,Exposure to sunlight above 25 degrees Celsius prevents COVID-19.,Hallucinated,WHO COVID-19 myth busters
+t_en_01,en,Drinking hot water does not kill the coronavirus.,Verified,negation of r_en_01 (WHO)
+t_en_02,en,5G mobile networks do not spread COVID-19.,Verified,negation of r_en_02 (WHO)
+t_en_03,en,COVID-19 vaccines do not contain microchips.,Verified,negation of r_en_08
+t_en_04,en,Mosquito bites do not spread the coronavirus.,Verified,negation of r_en_12 (WHO)
+t_en_05,en,Taking a hot bath does not prevent COVID-19.,Verified,negation of r_en_13 (WHO)
+t_en_06,en,Jana Gana Mana is the national anthem of India.,Verified,Constitution of India; Wikipedia
+t_en_07,en,Rabindranath Tagore wrote Jana Gana Mana.,Verified,Wikipedia
+t_en_08,en,The 2000 rupee note was introduced in India in 2016.,Verified,RBI; Wikipedia
+t_en_09,en,COVID-19 is caused by the SARS-CoV-2 virus.,Verified,WHO; Wikipedia
+t_en_10,en,Narendra Modi became the prime minister of India in 2014.,Verified,Wikipedia
+r_hi_01,hi,गर्म पानी पीने से कोरोना वायरस मर जाता है।,Hallucinated,WHO COVID-19 myth busters; widely fact-checked
+r_hi_02,hi,2000 रुपये के नए नोट में जीपीएस चिप लगी है।,Hallucinated,RBI; widely fact-checked in India (2016)
+r_hi_03,hi,यूनेस्को ने जन गण मन को दुनिया का सबसे अच्छा राष्ट्रगान घोषित किया है।,Hallucinated,widely fact-checked hoax
+r_hi_04,hi,5जी टावर से कोरोना वायरस फैलता है।,Hallucinated,WHO COVID-19 myth busters
+r_hi_05,hi,गोमूत्र पीने से कोरोना ठीक हो जाता है।,Hallucinated,widely fact-checked claim; no evidence
+r_hi_06,hi,कोरोना वैक्सीन लगवाने के बाद शरीर पर चुंबक चिपकने लगता है।,Hallucinated,widely fact-checked claim
+r_hi_07,hi,लहसुन खाने से कोरोना संक्रमण से बचाव होता है।,Hallucinated,WHO COVID-19 myth busters
+r_hi_08,hi,यूनेस्को ने नरेंद्र मोदी को दुनिया का सर्वश्रेष्ठ प्रधानमंत्री घोषित किया है।,Hallucinated,widely fact-checked hoax
+r_hi_09,hi,मच्छर के काटने से कोरोना वायरस फैलता है।,Hallucinated,WHO COVID-19 myth busters
+r_hi_10,hi,शराब पीने से कोरोना वायरस से बचाव होता है।,Hallucinated,WHO COVID-19 myth busters
+t_hi_01,hi,गर्म पानी पीने से कोरोना वायरस नहीं मरता है।,Verified,negation of r_hi_01 (WHO)
+t_hi_02,hi,5जी टावर से कोरोना वायरस नहीं फैलता है।,Verified,negation of r_hi_04 (WHO)
+t_hi_03,hi,2000 रुपये का नोट 2016 में जारी किया गया था।,Verified,RBI; Wikipedia
+t_hi_04,hi,जन गण मन भारत का राष्ट्रगान है।,Verified,Constitution of India; Wikipedia
+t_hi_05,hi,कोरोना वैक्सीन में माइक्रोचिप नहीं होती है।,Verified,negation of r_en_08

@@ -25,7 +25,15 @@ export interface SourceRef {
   title: string
   language: string // "en" | "hi" | "mul" (Wikidata)
   url: string
-  role: 'supports' | 'contradicts' | 'knowledge graph' | 'checked'
+  role: 'supports' | 'contradicts' | 'knowledge graph' | 'fact-check' | 'checked'
+  rating?: string | null // fact-check only: the publisher's own rating, e.g. "False"
+}
+
+/** What kind of reference this is, for the "(…)" after its name. */
+export function sourceKind(s: SourceRef): string {
+  if (s.role === 'fact-check') return s.rating ? `fact-check: ${s.rating}` : 'fact-check'
+  if (s.role === 'knowledge graph' || s.language === 'mul') return 'knowledge graph'
+  return 'Wikipedia'
 }
 
 // Whole-text verdict: Hallucinated when >= 1/3 of claims are Hallucinated.

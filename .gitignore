@@ -25,3 +25,4 @@ results/_wiki_cache/
 # expanded evidence corpus (>100 MB, GitHub's file limit) -- rebuild: python build_corpus_expanded.py
 corpus_passages_expanded.json
 corpus_vectors_expanded.npy
+results/_factcheck_cache/

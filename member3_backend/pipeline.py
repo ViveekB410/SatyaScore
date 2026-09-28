@@ -50,6 +50,9 @@ from member2_data.entity_linker import EntityLinker
 from member2_data.wikidata_connector import WikidataConnector
 from member3_backend.claim_extractor import ClaimExtractor, ExtractedClaim
 from member3_backend.evidence_rules import RULES as AGGREGATION_RULES, SubjectIndex, deciding
+from member3_backend.factcheck_rules import FC_FALSE_SCORE, FC_NOTE_PREFIX, FC_TRUE_SCORE
+from member3_backend.factcheck_rules import decide as decide_fact_check
+from member3_backend.factcheck_rules import match as match_fact_checks
 from member3_backend.faiss_retriever import FAISSRetriever
 
 Language = Literal["en", "hi", "mr"]
@@ -187,6 +190,7 @@ class DetectionPipeline:
         llm_verifier=None,
         aggregation: str = "gated",
         subjects: SubjectIndex | None = None,
+        fact_checker=None,
     ):
         self.embedder = embedder
         self.retriever = retriever
@@ -219,6 +223,11 @@ class DetectionPipeline:
             raise ValueError(f"aggregation must be one of {list(AGGREGATION_RULES)}")
         self.aggregation = aggregation
         self.subjects = subjects or SubjectIndex(strict=True)
+        # Optional professional fact-checks (member2_data/factcheck.py): a fact-check
+        # of THE SAME claim with a clear rating decides it (member3_backend/
+        # factcheck_rules.py), for every claim the KG did not decide. Off by default;
+        # adopted only if factcheck_eval.py meets its fixed rule.
+        self.fact_checker = fact_checker
 
     def run(
         self,
@@ -233,7 +242,7 @@ class DetectionPipeline:
         """
         timings = {k: 0.0 for k in
                    ("claim_extraction", "expansion", "embedding", "retrieval", "nli", "kg", "llm",
-                    "fusion", "total")}
+                    "factcheck", "fusion", "total")}
         t_start = time.perf_counter()
 
         t = time.perf_counter()
@@ -357,6 +366,14 @@ class DetectionPipeline:
             scores = [s if s.note == KG_NOTE else self._llm_judge(s, claim_texts[i], per_claim[i]["passages"])
                       for i, s in enumerate(scores)]
             timings["llm"] = (time.perf_counter() - t_llm) * 1000
+        fact_checks: list[dict | None] = [None] * len(scores)
+        if self.fact_checker is not None and self.nli_scorer is not None:
+            t_fc = time.perf_counter()
+            for i, s in enumerate(scores):
+                if s.note == KG_NOTE:
+                    continue
+                scores[i], fact_checks[i] = self._fact_check(s, claim_texts[i], language)
+            timings["factcheck"] = (time.perf_counter() - t_fc) * 1000
 
         # overall_score (mean) is kept for backward compatibility; `document`
         # is the whole-text verdict and should be what a reader looks at.
@@ -373,8 +390,31 @@ class DetectionPipeline:
             processing_time_ms=timings["total"],
             timings_ms=timings,
             document=document,
-            evidence=[{"passage_ids": pc["passage_ids"], "deciding": pc["deciding"]} for pc in per_claim],
+            evidence=[{"passage_ids": pc["passage_ids"], "deciding": pc["deciding"], "fact_check": fc}
+                      for pc, fc in zip(per_claim, fact_checks)],
         )
+
+    def _fact_check(self, score: ClaimScore, claim_text: str, language: Language
+                    ) -> tuple[ClaimScore, dict | None]:
+        """A fact-check of the same claim with a clear rating replaces the score;
+        otherwise (none found, none matching, mixed rating, lookup failed) it stays."""
+        try:
+            checks = self.fact_checker.search(claim_text, language)
+            m = decide_fact_check(match_fact_checks(claim_text, language, checks, self.embedder, self.nli_scorer))
+        except Exception:
+            return score, None
+        if m is None:
+            return score, None
+        fc = m.check
+        false = fc.verdict == "false"
+        info = {"publisher": fc.publisher, "rating": fc.rating, "url": fc.url, "claim_text": fc.claim_text,
+                "verdict": fc.verdict}
+        return ClaimScore(
+            claim_id=score.claim_id, hallu_score=FC_FALSE_SCORE if false else FC_TRUE_SCORE,
+            verdict=Verdict.HALLUCINATED if false else Verdict.VERIFIED,
+            active_signals=[*score.active_signals, "factcheck"],
+            note=f"{FC_NOTE_PREFIX} {fc.publisher or 'a fact-checker'}: rated \"{fc.rating}\"",
+        ), info
 
     def _llm_judge(self, score: ClaimScore, claim_text: str, passages: list[str]) -> ClaimScore:
         """The LLM's verdict for one claim (the KG did not decide it). Falls back to

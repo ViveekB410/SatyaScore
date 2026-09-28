@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Claim, Language, Verdict } from '@/lib/types'
+import { sourceKind, type Claim, type Language, type Verdict } from '@/lib/types'
 import { VERDICT } from '@/lib/verdicts'
 import { cn } from '@/lib/utils'
 
@@ -54,6 +54,7 @@ const ROLE_TEXT: Record<string, string> = {
   supports: 'supported by',
   contradicts: 'contradicted by',
   'knowledge graph': 'decided by',
+  'fact-check': 'fact-checked by',
 }
 
 /** The source that decided this claim's verdict, linked; otherwise how many were checked. */
@@ -71,8 +72,8 @@ function EvidenceLine({ claim }: { claim: Claim }) {
              className="text-navy underline decoration-rule underline-offset-2 hover:decoration-navy">
             {deciding.title}
           </a>{' '}
-          ({deciding.role === 'knowledge graph' ? 'knowledge graph' : 'Wikipedia'})
-          {others > 0 && `; ${others} more article${others > 1 ? 's' : ''} checked`}
+          ({sourceKind(deciding)})
+          {others > 0 && `; ${others} ${deciding.role === 'fact-check' ? 'Wikipedia ' : 'more '}article${others > 1 ? 's' : ''} checked`}
         </>
       ) : (
         `Evidence: ${sources.length} Wikipedia article${sources.length > 1 ? 's' : ''} checked; none clearly states or contradicts this claim`

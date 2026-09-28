@@ -34,6 +34,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 from member1_model.calibration import load_table, lookup
 from member1_model.cmhsa import KG_NOTE, CMHSAScorer, aggregate_document
+from member3_backend.factcheck_rules import FC_NOTE_PREFIX
 from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
 from member2_data.entity_linker import EntityLinker
@@ -110,11 +111,14 @@ class DetectRequest(BaseModel):
 
 class SourceRef(BaseModel):
     """A reference a claim was checked against. role: "supports" / "contradicts" (it
-    decided the verdict), "knowledge graph" (Wikidata decided it), or "checked"."""
+    decided the verdict), "knowledge graph" (Wikidata decided it), "fact-check" (a
+    professional fact-check of the same claim decided it; title is the publisher,
+    rating its own wording) or "checked"."""
     title: str
     language: str
     url: str
-    role: Literal["supports", "contradicts", "knowledge graph", "checked"]
+    role: Literal["supports", "contradicts", "knowledge graph", "fact-check", "checked"]
+    rating: str | None = None
 
 
 class ClaimResult(BaseModel):
@@ -414,6 +418,15 @@ def load_starter_corpus():
                 has_key = bool(_os.environ.get("GROQ_API_KEY"))
                 print(f"[api] LLM judge ON ({llm_mode}); GROQ_API_KEY "
                       f"{'set' if has_key else 'MISSING: claims will fall back to NLI'}", flush=True)
+            # Optional professional fact-checks (Google Fact Check Tools API). OFF by
+            # default: adopted only if factcheck_eval.py meets its fixed rule. Needs
+            # GOOGLE_FACTCHECK_KEY in the server's environment (never logged).
+            if _os.environ.get("SATYASCORE_FACTCHECK", "false").lower() in ("1", "true", "yes"):
+                from member2_data.factcheck import FactChecker
+                _pipeline.fact_checker = FactChecker(cache_dir=base / "instance" / "factcheck_cache")
+                print(f"[api] fact-checks ON; GOOGLE_FACTCHECK_KEY "
+                      f"{'set' if FactChecker.available() else 'MISSING: no fact-checks will be found'}",
+                      flush=True)
             return
         print("[api] corpus cache size mismatch — falling back to Wikipedia fetch")
 
@@ -481,7 +494,7 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
         # The table is fitted on NLI-rule scores. A score set by the KG (1.0 / 0.0) or by
         # the LLM judge is on a different scale: looking it up would show e.g. a KG-caught
         # hallucination with "P(Verified) 0.73". No calibrated reading for those.
-        if score.note and (score.note == KG_NOTE or score.note.startswith("judged by LLM")):
+        if score.note and (score.note == KG_NOTE or score.note.startswith(("judged by LLM", FC_NOTE_PREFIX))):
             return {}
         c = lookup(score.hallu_score, table)
         return {"p_verified": c.p_verified, "p_verified_ci95": list(c.ci95), "calibration_n": c.n}
@@ -491,11 +504,15 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
     def _sources(i: int, score) -> list[SourceRef]:
         ev = result.evidence[i] if i < len(result.evidence) else {"passage_ids": [], "deciding": None}
         refs, seen = [], set()
+        fc = ev.get("fact_check")
+        if fc and (score.note or "").startswith(FC_NOTE_PREFIX):
+            refs.append(SourceRef(title=fc["publisher"] or "Fact-check", language=request.language,
+                                  url=fc["url"], role="fact-check", rating=fc["rating"]))
         if score.note == KG_NOTE:
             refs.append(SourceRef(title="Wikidata", language="mul", url="https://www.wikidata.org/",
                                   role="knowledge graph"))
         # the NLI's deciding passage is only "the" source when NLI made the verdict
-        nli_decided = score.note != KG_NOTE and not (score.note or "").startswith("judged by LLM")
+        nli_decided = score.note != KG_NOTE and not (score.note or "").startswith(("judged by LLM", FC_NOTE_PREFIX))
         deciding = ev.get("deciding") if nli_decided else None
         order = ([deciding[0]] if deciding else []) + list(ev.get("passage_ids", []))
         for pid in order:

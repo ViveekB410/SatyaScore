@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import type { Claim, SourceRef } from '@/lib/types'
+import { sourceKind, type Claim, type SourceRef } from '@/lib/types'
 
 /** One line: the references that decided a verdict (supported, contradicted, or
  * Wikidata), de-duplicated and linked. Nothing when none decided anything. */
@@ -22,7 +22,7 @@ export default function SourcesList({ claims }: { claims: Claim[] }) {
              className="text-navy underline decoration-rule underline-offset-2 hover:decoration-navy">
             {s.title}
           </a>
-          {s.language !== 'mul' && ' (Wikipedia)'}
+          {s.role === 'fact-check' ? ` (${sourceKind(s)})` : s.language !== 'mul' && ' (Wikipedia)'}
         </Fragment>
       ))}
     </p>

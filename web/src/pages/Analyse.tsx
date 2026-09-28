@@ -250,11 +250,8 @@ export default function Analyse() {
           </section>
         </Reveal>
 
-        <Reveal order={4}>
+        <div className="space-y-3 border-t border-rule pt-6">
           <SourcesList claims={analysis.claims} />
-        </Reveal>
-
-        <div className="border-t border-rule pt-6">
           <Button variant="outline" onClick={checkAnother}>
             Check another passage
           </Button>

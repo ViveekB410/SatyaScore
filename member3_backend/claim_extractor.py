@@ -139,8 +139,30 @@ _nlp_cache: dict[str, SpacyLanguage] = {}
 
 def _get_english_pipeline() -> SpacyLanguage:
     if "en" not in _nlp_cache:
-        _nlp_cache["en"] = spacy.load("en_core_web_sm")
+        nlp = spacy.load("en_core_web_sm")
+        nlp.add_pipe("paragraph_breaks", before="parser")
+        _nlp_cache["en"] = nlp
     return _nlp_cache["en"]
+
+
+def _possessive(referent: str, pronoun: Token) -> str:
+    """A possessive pronoun ("his", "her", "its", "their") is replaced by the
+    referent's possessive form: "the tomb of his wife" -> "... of Shah Jahan's wife",
+    not "... of Shah Jahan wife"."""
+    if pronoun.tag_ != "PRP$":
+        return referent
+    return referent + ("'" if referent.endswith("s") else "'s")
+
+
+@SpacyLanguage.component("paragraph_breaks")
+def _paragraph_breaks(doc: Doc) -> Doc:
+    """A blank line always ends a sentence. Without this a heading with no full stop
+    ("🩸 Dengue warning signs 🚨") was glued onto the next sentence as one claim.
+    Single line breaks are left to the parser: PDF text breaks lines mid-sentence."""
+    for tok in doc[:-1]:
+        if tok.is_space and tok.text.count("\n") >= 2:
+            doc[tok.i + 1].is_sent_start = True
+    return doc
 
 
 # --- Claim quality: the ONE definition of a "broken" claim --------------------
@@ -233,7 +255,83 @@ class ClaimExtractor:
 
     # -- English: dependency-based decomposition + coreference --------------
 
+    # A lead-in line ending in ":" followed by short list lines. Each verb-less item
+    # ("Severe abdominal pain") says nothing on its own and used to be dropped, while
+    # the lead-in alone became a meaningless claim ("Seek urgent medical care if
+    # there is."). Joined, each item is a checkable claim of its own.
+    _LIST_ITEM_MAX = 160
+    _ITEM_MARKER = re.compile(r"^[\s\-*•·–—]*(?:\d+[.)]\s*)?")
+
+    def _extract_list_items(self, text: str) -> tuple[list[ExtractedClaim], str]:
+        """Claims "<lead-in> <item>." for verb-less list items, each spanning its own
+        item line; returns them with the text to parse normally, in which the used
+        lead-in and items are blanked (LENGTH-PRESERVING, offsets stay valid)."""
+        lines, pos = [], 0
+        for raw in text.splitlines(keepends=True):
+            lines.append((pos, raw.rstrip("\r\n")))
+            pos += len(raw)
+        made: list[ExtractedClaim] = []
+        blank: list[tuple[int, int]] = []
+        i = 0
+        while i < len(lines):
+            start, raw = lines[i]
+            lead = raw.strip()
+            if not (lead.endswith(":") and len(lead) > 3):
+                i += 1
+                continue
+            j = i + 1
+            while j < len(lines) and not lines[j][1].strip():
+                j += 1  # blank lines between the lead-in and its first item
+            items = []
+            while j < len(lines):
+                r = lines[j][1].strip()
+                if not r or r.endswith(":") or len(r) > self._LIST_ITEM_MAX:
+                    break
+                items.append(lines[j])
+                j += 1
+            intro = lead[:-1].strip()
+            used = []
+            for item_start, item_raw in items if len(items) >= 2 else []:
+                marker = self._ITEM_MARKER.match(item_raw).end()
+                item = item_raw[marker:].strip().rstrip(".;,")
+                if not item or is_well_formed_claim(item + ".", "en"):
+                    continue  # empty, or a full sentence: normal extraction handles it
+                first = item.split()[0]
+                if first[:1].isupper() and first[1:].islower():
+                    item = item[0].lower() + item[1:]  # "Severe pain" -> "... severe pain"; keeps "WHO"
+                claim = f"{intro} {item}."
+                if not is_well_formed_claim(claim, "en"):
+                    continue
+                s = item_start + marker + (len(item_raw[marker:]) - len(item_raw[marker:].lstrip()))
+                e = item_start + len(item_raw.rstrip())
+                used.append((claim, s, e))
+                blank.append((item_start, item_start + len(item_raw)))
+            if used:
+                blank.append((start, start + len(raw)))  # the lead-in lives on in each item's claim
+                made += [ExtractedClaim(claim_id="", text=c, start_char=s, end_char=e,
+                                        extraction_method="list_item") for c, s, e in used]
+            i = max(j, i + 1)
+        chars = list(text)
+        for s, e in blank:
+            chars[s:e] = [" "] * (e - s)
+        return made, "".join(chars)
+
     def _extract_english(self, text: str) -> list[ExtractedClaim]:
+        list_claims, text = self._extract_list_items(text)
+        claims = self._extract_english_sentences(text)
+        for c in claims:
+            # a whole-sentence span may run over blanked (list) text; trim to its own words
+            # so it cannot overlap the list items' spans (the page skips overlapping marks)
+            while c.start_char < c.end_char and text[c.start_char].isspace():
+                c.start_char += 1
+            while c.end_char > c.start_char and text[c.end_char - 1].isspace():
+                c.end_char -= 1
+        claims = sorted(claims + list_claims, key=lambda c: c.start_char)
+        for k, c in enumerate(claims):
+            c.claim_id = f"claim_{k}"
+        return claims
+
+    def _extract_english_sentences(self, text: str) -> list[ExtractedClaim]:
         doc = _get_english_pipeline()(text)
         referents = self._build_pronoun_referents(doc)
 
@@ -361,7 +459,7 @@ class ClaimExtractor:
             if t.text.lower() in ALL_PRONOUNS:
                 ref = referents.get(t.i)
                 if ref:
-                    parts.append(ref + t.whitespace_)
+                    parts.append(_possessive(ref, t) + t.whitespace_)
                     continue
                 had_unresolved = True
             parts.append(t.text_with_ws)
@@ -509,7 +607,7 @@ class ClaimExtractor:
             if lowered in ALL_PRONOUNS:
                 referent = referents.get(tid)
                 if referent:
-                    words.append(referent)
+                    words.append(_possessive(referent, doc[tid]))
                 else:
                     had_unresolved = True
                     words.append(token.text)

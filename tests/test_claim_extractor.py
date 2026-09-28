@@ -200,3 +200,40 @@ def test_quality_rule_false_positives_are_fixed():
     # a genuinely stripped % is still caught
     assert claim_quality("The candidate with more than 50 of the total votes is elected.",
                          "en") == ("broken", "stripped_symbol")
+
+
+def test_list_items_after_a_lead_in_become_claims_on_their_own_lines(extractor):
+    # reported: only the lead-in was a claim ("Seek urgent medical care if there is.")
+    # and the six warning signs under it were never checked
+    text = ("Dengue is spread by Aedes mosquitoes.\n\nSeek urgent medical care if there is:\n\n"
+            "Severe abdominal pain\nPersistent vomiting\nVery little urine\n\nMost people recover within two weeks.")
+    claims = extractor.extract(text, "en")
+    assert [c.text for c in claims] == [
+        "Dengue is spread by Aedes mosquitoes.",
+        "Seek urgent medical care if there is severe abdominal pain.",
+        "Seek urgent medical care if there is persistent vomiting.",
+        "Seek urgent medical care if there is very little urine.",
+        "Most people recover within two weeks.",
+    ]
+    assert text[claims[1].start_char:claims[1].end_char] == "Severe abdominal pain"  # highlighted on its own line
+    spans = sorted((c.start_char, c.end_char) for c in claims)
+    assert all(a[1] <= b[0] for a, b in zip(spans, spans[1:]))  # no overlaps: every item gets highlighted
+
+
+def test_bulleted_items_join_their_lead_in_and_full_sentence_items_stay_as_they_are(extractor):
+    text = ("Common symptoms include:\n- High fever\n- Severe headache\n\n"
+            "The rules are:\n1. The virus spreads through mosquito bites.\n2. It does not spread from person to person.")
+    texts = [c.text for c in extractor.extract(text, "en")]
+    assert texts[:2] == ["Common symptoms include high fever.", "Common symptoms include severe headache."]
+    assert "The virus spreads through mosquito bites." in texts
+    assert not any(t.startswith("The rules are") for t in texts)
+
+
+def test_a_heading_before_a_blank_line_is_not_glued_to_the_next_sentence(extractor):
+    text = "\U0001FA78 Dengue warning signs \U0001F6A8\n\nDengue is spread by Aedes mosquitoes."
+    assert [c.text for c in extractor.extract(text, "en")] == ["Dengue is spread by Aedes mosquitoes."]
+
+
+def test_a_possessive_pronoun_becomes_a_possessive_name(extractor):
+    claims = extractor.extract("Marie Curie won two Nobel Prizes. Her research was on radioactivity.", "en")
+    assert claims[1].text == "Marie Curie's research was on radioactivity."

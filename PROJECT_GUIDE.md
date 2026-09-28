@@ -33,6 +33,20 @@ in a few seconds per check.
 
 ## 3. How to run it (demo)
 
+### 3.1 One-time setup: the fact-check key
+Professional fact-checks need a free Google API key (Google Cloud Console → enable **Fact Check
+Tools API** → Credentials → Create API key). Save it once for your Windows account, in your own
+terminal, then close and reopen the terminal:
+
+```powershell
+[Environment]::SetEnvironmentVariable("GOOGLE_FACTCHECK_KEY", "your-key", "User")
+[bool][Environment]::GetEnvironmentVariable("GOOGLE_FACTCHECK_KEY", "User")   # True = saved (key not shown)
+```
+
+The key is never stored in the project or on GitHub. Without it, the app runs normally with no
+fact-checks.
+
+### 3.2 Start it
 Two terminals in the project folder:
 
 ```powershell
@@ -40,10 +54,52 @@ Two terminals in the project folder:
 cd web; npm run dev                                                           # web app
 ```
 
-Open **http://localhost:5173**. The status pill shows *Online · 102,069 passages*. Internet is needed
-(Wikipedia/Wikidata lookups). Try: *"Cricket is a bat-and-ball sport played between two teams usually
-with 11 players per team. The capital of Japan is Beijing. Mahatma Gandhi was born in Delhi."*
-→ Verified, Hallucinated, Hallucinated, each with its source.
+The backend is ready when it prints `Application startup complete`. It should also print
+`fact-checks ON; GOOGLE_FACTCHECK_KEY set`. Open **http://localhost:5173**; the status pill shows
+*Online · 102,069 passages*. Internet is needed (Wikipedia, Wikidata and fact-check lookups).
+
+**Before the audience arrives:** sign in and run each example below once. Lookups are then cached
+(faster), and every check is saved in **History**: a backup if the internet is slow.
+
+### 3.3 Demo script (about 10 minutes)
+The results below were checked on the live system.
+
+| # | Paste this | Expected result | What it shows |
+|---|---|---|---|
+| 1 | *Cricket is a bat-and-ball sport played between two teams usually with 11 players per team. The capital of Japan is Beijing. Mahatma Gandhi was born in Delhi.* | **Verified** (Cricket, Wikipedia) · **Hallucinated** (Beijing, Wikipedia) · **Hallucinated** (Wikidata); whole text Hallucinated | claim-by-claim checking, in-place highlights, three kinds of evidence, the source of every verdict |
+| 2 | *UNESCO declared Narendra Modi the best prime minister in the world.* | **Hallucinated**, "fact-checked by FACTLY (fact-check: FALSE)", linked | professional fact-checks; click the link to show the real article |
+| 3 | *Drinking hot water does not kill the coronavirus.* | **not** Hallucinated (Verified), although fact-checks exist for "hot water kills coronavirus" | safety: a fact-check counts only if it is about the same claim; negations are blocked |
+| 4 | *यूनेस्को ने नरेंद्र मोदी को दुनिया का सर्वश्रेष्ठ प्रधानमंत्री घोषित किया है।* (language on **Auto**) | **Hallucinated**, fact-checked by विश्वास न्यूज (Vishvas News) | Hindi end to end; language detected automatically |
+| 5 | a short answer from any chatbot, or a built-in example | claims grouped by verdict | **Show scores**, **Export** (CSV/JSON), **History** |
+
+Then walk through the pipeline diagram (§4) and, optionally, the API docs at
+http://localhost:8000/docs.
+
+**What to say at each step:**
+1. *The problem:* "Chatbots state false facts confidently, and usually only one sentence of an
+   answer is wrong. SatyaScore checks each claim separately, in English and Hindi, and shows the
+   source for every verdict."
+2. *Live growth:* the passage count in the status pill rises during the demo. When a claim is about
+   a topic the index lacks, the matching Wikipedia article is fetched and added on the spot. The text
+   users paste is never added as evidence.
+3. *Numbers* (all in `results/`):
+   - fresh true sentences wrongly flagged: 33% → 3%;
+   - the knowledge graph was right on 12/12 claims it answered;
+   - fact-checks: 0 wrong decisions, rumours caught 3 → 10 of 25;
+   - every rule was fixed before its test was run.
+4. *Limits (say them openly):* hallucinations are caught reliably only where Wikidata or a
+   fact-checker covers them. Otherwise the answer is usually **Uncertain**, a deliberate choice not
+   to call true text false. Hindi has less evidence. The LLM verifier is built but not yet evaluated.
+
+### 3.4 If something goes wrong
+
+| Problem | Fix |
+|---|---|
+| A check takes 10–15 s | normal for a topic seen for the first time (live Wikipedia lookup); or open the saved check from **History** |
+| Page stuck on "Connecting" | the backend is not running or still loading: check its terminal |
+| Page goes blank after an edit to the code | restart the web app (`npm run dev`) and reload with Ctrl + Shift + R |
+| No fact-checks shown | the backend was started from a terminal opened before the key was saved: open a new terminal and restart it |
+| No internet | stored passages still work; Wikidata and fact-checks do not. Use saved checks in **History** |
 
 ---
 

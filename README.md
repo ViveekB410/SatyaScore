@@ -63,8 +63,9 @@ cd web; npm install; cd ..
 ## Web app and accounts
 
 `web/` (Vite + React + TypeScript): highlighted text, whole-text verdict, claims grouped by
-verdict, language auto-detection, optional scores, `.txt`/`.pdf` upload, CSV/JSON export, and
-per-user history. Sign-up is open and sign-in optional: anyone can check text; signed-in checks
+verdict, language auto-detection, optional scores, `.txt`/`.pdf` upload, CSV/JSON export,
+per-user history, and a **Sources** list: every Wikipedia article (English/Hindi) and Wikidata check
+behind the verdicts, linked, with the one that decided each claim marked. Sign-up is open and sign-in optional: anyone can check text; signed-in checks
 are saved to the user's own history on the server. Passwords are scrypt-hashed, sessions use
 HttpOnly cookies, cross-site requests and repeated failed sign-ins are refused — details in
 **`web/README.md`**. User data lives in `instance/satyascore.db` (git-ignored).

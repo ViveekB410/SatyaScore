@@ -40,7 +40,7 @@ from member2_data.entity_linker import EntityLinker
 from member2_data.wikidata_connector import WikidataConnector
 from member3_backend import auth
 from member3_backend.claim_extractor import ClaimExtractor
-from member3_backend.evidence_rules import SubjectIndex
+from member3_backend.evidence_rules import SubjectIndex, passage_source
 from member3_backend.faiss_retriever import FAISSRetriever
 from member3_backend.pipeline import DetectionPipeline
 
@@ -108,6 +108,15 @@ class DetectRequest(BaseModel):
     )
 
 
+class SourceRef(BaseModel):
+    """A reference a claim was checked against. role: "supports" / "contradicts" (it
+    decided the verdict), "knowledge graph" (Wikidata decided it), or "checked"."""
+    title: str
+    language: str
+    url: str
+    role: Literal["supports", "contradicts", "knowledge graph", "checked"]
+
+
 class ClaimResult(BaseModel):
     claim_id: str
     text: str
@@ -124,6 +133,8 @@ class ClaimResult(BaseModel):
     p_verified: float | None = None
     p_verified_ci95: list[float] | None = None
     calibration_n: int | None = None
+    # Where the claim was checked (Wikipedia articles, Wikidata), deciding one first.
+    sources: list[SourceRef] = []
 
 
 class DocumentResult(BaseModel):
@@ -475,6 +486,27 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
         c = lookup(score.hallu_score, table)
         return {"p_verified": c.p_verified, "p_verified_ci95": list(c.ci95), "calibration_n": c.n}
 
+    hi_titles = _pipeline.subjects.hi_titles
+
+    def _sources(i: int, score) -> list[SourceRef]:
+        ev = result.evidence[i] if i < len(result.evidence) else {"passage_ids": [], "deciding": None}
+        refs, seen = [], set()
+        if score.note == KG_NOTE:
+            refs.append(SourceRef(title="Wikidata", language="mul", url="https://www.wikidata.org/",
+                                  role="knowledge graph"))
+        # the NLI's deciding passage is only "the" source when NLI made the verdict
+        nli_decided = score.note != KG_NOTE and not (score.note or "").startswith("judged by LLM")
+        deciding = ev.get("deciding") if nli_decided else None
+        order = ([deciding[0]] if deciding else []) + list(ev.get("passage_ids", []))
+        for pid in order:
+            title, lang, url = passage_source(pid, hi_titles)
+            if (lang, title) in seen:
+                continue
+            seen.add((lang, title))
+            role = deciding[1] if deciding and pid == deciding[0] else "checked"
+            refs.append(SourceRef(title=title, language=lang, url=url, role=role))
+        return refs
+
     claims = [
         ClaimResult(
             claim_id=score.claim_id,
@@ -487,8 +519,9 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
             end_char=claim.end_char,
             extraction_method=claim.extraction_method,
             **_calib(score),
+            sources=_sources(i, score),
         )
-        for claim, score in zip(result.claims, result.scores)
+        for i, (claim, score) in enumerate(zip(result.claims, result.scores))
     ]
 
     # Aggregate from the FINAL per-claim verdicts (after any threshold override),

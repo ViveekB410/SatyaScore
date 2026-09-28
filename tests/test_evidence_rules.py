@@ -39,3 +39,21 @@ def test_passages_are_matched_to_the_claim_by_article_title_in_both_languages():
     assert s.on_topic("Gandhi was born in Porbandar.", "wiki:en:Mahatma Gandhi::2")
     assert title_forms("Chief Minister (India)") == ["chief minister", "minister"]
     assert title_forms("Prime Minister of India") == ["prime minister of india", "india"]
+
+
+def test_the_deciding_source_is_the_passage_the_rule_used():
+    from member3_backend.evidence_rules import deciding
+    cricket = [(0.08, 0.01, True, "Cricket::en::0"), (0.02, 0.94, False, "Association football::hi::4"),
+               (0.92, 0.03, True, "Cricket::en::23")]
+    assert deciding(cricket) == ("Cricket::en::23", "supports")
+    assert deciding([(0.01, 0.95, True, "Japan::en::1")]) == ("Japan::en::1", "contradicts")
+    assert deciding([(0.01, 0.95, False, "Paris::en::1")]) is None  # off-topic never decides
+    assert deciding([]) is None
+
+
+def test_sources_link_to_the_right_wikipedia():
+    from member3_backend.evidence_rules import passage_source
+    assert passage_source("wiki:en:Porbandar::3") == ("Porbandar", "en", "https://en.wikipedia.org/wiki/Porbandar")
+    title, lang, url = passage_source("Cricket::hi::0", {"Cricket": "क्रिकेट"})
+    assert (title, lang) == ("क्रिकेट", "hi") and url.startswith("https://hi.wikipedia.org/wiki/")
+    assert passage_source("Cricket::hi::0", {})[1] == "en"  # no Hindi title known: English article

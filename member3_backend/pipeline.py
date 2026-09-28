@@ -49,7 +49,7 @@ from member1_model.nli_scorer import NLIScorer
 from member2_data.entity_linker import EntityLinker
 from member2_data.wikidata_connector import WikidataConnector
 from member3_backend.claim_extractor import ClaimExtractor, ExtractedClaim
-from member3_backend.evidence_rules import RULES as AGGREGATION_RULES, SubjectIndex
+from member3_backend.evidence_rules import RULES as AGGREGATION_RULES, SubjectIndex, deciding
 from member3_backend.faiss_retriever import FAISSRetriever
 
 Language = Literal["en", "hi", "mr"]
@@ -166,6 +166,9 @@ class PipelineResult:
     # Per-stage timings (ms): claim_extraction, embedding, retrieval, nli, kg, fusion, total.
     timings_ms: dict[str, float] = field(default_factory=dict)
     document: DocumentSummary | None = None  # whole-text verdict (hallucinated-share rule)
+    # Per claim: the passages checked (rank order) and the one that decided the NLI
+    # score, (passage_id, "supports" | "contradicts") or None. Shown as sources.
+    evidence: list[dict] = field(default_factory=list)
 
 
 class DetectionPipeline:
@@ -264,6 +267,7 @@ class DetectionPipeline:
         per_claim: list[dict] = []
         nli_pairs: list[tuple[int, str, str, str]] = []  # (claim_idx, claim_id, premise, hypothesis)
         on_topic: list[bool] = []  # per NLI pair: is its passage about the claim's subject?
+        pair_pid: list[str] = []   # per NLI pair: the passage it came from
         for i, claim_id in enumerate(claim_ids):
             claim_text = claim_texts[i]
             t = time.perf_counter()
@@ -288,7 +292,8 @@ class DetectionPipeline:
                 timings["kg"] += (time.perf_counter() - t) * 1000
 
             per_claim.append({"sem_sim": sem_sim, "nli_prob": None, "kg_conf": kg_conf,
-                              "passages": [p.text for p in relevant_passages]})
+                              "passages": [p.text for p in relevant_passages],
+                              "passage_ids": [p.passage_id for p in relevant_passages], "deciding": None})
             if "nli" in enabled and self.nli_scorer and relevant_passages:
                 # C2-lite: each passage becomes one-or-more premise units
                 # (sentences when the switch is on; otherwise the whole passage,
@@ -301,6 +306,7 @@ class DetectionPipeline:
                     for premise in passage_to_premises(p.text):
                         nli_pairs.append((i, claim_id, premise, claim_text))
                         on_topic.append(topical)
+                        pair_pid.append(p.passage_id)
 
         # --- Phase B: a SINGLE batched NLI call over every claim's pairs, then regroup ---
         if nli_pairs:
@@ -313,14 +319,15 @@ class DetectionPipeline:
             timings["nli"] = (time.perf_counter() - t) * 1000
 
             grouped: dict[int, list] = defaultdict(list)
-            for (idx, _, _, _), res, topical in zip(nli_pairs, nli_results, on_topic):
-                grouped[idx].append((res.entailment_prob, res.contradiction_prob, topical))
+            for (idx, _, _, _), res, topical, pid in zip(nli_pairs, nli_results, on_topic, pair_pid):
+                grouped[idx].append((res.entailment_prob, res.contradiction_prob, topical, pid))
             rule = AGGREGATION_RULES[self.aggregation]
             for idx, rows in grouped.items():
                 # nli_prob reflects both directions of evidence: 1.0 = entailed,
                 # 0.0 = contradicted, 0.5 = neutral / not addressed. How the
                 # passages combine is the aggregation rule (evidence_rules.py).
-                per_claim[idx]["nli_prob"] = rule(rows)
+                per_claim[idx]["nli_prob"] = rule([r[:3] for r in rows])
+                per_claim[idx]["deciding"] = deciding(rows, self.aggregation)
 
         # --- Phase C: assemble sub-scores (original claim order) + fuse ---
         sub_scores_list = [
@@ -366,6 +373,7 @@ class DetectionPipeline:
             processing_time_ms=timings["total"],
             timings_ms=timings,
             document=document,
+            evidence=[{"passage_ids": pc["passage_ids"], "deciding": pc["deciding"]} for pc in per_claim],
         )
 
     def _llm_judge(self, score: ClaimScore, claim_text: str, passages: list[str]) -> ClaimScore:

@@ -115,3 +115,45 @@ def aggregate_legacy(rows: list[tuple[float, float, bool]]) -> float:
 
 
 RULES = {"gated": aggregate, "legacy": aggregate_legacy}
+
+# --- which passage decided, and where it comes from (shown to users as sources) ----------
+
+LOW, HIGH = 0.35, 0.65  # the verdict tiers (member1_model/cmhsa.py)
+
+
+def deciding(rows: list[tuple[float, float, bool, str]], aggregation: str = "gated") -> tuple[str, str] | None:
+    """(passage_id, "supports" | "contradicts") for the passage that decided the NLI
+    score, by the same logic as the rule itself; None when no passage decided it
+    (the claim is Uncertain / there is no usable evidence). rows: (e, c, on_topic, id)."""
+    if not rows:
+        return None
+    if aggregation == "legacy":
+        best = max(rows, key=lambda r: abs(r[0] - r[1]))
+        net = 0.5 + 0.5 * (best[0] - best[1])
+        return (best[3], "supports") if net > HIGH else (best[3], "contradicts") if net < LOW else None
+    top_e = max(rows, key=lambda r: r[0])
+    if top_e[0] >= ENTAIL_WINS:
+        return top_e[3], "supports"
+    on_topic = [r for r in rows if r[2]]
+    if on_topic:
+        top_c = max(on_topic, key=lambda r: r[1])
+        if 0.5 + 0.5 * (top_e[0] - top_c[1]) < LOW:
+            return top_c[3], "contradicts"
+    return None
+
+
+def passage_source(passage_id: str, hi_titles: dict[str, str] | None = None) -> tuple[str, str, str]:
+    """(title, language, Wikipedia URL) of the article a passage comes from."""
+    from urllib.parse import quote
+    if passage_id.startswith("wiki:"):
+        _, lang, rest = passage_id.split(":", 2)
+        title = rest.rsplit("::", 1)[0]
+    else:
+        parts = passage_id.split("::")
+        title, lang = parts[0], (parts[1] if len(parts) > 1 else "en")
+        if lang == "hi":  # demo-corpus Hindi passages carry the English title
+            if hi_titles and title in hi_titles:
+                title = hi_titles[title]
+            else:
+                lang = "en"  # no Hindi title known: link the English article
+    return title, lang, f"https://{lang}.wikipedia.org/wiki/{quote(title.replace(' ', '_'))}"

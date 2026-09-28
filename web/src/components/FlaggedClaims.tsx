@@ -50,6 +50,37 @@ export function Segmented<T extends string>({
   )
 }
 
+const ROLE_TEXT: Record<string, string> = {
+  supports: 'supported by',
+  contradicts: 'contradicted by',
+  'knowledge graph': 'decided by',
+}
+
+/** The source that decided this claim's verdict, linked; otherwise how many were checked. */
+function EvidenceLine({ claim }: { claim: Claim }) {
+  const sources = claim.sources ?? []
+  if (!sources.length) return null
+  const deciding = sources.find((s) => s.role !== 'checked')
+  const others = sources.length - (deciding ? 1 : 0)
+  return (
+    <p className="mt-1.5 text-[13px] text-muted">
+      {deciding ? (
+        <>
+          Evidence: {ROLE_TEXT[deciding.role]}{' '}
+          <a href={deciding.url} target="_blank" rel="noopener noreferrer" lang={deciding.language === 'hi' ? 'hi' : undefined}
+             className="text-navy underline decoration-rule underline-offset-2 hover:decoration-navy">
+            {deciding.title}
+          </a>{' '}
+          ({deciding.role === 'knowledge graph' ? 'knowledge graph' : 'Wikipedia'})
+          {others > 0 && `; ${others} more article${others > 1 ? 's' : ''} checked`}
+        </>
+      ) : (
+        `Evidence: ${sources.length} Wikipedia article${sources.length > 1 ? 's' : ''} checked; none clearly states or contradicts this claim`
+      )}
+    </p>
+  )
+}
+
 function ClaimCard({ claim, n, language }: { claim: Claim; n: number; language: Language }) {
   return (
     <li className="relative rounded border border-rule bg-card py-4 pl-7 pr-5">
@@ -62,6 +93,7 @@ function ClaimCard({ claim, n, language }: { claim: Claim; n: number; language: 
         {claim.text}
       </p>
       {claim.note && <p className="mt-1.5 text-[14px] text-muted">{claim.note}</p>}
+      <EvidenceLine claim={claim} />
     </li>
   )
 }

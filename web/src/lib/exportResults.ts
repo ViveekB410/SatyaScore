@@ -27,7 +27,7 @@ export function exportJson(e: Analysis) {
 
 const COLUMNS = [
   'claim_id', 'text', 'verdict', 'hallu_score', 'p_verified', 'p_verified_ci_low',
-  'p_verified_ci_high', 'start_char', 'end_char', 'extraction_method', 'note',
+  'p_verified_ci_high', 'start_char', 'end_char', 'extraction_method', 'note', 'sources',
 ]
 
 const cell = (v: unknown) => {
@@ -41,6 +41,7 @@ export function exportCsv(e: Analysis) {
       c.claim_id, c.text, c.verdict, c.hallu_score, c.p_verified,
       c.p_verified_ci95?.[0], c.p_verified_ci95?.[1], c.start_char, c.end_char,
       c.extraction_method, c.note,
+      (c.sources ?? []).map((s) => `${s.title} (${s.role}) ${s.url}`).join(' | '),
     ].map(cell).join(','),
   )
   // BOM so Excel opens Devanagari correctly

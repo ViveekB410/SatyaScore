@@ -17,6 +17,15 @@ export interface Claim {
   p_verified?: number | null
   p_verified_ci95?: [number, number] | null
   calibration_n?: number | null
+  // Where the claim was checked; the article that decided the verdict comes first.
+  sources?: SourceRef[]
+}
+
+export interface SourceRef {
+  title: string
+  language: string // "en" | "hi" | "mul" (Wikidata)
+  url: string
+  role: 'supports' | 'contradicts' | 'knowledge graph' | 'checked'
 }
 
 // Whole-text verdict: Hallucinated when >= 1/3 of claims are Hallucinated.

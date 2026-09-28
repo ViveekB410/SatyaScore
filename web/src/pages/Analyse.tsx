@@ -20,6 +20,7 @@ import ClaimGroups, { Segmented } from '@/components/FlaggedClaims'
 import MarkedText from '@/components/MarkedText'
 import Reveal from '@/components/Reveal'
 import ScoresPanel from '@/components/ScoresPanel'
+import SourcesList from '@/components/SourcesList'
 import WaitingPanel from '@/components/WaitingPanel'
 import WholeTextVerdict from '@/components/WholeTextVerdict'
 
@@ -247,6 +248,10 @@ export default function Analyse() {
               </p>
             )}
           </section>
+        </Reveal>
+
+        <Reveal order={4}>
+          <SourcesList claims={analysis.claims} />
         </Reveal>
 
         <div className="border-t border-rule pt-6">

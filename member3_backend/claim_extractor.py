@@ -79,6 +79,10 @@ PRONOUN_NONPERSON = {"it", "its", "itself"}
 PRONOUN_PLURAL = {"they", "them", "their", "theirs", "themselves"}
 ALL_PRONOUNS = PRONOUN_PERSON | PRONOUN_NONPERSON | PRONOUN_PLURAL
 _NON_REFERENT_LABELS = {"CARDINAL", "ORDINAL", "QUANTITY", "PERCENT", "MONEY", "DATE", "TIME"}
+# How pronouns are resolved: "nearest" (the nearest preceding compatible entity, the
+# original rule) or "salience" (the sentence subject / topic first). Chosen by
+# coref_eval.py under its fixed rule; see ClaimExtractor._referents_by_salience.
+COREF_RULE = "nearest"
 _FINITE_TAGS = {"VBD", "VBZ", "VBP", "MD"}  # past, 3sg-present, non-3sg-present, modal
 # Objects / complements. Deliberately excludes "pobj": "The rules for a
 # run-out are:" has one but still says nothing on its own.
@@ -515,6 +519,75 @@ class ClaimExtractor:
         return text, had_unresolved
 
     def _build_pronoun_referents(self, doc: Doc) -> dict[int, str | None]:
+        if COREF_RULE == "salience":
+            return self._referents_by_salience(doc)
+        return self._referents_nearest(doc)
+
+    def _referents_by_salience(self, doc: Doc) -> dict[int, str | None]:
+        """Pronouns follow the TOPIC, not the last name mentioned. A pronoun refers to
+        (1) the subject of its own sentence if that subject is a compatible entity
+        before it ("Shah Jahan built it for his wife"), else (2) the most recent
+        compatible entity that was a sentence SUBJECT (directly, or as a resolved
+        pronoun subject), else (3) the nearest compatible entity (the old rule).
+        Before: "The Taj Mahal is located in Agra, Uttar Pradesh. It was completed in
+        1653." -> "Uttar Pradesh was completed in 1653" (a false claim from true text)."""
+        nearest = self._referents_nearest(doc)
+        ents = [e for e in doc.ents if e.label_ not in _NON_REFERENT_LABELS]
+
+        def entity_of(tok: Token):
+            return next((e for e in ents if e.start <= tok.i < e.end), None)
+
+        chunks = list(doc.noun_chunks)
+
+        def subject_referent(tok: Token) -> tuple[str, str] | None:
+            """(kind, text) a subject offers as a referent: a named entity, or for
+            things a plain noun phrase the NER does not tag ("Diarrhea", "The triangle",
+            "Spironolactone") -- else "it" fell back to a name in an aside ("English",
+            "trigon", the brand name "Aldactone")."""
+            if (e := entity_of(tok)) is not None:
+                k = kind(e.label_)
+                return (k, e.text) if k else None
+            if tok.pos_ in ("NOUN", "PROPN") and tok.tag_ in ("NN", "NNP"):  # singular: "it", not "Signs"
+                chunk = next((c for c in chunks if c.start <= tok.i < c.end), None)
+                return ("thing", chunk.text if chunk is not None else tok.text)
+            return None
+
+        def kind(label_or_pronoun: str) -> str | None:
+            low = label_or_pronoun.lower()
+            if low in PRONOUN_PERSON or label_or_pronoun == "PERSON":
+                return "person"
+            if low in PRONOUN_NONPERSON or (label_or_pronoun.isupper() and label_or_pronoun not in ("PERSON", "NORP")):
+                return "thing"
+            return None
+
+        salient: dict[str, str] = {}
+        referents: dict[int, str | None] = {}
+        for sent in doc.sents:
+            subjects = [t for t in sent if t.dep_ in ("nsubj", "nsubjpass") and t.head == sent.root]
+            for token in sent:
+                low = token.text.lower()
+                if low not in ALL_PRONOUNS:
+                    continue
+                k = kind(low)
+                if k is None:  # plural pronouns: unchanged
+                    referents[token.i] = nearest.get(token.i)
+                    continue
+                own = None
+                for s in subjects:
+                    sr = subject_referent(s)
+                    if s.i < token.i and sr is not None and sr[0] == k:
+                        own = sr[1]
+                referents[token.i] = own or salient.get(k) or nearest.get(token.i)
+            for s in subjects:  # the sentence subject becomes the topic for what follows
+                if s.text.lower() in ALL_PRONOUNS:
+                    k = kind(s.text)
+                    if k and referents.get(s.i):
+                        salient[k] = referents[s.i]
+                elif (sr := subject_referent(s)) is not None:
+                    salient[sr[0]] = sr[1]
+        return referents
+
+    def _referents_nearest(self, doc: Doc) -> dict[int, str | None]:
         """Maps token.i -> resolved referent text for every pronoun token,
         based on the nearest preceding entity of a compatible type. See
         module docstring item 1 for known limitations."""

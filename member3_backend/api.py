@@ -35,6 +35,7 @@ from starlette.middleware.cors import CORSMiddleware
 from member1_model.calibration import load_table, lookup
 from member1_model.cmhsa import KG_NOTE, CMHSAScorer, aggregate_document
 from member3_backend.factcheck_rules import FC_NOTE_PREFIX
+from member3_backend.number_guard import NUMBER_NOTE
 from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
 from member2_data.entity_linker import EntityLinker
@@ -434,6 +435,9 @@ def load_starter_corpus():
                 has_key = bool(_os.environ.get("GROQ_API_KEY"))
                 print(f"[api] LLM judge ON ({llm_mode}); GROQ_API_KEY "
                       f"{'set' if has_key else 'MISSING: claims will fall back to NLI'}", flush=True)
+            # Number guard (member3_backend/number_guard.py): OFF unless number_guard_eval.py
+            # meets its fixed rule. SATYASCORE_NUMBER_GUARD=true turns it on.
+            _pipeline.number_guard = _os.environ.get("SATYASCORE_NUMBER_GUARD", "false").lower() in ("1", "true", "yes")
             # Professional fact-checks (Google Fact Check Tools API). ON by default: met
             # its fixed adoption rule (results/factcheck_eval.md: 0 wrong decisions on all
             # sets; rumours caught 3 -> 10 of 25; true claims marked Hallucinated 1 -> 1 of
@@ -534,7 +538,9 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
             refs.append(SourceRef(title="Wikidata", language="mul",
                                   url=kf["url"] if kf else "https://www.wikidata.org/", role="knowledge graph"))
         # the NLI's deciding passage is only "the" source when NLI made the verdict
-        nli_decided = score.note != KG_NOTE and not (score.note or "").startswith(("judged by LLM", FC_NOTE_PREFIX))
+        # (nor when the number guard overrode it: the passage lacks the claim's numbers)
+        nli_decided = score.note != KG_NOTE and not (score.note or "").startswith(
+            ("judged by LLM", FC_NOTE_PREFIX, NUMBER_NOTE))
         deciding = ev.get("deciding") if nli_decided else None
         order = ([deciding[0]] if deciding else []) + list(ev.get("passage_ids", []))
         for pid in order:

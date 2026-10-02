@@ -55,6 +55,7 @@ from member3_backend.factcheck_rules import FC_FALSE_SCORE, FC_NOTE_PREFIX, FC_T
 from member3_backend.factcheck_rules import decide as decide_fact_check
 from member3_backend.factcheck_rules import match as match_fact_checks
 from member3_backend.faiss_retriever import FAISSRetriever
+from member3_backend.number_guard import NUMBER_NOTE, missing_numbers
 
 Language = Literal["en", "hi", "mr"]
 
@@ -214,6 +215,7 @@ class DetectionPipeline:
         aggregation: str = "gated",
         subjects: SubjectIndex | None = None,
         fact_checker=None,
+        number_guard: bool = False,
     ):
         self.embedder = embedder
         self.retriever = retriever
@@ -251,6 +253,8 @@ class DetectionPipeline:
         # factcheck_rules.py), for every claim the KG did not decide. None here; the
         # API switches it on (it met its fixed rule, results/factcheck_eval.md).
         self.fact_checker = fact_checker
+        # Number guard (member3_backend/number_guard.py); see number_guard_eval.py.
+        self.number_guard = number_guard
 
     def run(
         self,
@@ -398,6 +402,19 @@ class DetectionPipeline:
                 scores[i], fact_checks[i] = self._fact_check(s, claim_texts[i], language)
             timings["factcheck"] = (time.perf_counter() - t_fc) * 1000
 
+        # --- Number guard (member3_backend/number_guard.py): Verified by a passage only if
+        # the passage contains the claim's numbers; else Uncertain. Off unless adopted.
+        for i, s in enumerate(scores):
+            dec = per_claim[i]["deciding"]
+            if not (self.number_guard and s.verdict == Verdict.VERIFIED and not _decided_elsewhere(s.note)
+                    and dec and dec[1] == "supports" and dec[0] in per_claim[i]["passage_ids"]):
+                continue
+            text = per_claim[i]["passages"][per_claim[i]["passage_ids"].index(dec[0])]
+            if missing := missing_numbers(claim_texts[i], text):
+                scores[i] = ClaimScore(claim_id=s.claim_id, hallu_score=0.5, verdict=Verdict.UNCERTAIN,
+                                       active_signals=s.active_signals,
+                                       note=f"{NUMBER_NOTE} ({', '.join(missing)})")
+
         # --- Explanation only (no verdict changes): the evidence sentence of the
         # passage that decided each NLI-decided claim, and the fact Wikidata holds
         # for each KG-decided claim (e.g. the correct birthplace).
@@ -430,7 +447,9 @@ class DetectionPipeline:
             timings_ms=timings,
             document=document,
             evidence=[{"passage_ids": pc["passage_ids"], "deciding": pc["deciding"], "fact_check": fc,
-                       "excerpt": ex, "kg_fact": kf}
+                       "excerpt": ex, "kg_fact": kf,
+                       "deciding_text": (pc["passages"][pc["passage_ids"].index(pc["deciding"][0])]
+                                         if pc["deciding"] and pc["deciding"][0] in pc["passage_ids"] else None)}
                       for pc, fc, ex, kf in zip(per_claim, fact_checks, excerpts, kg_facts)],
         )
 

@@ -50,6 +50,12 @@ export function summarise(claims: Claim[], doc?: DocumentSummary | null): Docume
   }
 }
 
+/** Overall support score of the passage: the average of its claims' support scores
+ * (0 = contradicted, 1 = supported). Same number as the API's overall_score (PRD). */
+export function overallScore(claims: Claim[]): number | null {
+  return claims.length ? claims.reduce((s, c) => s + c.hallu_score, 0) / claims.length : null
+}
+
 export function summaryLine(d: DocumentSummary): string {
   const claims = `${d.n_claims} ${d.n_claims === 1 ? 'claim' : 'claims'}`
   return `${claims} · ${d.n_verified} verified · ${d.n_uncertain} uncertain · ${d.n_hallucinated} hallucinated`

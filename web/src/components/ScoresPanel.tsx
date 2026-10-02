@@ -2,15 +2,15 @@ import type { Claim, Language } from '@/lib/types'
 import { VERDICT } from '@/lib/verdicts'
 import { cn } from '@/lib/utils'
 
-const LOW = 0.35
-const HIGH = 0.65
+export const LOW = 0.35
+export const HIGH = 0.65
 
 // Per-claim scores (PRD FR-04 / FR-06), shown only on request. The support score
 // is drawn as a plain CSS bar against the two verdict cut-offs; no chart library.
-function ScoreBar({ score, bar }: { score: number; bar: string }) {
+export function ScoreBar({ score, bar, className = 'w-24' }: { score: number; bar: string; className?: string }) {
   const pct = Math.max(0, Math.min(1, score)) * 100
   return (
-    <span className="relative inline-block h-1.5 w-24 rounded-full bg-rule align-middle" aria-hidden="true">
+    <span className={cn('relative inline-block h-1.5 rounded-full bg-rule align-middle', className)} aria-hidden="true">
       <span className={cn('absolute inset-y-0 left-0 rounded-full', bar)} style={{ width: `${pct}%` }} />
       <span className="absolute -inset-y-1 w-px bg-ink/40" style={{ left: `${LOW * 100}%` }} />
       <span className="absolute -inset-y-1 w-px bg-ink/40" style={{ left: `${HIGH * 100}%` }} />

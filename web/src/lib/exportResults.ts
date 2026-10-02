@@ -1,5 +1,5 @@
 // PRD FR-06: export a result as CSV or JSON (client-side download).
-import { summarise } from './verdicts'
+import { overallScore, summarise } from './verdicts'
 import type { Analysis } from './types'
 
 function download(filename: string, content: string, type: string) {
@@ -19,6 +19,7 @@ export function exportJson(e: Analysis) {
     language: e.language,
     created_at: e.created_at,
     document: summarise(e.claims, e.document),
+    overall_score: overallScore(e.claims),
     claims: e.claims,
     processing_time_ms: e.processing_time_ms ?? null,
   }

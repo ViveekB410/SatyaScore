@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth'
 import { exportCsv, exportJson } from '@/lib/exportResults'
 import { fromResponse, history } from '@/lib/history'
 import type { Analysis, Language } from '@/lib/types'
-import { VERDICT, summarise } from '@/lib/verdicts'
+import { VERDICT, overallScore, summarise } from '@/lib/verdicts'
 import { EXAMPLES, cn, detectLanguage, formatDate } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/input'
@@ -190,7 +190,7 @@ export default function Analyse() {
         </div>
 
         <Reveal order={0}>
-          <WholeTextVerdict doc={doc} />
+          <WholeTextVerdict doc={doc} score={overallScore(analysis.claims)} />
         </Reveal>
 
         <Reveal order={1}>

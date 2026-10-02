@@ -25,6 +25,10 @@ Ready when it prints `Application startup complete`. API docs: http://localhost:
 cd web
 npm run dev
 ```
+**On a phone** (same Wi-Fi): run `npm run dev:phone` instead and open the *Network* address it prints
+(e.g. `http://192.168.x.x:5173`). The phone reaches the backend through the web server's `/api`
+forwarding; the backend itself stays on localhost. Details: `PROJECT_GUIDE.md` §3.2a.
+
 Open **http://localhost:5173** — the status pill should read *Online · 102,069 passages* (or *9,351* if the
 expanded corpus has not been built on this machine; see First-time setup).
 

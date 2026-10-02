@@ -49,7 +49,7 @@ export interface DocumentSummary {
 export interface DetectResponse {
   claims: Claim[]
   document?: DocumentSummary | null
-  overall_score: number // legacy average; never displayed
+  overall_score: number // average support score; the web app recomputes it from the claims (verdicts.ts overallScore)
   processing_time_ms: number
   analysis_id?: string // present when signed in: the result was saved to history
 }

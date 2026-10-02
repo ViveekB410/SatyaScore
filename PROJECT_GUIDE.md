@@ -61,6 +61,24 @@ The backend is ready when it prints `Application startup complete`. It should al
 **Before the audience arrives:** sign in and run each example below once. Lookups are then cached
 (faster), and every check is saved in **History**: a backup if the internet is slow.
 
+### 3.2a On a phone (same Wi-Fi)
+Start the web app with `npm run dev:phone` instead of `npm run dev`; the backend command is unchanged.
+The web app prints two addresses:
+
+```
+➜  Local:   http://localhost:5173/
+➜  Network: http://192.168.x.x:5173/     ← open this one on the phone
+```
+
+- **Connection:** the phone must be on the same Wi-Fi as the laptop. The first time, Windows asks
+  whether Node.js may use the network: allow it on **Private networks**. If the phone cannot connect,
+  set the laptop's Wi-Fi to *Private* (Settings → Network → Wi-Fi → network properties).
+- **Security:** the phone talks only to the web app, which forwards checks to the backend inside
+  the laptop. The backend itself stays private to the laptop, and requests from other websites are
+  still refused.
+- **Sign-in:** works on the phone, but it is a separate sign-in from the laptop's.
+- **Both at once:** the laptop can keep using http://localhost:5173 at the same time.
+
 ### 3.3 Demo script (about 10 minutes)
 The results below were checked on the live system.
 
@@ -97,6 +115,7 @@ http://localhost:8000/docs.
 |---|---|
 | A check takes 10–15 s | normal for a topic seen for the first time (live Wikipedia lookup); or open the saved check from **History** |
 | Page stuck on "Connecting" | the backend is not running or still loading: check its terminal |
+| Phone cannot open the Network address | same Wi-Fi? laptop network set to *Private*? web app started with `npm run dev:phone`? |
 | Page goes blank after an edit to the code | restart the web app (`npm run dev`) and reload with Ctrl + Shift + R |
 | No fact-checks shown | the backend was started from a terminal opened before the key was saved: open a new terminal and restart it |
 | No internet | stored passages still work; Wikidata and fact-checks do not. Use saved checks in **History** |
@@ -247,6 +266,10 @@ measures *topic*, not *truth* (below chance in Hindi). When the KG answers, it o
 ### Step 9 — Whole-text verdict, confidence and sources
 - **Whole text:** Hallucinated if **one third or more** of its claims are hallucinated; otherwise
   Uncertain if any claim is hallucinated/uncertain; Verified only if every claim is verified.
+- **Overall score** (shown beside the whole-text verdict; the PRD's `overall_score`): the average
+  support score of the claims, 0 = contradicted, 1 = supported. Example: the cricket/Japan/Gandhi
+  text scores **0.34** (0.96, 0.07 and 0.00 averaged). The verdict, not the average, is the result.
+  An average can hide one false claim among true ones, which is why the verdict uses the share rule.
 - **P(Verified) with a 95% interval** (PRD FR-04; `member1_model/calibration.py`): the share of
   training claims with a similar score that were truly Verified. Honestly reported: for English the
   score adds little beyond the base rate (`results/calibration.md`).
@@ -296,7 +319,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 |---|---|
 | Stack | **React + TypeScript**, built with **Vite**; **Tailwind CSS**; **Radix/shadcn** primitives (dialogs, menus); Framer Motion (subtle transitions); React Router |
 | Pages | Connecting (waits for the backend), **Analyse**, **History**, Sign in, Create account |
-| Analyse page | text box (paste or upload), language **Auto / English / हिन्दी**, examples, Clear; results: whole-text verdict, the text with each claim highlighted (red / amber / green), claims grouped by verdict with their evidence, optional scores table, one-line sources, export CSV/JSON |
+| Analyse page | text box (paste or upload), language **Auto / English / हिन्दी**, examples, Clear; results: whole-text verdict with the overall score beside it, the text with each claim highlighted (red / amber / green), claims grouped by verdict with their evidence, optional scores table, one-line sources, export CSV/JSON |
 | Design | quiet "research instrument" style (Lora + Inter fonts, Noto for Hindi), accessible (keyboard, focus rings, contrast, verdicts never by colour alone), works on phone-sized screens |
 | Details | highlights are exact even after emoji; saved checks reopen without re-running |
 

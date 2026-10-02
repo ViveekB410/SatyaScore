@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:phone": "vite --host --mode phone",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview"
   },

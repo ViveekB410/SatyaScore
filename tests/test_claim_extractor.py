@@ -266,3 +266,20 @@ def test_a_chatbot_answer_keeps_only_its_facts(extractor):
     assert [c.text for c in extractor.extract(text, "en")] == ["The Taj Mahal is located in Agra."]
     hi = extractor.extract("ताजमहल आगरा में स्थित है। मुझे उम्मीद है कि इससे मदद मिलेगी।", "hi")
     assert [c.text for c in hi] == ["ताजमहल आगरा में स्थित है।"] and hi[0].claim_id == "claim_0"
+
+# --- Pronouns follow the topic (sentence subject), not the last name mentioned -----
+
+def test_pronouns_follow_the_topic_not_the_last_name(extractor):
+    text = ("The Taj Mahal is located in Agra, Uttar Pradesh. Shah Jahan commissioned it in 1632. "
+            "It was completed in 1653. Its dome is made of marble. Many tourists visit its gardens.")
+    assert [c.text for c in extractor.extract(text, "en")] == [
+        "The Taj Mahal is located in Agra Uttar Pradesh.",
+        "Shah Jahan commissioned the Taj Mahal in 1632.",
+        "The Taj Mahal was completed in 1653.",          # was: "Uttar Pradesh was completed in 1653."
+        "The Taj Mahal's dome is made of marble.",
+        "Many tourists visit the Taj Mahal's gardens.",
+    ]
+    people = [c.text for c in extractor.extract("Gandhi met Nehru in 1916. He later led the Salt March.", "en")]
+    assert people[-1] == "Gandhi later led the Salt March."  # was: "Nehru later led ..."
+    paris = [c.text for c in extractor.extract("Paris is the capital of France. It has many museums.", "en")]
+    assert paris[-1] == "Paris has many museums."  # was: "France has many museums."

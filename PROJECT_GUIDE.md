@@ -149,7 +149,7 @@ http://localhost:8000/docs.
 Code map: `member1_model/` (embeddings, NLI, scoring, calibration, LLM verifier) ·
 `member2_data/` (Wikidata connector, entity linker) · `member3_backend/` (API, accounts, pipeline,
 claim extractor, retriever, Wikipedia expander, evidence rules) · `web/` (the web app) ·
-`results/` (every measured result) · `tests/` (215 automated tests).
+`results/` (every measured result) · `tests/` (225 automated tests).
 
 ---
 
@@ -161,8 +161,15 @@ text (character positions) so the web page can highlight it in place.
 
 - **English:** uses **spaCy** dependency parsing. A long sentence is decomposed into simple claims
   ("Gandhi was born in Porbandar and led the independence movement" → two claims). Pronouns are
-  replaced by the person they refer to ("He led…" → "Mahatma Gandhi led…"; "her research" →
-  "Marie Curie's research").
+  replaced by what they refer to, following the **topic** (the sentence subject), not the last name
+  mentioned: in *"The Taj Mahal is located in Agra, Uttar Pradesh. It was completed in 1653."* the
+  second claim is *"The Taj Mahal was completed in 1653"*. The old nearest-name rule produced
+  *"Uttar Pradesh was completed in 1653"*, a false claim made from true text. Measured on 400
+  held-out Wikipedia introductions (`results/coref_eval.md`, rule fixed before the run): pronouns
+  resolved to the article's subject 93 → 277, wrong 206 → 128.
+- **Only factual sentences are checked:** questions, pleasantries ("I hope this helps!"), advice
+  ("You should visit it in winter"), opinions ("I think…") and commands are skipped. They cannot be
+  verified and only made the whole-text verdict Uncertain. None of the 419 annotated claims is skipped.
 - **Hindi:** sentence-level (split on "।"), because no reliable Hindi dependency parser is wired in.
 - **Lists:** a lead-in line ending in ":" followed by items becomes one claim per item
   ("Seek urgent medical care if there is: Severe abdominal pain" → *"Seek urgent medical care if there
@@ -234,6 +241,13 @@ of 99 (`results/aggregation_eval.md`).
   forms), are checked from the country's side: a country has one current capital on Wikidata, so a
   different city is a clear contradiction ("The capital of Australia is Sydney" → Canberra). A capital
   lying inside the claimed city counts as support ("Delhi is the capital of India": New Delhi is in Delhi);
+- **dates** after "born in / died in / founded in" (and "born on…", and the Hindi forms) are checked
+  against Wikidata's date of birth / death / founding, as precisely as the claim states them
+  ("1869" to the year, "2 October 1869" to the day). Before, a year was read as a *place*: Wikidata
+  has an item for the year 1869, so *"Mahatma Gandhi was born in 1869"* was marked Hallucinated.
+  The subject is matched by exact name; if several items share it (two Michael Jordans), any match
+  supports and only all disagreeing contradicts. Early dates where the old and new calendars
+  disagree are not judged;
 - three outcomes: **supported**, **contradicted** (a different value for a one-value fact like
   birthplace), or **unknown** (no signal — never counted as false).
 
@@ -324,7 +338,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 | Data | SQLite (`instance/satyascore.db`, never committed): users, sessions, each user's saved checks |
 | Rate limits | 100 checks/min per signed-in user or API key; 20/min per network when anonymous |
 | Speed | NVIDIA GPU (RTX 4050): typically **1–5 s per check**; a topic seen for the first time can take 10–15 s (live Wikipedia/Wikidata lookups) |
-| Quality | **215 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
+| Quality | **225 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
 
 ---
 

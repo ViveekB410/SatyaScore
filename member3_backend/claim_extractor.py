@@ -80,9 +80,11 @@ PRONOUN_PLURAL = {"they", "them", "their", "theirs", "themselves"}
 ALL_PRONOUNS = PRONOUN_PERSON | PRONOUN_NONPERSON | PRONOUN_PLURAL
 _NON_REFERENT_LABELS = {"CARDINAL", "ORDINAL", "QUANTITY", "PERCENT", "MONEY", "DATE", "TIME"}
 # How pronouns are resolved: "nearest" (the nearest preceding compatible entity, the
-# original rule) or "salience" (the sentence subject / topic first). Chosen by
-# coref_eval.py under its fixed rule; see ClaimExtractor._referents_by_salience.
-COREF_RULE = "nearest"
+# original rule) or "salience" (the sentence subject / topic first; see
+# ClaimExtractor._referents_by_salience). "salience" met coref_eval.py's fixed rule on 400
+# held-out Wikipedia introductions: right referents 93 -> 277, wrong 206 -> 128
+# (results/coref_eval.md).
+COREF_RULE = "salience"
 _FINITE_TAGS = {"VBD", "VBZ", "VBP", "MD"}  # past, 3sg-present, non-3sg-present, modal
 # Objects / complements. Deliberately excludes "pobj": "The rules for a
 # run-out are:" has one but still says nothing on its own.
@@ -153,6 +155,11 @@ def _possessive(referent: str, pronoun: Token) -> str:
     """A possessive pronoun ("his", "her", "its", "their") is replaced by the
     referent's possessive form: "the tomb of his wife" -> "... of Shah Jahan's wife",
     not "... of Shah Jahan wife"."""
+    # a referent with a leading "The" inside the claim reads "the": "commissioned the Taj
+    # Mahal", but "The Taj Mahal was completed" (subject: the claim starts there)
+    starts_claim = pronoun.dep_ in _SUBJECT_DEPS or (pronoun.dep_ == "poss" and pronoun.head.dep_ in _SUBJECT_DEPS)
+    if referent.startswith("The ") and not starts_claim:
+        referent = "the " + referent[4:]
     if pronoun.tag_ != "PRP$":
         return referent
     return referent + ("'" if referent.endswith("s") else "'s")
@@ -549,6 +556,10 @@ class ClaimExtractor:
                 return (k, e.text) if k else None
             if tok.pos_ in ("NOUN", "PROPN") and tok.tag_ in ("NN", "NNP"):  # singular: "it", not "Signs"
                 chunk = next((c for c in chunks if c.start <= tok.i < c.end), None)
+                # "Its dome", "This building": a part of / pointer back to the topic, not a new one
+                if chunk is not None and any(t.tag_ == "PRP$" or t.lower_ in ("this", "that", "these", "those")
+                                             for t in chunk):
+                    return None
                 return ("thing", chunk.text if chunk is not None else tok.text)
             return None
 

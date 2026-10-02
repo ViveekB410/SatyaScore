@@ -31,12 +31,25 @@ export default function WholeTextVerdict({ doc, score }: { doc: DocumentSummary;
         )}
       </div>
       <p className="mt-3 text-[15px] text-ink">{summaryLine(doc)}</p>
-      <p className="mt-2 text-[13px] text-muted">
-        Hallucinated when a third or more of the claims are hallucinated. Fewer hallucinated claims, or any
-        uncertain claim, make it Uncertain; Verified needs every claim verified. The overall score is the average
-        support score of the claims (0 = contradicted by evidence, 1 = supported; ticks at {LOW} and {HIGH}); the
-        verdict, not the average, is the result.
-      </p>
+      <details className="group mt-3">
+        <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 rounded text-[13px] text-navy underline decoration-rule underline-offset-4 hover:decoration-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy [&::-webkit-details-marker]:hidden">
+          How is this decided?
+          <span aria-hidden="true" className="text-[13px] leading-none no-underline transition-transform group-open:rotate-180">▾</span>
+        </summary>
+        <dl className="mt-3 grid gap-x-6 gap-y-2.5 rounded border border-rule px-4 py-3 text-[13px] sm:grid-cols-[auto_1fr]">
+          <dt className="font-medium text-flag-no">Hallucinated</dt>
+          <dd className="text-muted">a third or more of the claims are hallucinated</dd>
+          <dt className="font-medium text-flag-unc">Uncertain</dt>
+          <dd className="text-muted">some claims are hallucinated or uncertain, but fewer than a third hallucinated</dd>
+          <dt className="font-medium text-flag-yes">Verified</dt>
+          <dd className="text-muted">every claim is verified</dd>
+          <dt className="mt-1 border-t border-rule pt-2.5 font-medium text-ink sm:mt-0">Overall score</dt>
+          <dd className="border-rule text-muted sm:border-t sm:pt-2.5">
+            the average of the claims’ support scores: 0 = contradicted by evidence, 1 = supported (bar ticks at{' '}
+            {LOW} and {HIGH}). The verdict above is the result; the average can hide one false claim among true ones.
+          </dd>
+        </dl>
+      </details>
     </section>
   )
 }

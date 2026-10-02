@@ -200,6 +200,52 @@ class WikidataConnector:
             actual_text=tuple(dict.fromkeys(dates.format_date(s, language) for s in stored or [])),
         )
 
+    def statements(self, qid: str, pid: str) -> list[dict] | None:
+        """The subject's statements for `pid` (deprecated skipped; preferred-rank ones
+        marked), each {"value", "rank", "qualifiers"} with the raw datavalue value. None if
+        the lookup failed."""
+        key = f"stmts|{qid}|{pid}"
+        cached = self._cache.get(key)
+        if cached is not None:
+            return cached
+        try:
+            response = polite_get(self._session, WIKIDATA_ENTITY_API, params={
+                "action": "wbgetclaims", "entity": qid, "property": pid, "format": "json"}, timeout=10)
+            raw = response.json()["claims"].get(pid, [])
+        except Exception:
+            return None
+        out = [{"value": s.get("mainsnak", {}).get("datavalue", {}).get("value"), "rank": s.get("rank"),
+                "qualifiers": s.get("qualifiers", {})} for s in raw if s.get("rank") != "deprecated"]
+        self._cache.set(key, out)
+        return out
+
+    def names(self, ids: list[str], language: Language = "en") -> dict[str, set[str]]:
+        """Every label and alias (claim language, "mul", English) of each item, casefolded.
+        {} on failure."""
+        ids = list(dict.fromkeys(i for i in ids if i))[:50]
+        if not ids:
+            return {}
+        langs = list(dict.fromkeys([language, "mul", "en"]))
+        key = f"names|{'|'.join(ids)}|{language}"
+        cached = self._cache.get(key)
+        if cached is not None:
+            return cached
+        try:
+            response = polite_get(self._session, WIKIDATA_ENTITY_API, params={
+                "action": "wbgetentities", "ids": "|".join(ids), "props": "labels|aliases",
+                "languages": "|".join(langs), "format": "json"}, timeout=10)
+            entities = response.json()["entities"]
+        except Exception:
+            return {}
+        out = {}
+        for i in ids:
+            e = entities.get(i, {})
+            got = {v["value"].casefold() for lang in langs for v in [e.get("labels", {}).get(lang)] if v}
+            got |= {a["value"].casefold() for lang in langs for a in e.get("aliases", {}).get(lang, [])}
+            out[i] = got
+        self._cache.set(key, out)
+        return out
+
     def _date_values(self, qid: str, pid: str) -> list[tuple] | None:
         """The subject's dates for `pid` (preferred rank if any, else normal;
         deprecated skipped), each (year, month, day, gregorian). None if the lookup failed."""

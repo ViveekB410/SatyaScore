@@ -78,16 +78,18 @@ def test_pipeline_with_full_kg_chain_resolved():
 
     claim_extractor = MagicMock()
     extracted = MagicMock()
-    extracted.text = "Narendra Modi is the Prime Minister of India."
+    # a birthplace claim: present-tense office claims now go to the current-office check
+    # (member2_data/kg_extra.py), not this general linking chain
+    extracted.text = "Mahatma Gandhi was born in Porbandar."
     claim_extractor.extract.return_value = [extracted]
-    claim_extractor.extract_entities.return_value = ["Narendra Modi", "India"]
+    claim_extractor.extract_entities.return_value = ["Mahatma Gandhi", "Porbandar"]
 
     entity_linker = MagicMock()
     linked = MagicMock()
     linked.linkable = True
-    linked.subject_qid = "Q1058"
-    linked.property_pid = "P39"
-    linked.object_qid = "Q668"
+    linked.subject_qid = "Q1001"
+    linked.property_pid = "P19"
+    linked.object_qid = "Q200017"
     entity_linker.link_claim.return_value = linked
 
     wikidata = MagicMock()
@@ -104,7 +106,7 @@ def test_pipeline_with_full_kg_chain_resolved():
         entity_linker=entity_linker,
         wikidata=wikidata,
     )
-    result = pipeline.run("Narendra Modi is the Prime Minister of India.", language="en")
+    result = pipeline.run("Mahatma Gandhi was born in Porbandar.", language="en")
 
     assert set(result.scores[0].active_signals) == {"semsim", "nli", "kg"}
     wikidata.verify_triple.assert_called_once()

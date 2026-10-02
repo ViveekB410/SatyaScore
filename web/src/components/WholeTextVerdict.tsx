@@ -46,9 +46,9 @@ export default function WholeTextVerdict({ doc, score }: { doc: DocumentSummary;
             <dt className="font-medium text-flag-no">Hallucinated</dt>
             <dd className="text-muted">One third or more of the claims are hallucinated</dd>
             <dt className="font-medium text-flag-unc">Uncertain</dt>
-            <dd className="text-muted">Some claims are hallucinated or uncertain, but fewer than one third of hallucinated</dd>
+            <dd className="text-muted">Some claims are hallucinated or uncertain, but fewer than one third are hallucinated</dd>
             <dt className="font-medium text-flag-yes">Verified</dt>
-            <dd className="text-muted">All claim are verified</dd>
+            <dd className="text-muted">All claims are verified</dd>
           </dl>
           <dl className={cn(ROWS, 'border-t border-rule py-3')}>
             <dt className="font-medium text-ink">Overall score</dt>

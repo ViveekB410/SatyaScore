@@ -38,22 +38,32 @@ _WORDS = {w: i for i, w in enumerate(
 _WORDS.update({"thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90})
 _WORD_RE = re.compile(r"\b(" + "|".join(sorted(_WORDS, key=len, reverse=True)) +
                       r")(?:-(one|two|three|four|five|six|seven|eight|nine))?\b", re.I)
-# reference numbers, not quantities: "Article 370", "अनुच्छेद 324", "Section 377"
-_REFERENCE = re.compile(r"(?:article|articles|section|sections|clause|chapter|schedule|amendment|rule|"
-                        r"part|no\.?|number|अनुच्छेद|धारा|अध्याय|अनुसूची|संशोधन)\s*$", re.I)
+# reference numbers, not quantities: "Article 370", "अनुच्छेद 324", "Section 377". English
+# words need a word boundary: without it "no" matched inside "Nagano", "piano", "volcano"
+# and the next number ("The Nagano 1998 ...") was skipped (found by review).
+_REFERENCE = re.compile(r"(?:\b(?:article|articles|section|sections|clause|chapter|schedule|amendment|rule|"
+                        r"part|no\.?|number)|अनुच्छेद|धारा|अध्याय|अनुसूची|संशोधन)\s*$", re.I)
 
 
-def numbers(text: str, words: bool = True) -> list[tuple[float, int]]:
-    """(value, decimals written) for every number in the text; number words too if `words`."""
+def numbers(text: str) -> list[tuple[float, int]]:
+    """(value, decimals written) for every number in the text, number words included."""
     t = text.translate(_DEVANAGARI)
     out = []
     for m in _NUM.finditer(t):
         s = m.group(1).replace(",", "")
         out.append((float(s), len(s.split(".")[1]) if "." in s else 0))
-    if words:
-        for m in _WORD_RE.finditer(t):
-            out.append((float(_WORDS[m.group(1).lower()] + (_WORDS[m.group(2).lower()] if m.group(2) else 0)), 0))
+    for m in _WORD_RE.finditer(t):
+        out.append((float(_WORDS[m.group(1).lower()] + (_WORDS[m.group(2).lower()] if m.group(2) else 0)), 0))
     return out
+
+
+def _evidence_numbers(text: str) -> list[tuple[float, bool]]:
+    """(value, written like a year) for every number in an evidence text: a year is a
+    comma-less 1000-2100 integer, so "1,430" (a quantity) is not one but "1500" is."""
+    t = text.translate(_DEVANAGARI)
+    out = [(float(m.group(1).replace(",", "")), "," not in m.group(1) and _is_year(float(m.group(1))))
+           for m in _NUM.finditer(t)]
+    return out + [(v, False) for v, _ in numbers(t) if not any(v == x for x, _ in out)]
 
 
 def _is_year(x: float) -> bool:
@@ -84,22 +94,24 @@ def checked_numbers(claim: str) -> list[tuple[float, int, bool]]:
     return out
 
 
-def _close(claimed: tuple[float, int, bool], found: float) -> bool:
-    """Years must be equal. Other numbers: equal, or the passage's number rounds to the
-    claim's number at the claim's precision (1.43 -> "1.4"; 8,848.86 -> "8,849"; 1,430 ->
-    "1,400"), or within 1%."""
+def _close(claimed: tuple[float, int, bool], found: tuple[float, bool]) -> bool:
+    """Years must be equal, on either side: a claim's "1,500 km" must not match the year
+    1500 elsewhere in the article (found by review). Other numbers: equal, or the passage's
+    number rounds to the claim's number at the claim's precision (1.43 -> "1.4"; 8,848.86 ->
+    "8,849"; 1,430 -> "1,400"), or within 1%."""
     a, precision, year = claimed
-    if a == found:
+    value, found_year = found
+    if a == value:
         return True
-    if year:
+    if year or found_year:
         return False
-    return round(found, precision) == a or abs(a - found) <= REL_TOLERANCE * max(abs(a), abs(found))
+    return round(value, precision) == a or abs(a - value) <= REL_TOLERANCE * max(abs(a), abs(value))
 
 
 def missing_numbers(claim: str, evidence: str | list[str]) -> list[str]:
     """The checked numbers of the claim that no evidence text contains (as values)."""
     texts = [evidence] if isinstance(evidence, str) else evidence
-    have = [v for t in texts for v, _ in numbers(t)]
+    have = [n for t in texts for n in _evidence_numbers(t)]
     out = []
     for c in checked_numbers(claim):
         if not any(_close(c, y) for y in have):

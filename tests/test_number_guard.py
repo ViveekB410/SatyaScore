@@ -42,3 +42,12 @@ def test_right_numbers_match_however_they_are_written_and_wherever_in_the_articl
     # the year is in another passage of the same article (the pipeline passes all of them)
     assert missing_numbers("The assembly met from 1947 to 1949.", ["The assembly first met in 1946.",
                                                                    "It worked from 1947 to 1949."]) == []
+
+def test_review_findings_reference_words_and_years_on_the_evidence_side():
+    # "no" inside "Nagano" is not the reference word "No." (the year must still be checked)
+    assert checked_numbers("The Nagano 1998 Winter Olympics began in February.") == [(1998.0, 0, True)]
+    assert checked_numbers("Article no. 370 was revoked.") == []
+    # a claim's quantity does not match an unrelated YEAR in the article
+    # (1,500 rounds to the nearest hundred, so the year 1520 would have matched)
+    assert missing_numbers("The road is 1,500 km long.", "The road was first built in 1520.") == ["1500"]
+    assert missing_numbers("The road is 1,500 km long.", "The road is 1,500 km long.") == []

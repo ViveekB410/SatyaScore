@@ -46,6 +46,7 @@ from member1_model.cmhsa import (
 )
 from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
+from member2_data import kg_extra
 from member2_data.dates import DATE_PID, parse_date
 from member2_data.entity_linker import EntityLinker, english_capital_claim
 from member2_data.wikidata_connector import WikidataConnector
@@ -261,6 +262,7 @@ class DetectionPipeline:
         self.fact_checker = fact_checker
         # Number guard (member3_backend/number_guard.py); see number_guard_eval.py.
         self.number_guard = number_guard
+        self.keep_article_texts = False  # evidence["article_texts"], for number_guard_eval_v2.py only
 
     def run(
         self,
@@ -455,7 +457,9 @@ class DetectionPipeline:
                        "excerpt": ex, "kg_fact": kf,
                        "deciding_text": (pc["passages"][pc["passage_ids"].index(pc["deciding"][0])]
                                          if pc["deciding"] and pc["deciding"][0] in pc["passage_ids"] else None),
-                       "article_texts": _same_article_texts(pc, pc["deciding"][0]) if pc["deciding"] else []}
+                       # only for number_guard_eval_v2.py (not read by the API): not built per request
+                       "article_texts": (_same_article_texts(pc, pc["deciding"][0])
+                                         if self.keep_article_texts and pc["deciding"] else [])}
                       for pc, fc, ex, kf in zip(per_claim, fact_checks, excerpts, kg_facts)],
         )
 
@@ -527,6 +531,9 @@ class DetectionPipeline:
     def _kg_lookup(self, claim_text: str, language: Language):
         """(kg_conf, TripleVerification | None): the verification is kept so the
         API can show the fact Wikidata holds (e.g. the correct birthplace)."""
+        extra = kg_extra.check(claim_text, language, self.entity_linker, self.wikidata)
+        if extra is not None:  # authorship / current office / quantity / currency (member2_data/kg_extra.py)
+            return extra.confidence, (extra if extra.status != "unknown" else None)
         if language == "hi":
             return self._kg_lookup_hi(claim_text)
         cap = english_capital_claim(claim_text)

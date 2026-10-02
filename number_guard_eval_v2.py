@@ -104,6 +104,7 @@ def main() -> None:
     api._warmup_models()
     pipe = api._pipeline
     pipe.number_guard = False
+    pipe.keep_article_texts = True
     rng = random.Random(SEED)
     rows = []
     for lang, n in (("en", N_EN), ("hi", N_HI)):

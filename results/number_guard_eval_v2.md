@@ -19,3 +19,11 @@
 - [wiki, en] Until 2016 both men's and women's tournaments were held together since 2018 both are held separately but in the same calendar year with the exception of 2018 and 2020–2023.
 - [wiki, en] Broadcasting began with AM radio which became popular around 1920 with the spread of vacuum tube radio transmitters and receivers.
 - [wiki, en] There are 234 assembly constituencies and 39 Lok Sabha constituencies.
+
+## Note added after a code review (2026-10-03)
+
+A later review found two bugs in the version evaluated above: (1) the reference-number exemption
+matched "no" inside words such as "Nagano", so a following year could go unchecked; (2) a claim's
+non-year quantity could match a year elsewhere in the article by rounding. Both are fixed in the code;
+the guard is still off, and these results describe the version as it was. A third attempt would need a
+fresh evaluation of the fixed code.

@@ -23,6 +23,7 @@ from typing import Literal
 
 import requests
 
+from member2_data import dates
 from member2_data._http import polite_get
 
 Language = Literal["en", "hi", "mr"]
@@ -58,6 +59,8 @@ class TripleVerification:
     # The subject's own values for the property on Wikidata (QIDs), e.g. Gandhi's
     # place of birth = (Q200017,) Porbandar. Shown to the user as the correct fact.
     actual_values: tuple[str, ...] = ()
+    # Literal values already written out (dates), e.g. ("2 October 1869",).
+    actual_text: tuple[str, ...] = ()
 
 
 class _TTLCache:
@@ -171,6 +174,53 @@ class WikidataConnector:
         if found is not None:  # never cache a network failure for 24h
             self._cache.set(cache_key, result)
         return result
+
+    def verify_date(self, subject_qid: str, property_pid: str, claimed: tuple[int, int | None, int | None],
+                    language: Language = "en") -> TripleVerification:
+        """A claimed date (year, month, day) against the subject's date property
+        (P569 birth, P570 death, P571 inception), compared only as precisely as both
+        give it. Supported if any stored date agrees; contradicted only if dates are
+        on record and none can agree; unknown otherwise (none on record, lookup
+        failed, or an early non-Gregorian date that cannot be compared exactly)."""
+        stored = self._date_values(subject_qid, property_pid)
+        verdicts = [dates.matches(claimed, s) for s in stored or []]
+        if stored is None or not stored:
+            status = "unknown"
+        elif any(v is True for v in verdicts):
+            status = "supported"
+        elif all(v is False for v in verdicts):
+            status = "contradicted"
+        else:
+            status = "unknown"
+        return TripleVerification(
+            subject_qid=subject_qid, property_pid=property_pid,
+            expected_value="-".join(str(x) for x in claimed if x is not None),
+            found=status == "supported", confidence={"supported": 1.0, "contradicted": 0.0}.get(status),
+            used_fallback_label=False, source="live", status=status,
+            actual_text=tuple(dict.fromkeys(dates.format_date(s, language) for s in stored or [])),
+        )
+
+    def _date_values(self, qid: str, pid: str) -> list[tuple] | None:
+        """The subject's dates for `pid` (preferred rank if any, else normal;
+        deprecated skipped), each (year, month, day, gregorian). None if the lookup failed."""
+        key = f"dates|{qid}|{pid}"
+        cached = self._cache.get(key)
+        if cached is not None:
+            return cached
+        try:
+            response = polite_get(self._session, WIKIDATA_ENTITY_API, params={"action": "wbgetclaims", "entity": qid, "property": pid, "format": "json"}, timeout=10)
+            statements = response.json()["claims"].get(pid, [])
+        except Exception:
+            return None
+        live = [s for s in statements if s.get("rank") != "deprecated"]
+        preferred = [s for s in live if s.get("rank") == "preferred"]
+        out = []
+        for s in preferred or live:
+            v = s.get("mainsnak", {}).get("datavalue", {}).get("value")
+            if isinstance(v, dict) and (t := dates.wikidata_time(v)):
+                out.append(t)
+        self._cache.set(key, out)
+        return out
 
     # -- entity-API checks (fast, reliable; the SPARQL endpoint times out on paths)
 

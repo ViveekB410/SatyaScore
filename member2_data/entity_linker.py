@@ -31,6 +31,7 @@ from typing import Literal
 import requests
 
 from member2_data._http import polite_get
+from member2_data.dates import parse_date
 
 Language = Literal["en", "hi", "mr"]
 
@@ -60,6 +61,11 @@ RELATION_TO_PID: dict[str, str] = {
     "born in": "P19",
     "died in": "P20",
     "passed away in": "P20",
+    # "on" + a date: checked against date of birth / death (member2_data/dates.py)
+    "was born on": "P19",
+    "born on": "P19",
+    "died on": "P20",
+    "passed away on": "P20",
     # -- Citizenship (person -> country) --
     "is a citizen of": "P27",
     "is a national of": "P27",
@@ -159,6 +165,19 @@ def _splits(span: str, pid: str) -> list[tuple[str, str, str]]:
     return [(" ".join(toks[:k]), " ".join(toks[k:]), pid) for k in range(1, len(toks))]
 
 
+_HI_LIFE_DATE = re.compile(r"^(.+?) (का जन्म|का निधन|की मृत्यु) (.+?) (?:को|में) (?:हुआ|हुई)")
+
+
+def hindi_date_claim(claim_text: str) -> tuple[str, tuple, str] | None:
+    """(subject, (year, month, day), date PID) for "X का जन्म 1869 में हुआ" /
+    "X का जन्म 2 अक्टूबर 1869 को हुआ" / "X का निधन ... हुआ"; None otherwise."""
+    t = _HI_PUNCT.sub("", " ".join(claim_text.split()))
+    m = _HI_LIFE_DATE.match(t)
+    if not m or (d := parse_date(m.group(3))) is None:
+        return None
+    return m.group(1), d, ("P569" if m.group(2) == "का जन्म" else "P570")
+
+
 def hindi_relation_candidates(claim_text: str) -> list[tuple[str, str, str]]:
     """(subject, object, PID) readings of a Hindi claim; empty if no template fits."""
     t = _HI_PUNCT.sub("", " ".join(claim_text.split()))
@@ -231,6 +250,10 @@ class EntityLinker:
         insensitive) that are not obviously non-places (the same filter also
         suits people and countries). () if there are none, None if the lookup
         failed."""
+        # Wikidata has items for years and months ("1869", "October 1869"): a year matched
+        # as a birthplace contradicted "Gandhi was born in 1869". A date is never a place.
+        if parse_date(text) is not None:
+            return ()
         try:
             response = polite_get(self._session, WIKIDATA_SEARCH_ENDPOINT, params={
                     "action": "wbsearchentities",

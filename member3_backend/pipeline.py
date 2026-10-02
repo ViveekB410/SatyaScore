@@ -46,6 +46,7 @@ from member1_model.cmhsa import (
 )
 from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
+from member2_data.dates import DATE_PID, parse_date
 from member2_data.entity_linker import EntityLinker, english_capital_claim
 from member2_data.wikidata_connector import WikidataConnector
 from member3_backend.claim_extractor import ClaimExtractor, ExtractedClaim
@@ -99,6 +100,7 @@ NLI_EVIDENCE_TOP_K = 3
 # Gated behind SATYASCORE_SENTENCE_PREMISES (default OFF) so the live API keeps
 # its old behaviour until the A/B comparison justifies turning this on.
 MAX_SENTENCES_PER_PASSAGE = 8
+MAX_DATE_SUBJECTS = 5  # namesakes checked for a date claim (one Wikidata request each)
 MAX_EXCERPT_SENTENCES = 20  # sentences of the deciding passage scanned for the evidence excerpt
 # A sentence is quoted only if the NLI gives it at least this much for the deciding
 # direction AND it shares a content word with the claim beyond the article's name
@@ -520,6 +522,10 @@ class DetectionPipeline:
         entities = self.claim_extractor.extract_entities(claim_text, language)
         if len(entities) < 2:
             return None, None
+        pid = self.entity_linker.find_relation_pid(claim_text)
+        if pid in DATE_PID and (when := parse_date(entities[1])) is not None:
+            # "born in 1869" / "died on 27 May 1964" / "founded in 1885": a date, not a place
+            return self._date_lookup(re.sub(r"^the\s+", "", entities[0], flags=re.I), DATE_PID[pid], when, language)
 
         linked = self.entity_linker.link_claim(
             claim_text=claim_text, subject_text=entities[0], object_text=entities[1], language=language
@@ -543,7 +549,10 @@ class DetectionPipeline:
         """Hindi: template-based relation + exact Hindi-name linking
         (EntityLinker.link_hindi_claim). The first same-named subject with a
         definite answer is used; a namesake with no value gives no signal."""
-        from member2_data.entity_linker import hindi_relation_candidates
+        from member2_data.entity_linker import hindi_date_claim, hindi_relation_candidates
+        if (dated := hindi_date_claim(claim_text)) is not None:  # "X का जन्म 1869 में हुआ": a date
+            subject_text, when, date_pid = dated
+            return self._date_lookup(subject_text, date_pid, when, "hi")
         if not hindi_relation_candidates(claim_text):  # no template fits: no network call
             return None, None
         for linked in self.entity_linker.link_hindi_claim(claim_text):
@@ -555,16 +564,30 @@ class DetectionPipeline:
                 return v.confidence, v
         return None, None
 
+    def _date_lookup(self, subject_text: str, date_pid: str, when: tuple, language: Language):
+        """A claimed date against every item named exactly `subject_text` (at most
+        MAX_DATE_SUBJECTS): supported if any namesake's date agrees, contradicted only
+        if every namesake with a date on record disagrees, else no signal. A top search
+        hit is not trusted here: for "The Indian National Congress" it was a book."""
+        subjects = (self.entity_linker.search_places(subject_text, language) or ())[:MAX_DATE_SUBJECTS]
+        results = [self.wikidata.verify_date(s, date_pid, when, language) for s in subjects]
+        if supported := [v for v in results if v.status == "supported"]:
+            return supported[0].confidence, supported[0]
+        dated = [v for v in results if v.actual_text]  # namesakes with a date on record
+        if dated and all(v.status == "contradicted" for v in dated):
+            return dated[0].confidence, dated[0]
+        return None, None
+
     def _kg_fact(self, v, language: Language) -> dict | None:
         """The fact Wikidata holds, named in the claim's language (English fallback):
         {subject, property, values, status, url}. None if it cannot be named."""
-        if v is None or v.status not in ("supported", "contradicted") or not v.actual_values:
+        if v is None or v.status not in ("supported", "contradicted") or not (v.actual_values or v.actual_text):
             return None
         try:
             names = self.wikidata.labels([v.subject_qid, v.property_pid, *v.actual_values], language)
         except Exception:
             return None
-        values = [names[q] for q in v.actual_values if q in names]
+        values = list(v.actual_text) or [names[q] for q in v.actual_values if q in names]
         if v.subject_qid not in names or v.property_pid not in names or not values:
             return None
         return {"subject": names[v.subject_qid], "property": names[v.property_pid], "values": values,

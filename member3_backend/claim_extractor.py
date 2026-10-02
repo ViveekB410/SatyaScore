@@ -213,6 +213,48 @@ def is_well_formed_claim(text: str, language: Language) -> bool:
     return claim_quality(text, language)[0] == "ok"
 
 
+# -- Is a sentence a factual claim at all? -------------------------------------
+# Chatbot answers mix facts with pleasantries ("I hope this helps!"), advice ("You
+# should visit it in winter"), opinions ("I think it is the most beautiful ...") and
+# questions. None of these can be verified, so each came out Uncertain and pulled the
+# whole-text verdict toward Uncertain. They are skipped (not highlighted, not scored).
+_PLEASANTRY = re.compile(
+    r"^\W*(?:i hope|hope this|let me\b|let us\b|let's|feel free|great question|good question|happy to help|"
+    r"glad to help|is there anything|if you have any|thanks|thank you|sure\b|certainly\b|of course\b)", re.I)
+# (not "In summary," / "In conclusion,": what follows them is usually a fact)
+_SPEAKER_OR_READER = {"i", "we", "you", "me", "us"}
+_HI_SPEAKER_OR_READER = re.compile(r"^\W*(?:मैं|मुझे|मेरा|मेरी|हम|हमें|हमारा|आप|आपको|आपका|आपकी|कृपया)\s")
+
+
+def _not_a_claim_en(sent: Span) -> bool:
+    text = sent.text.strip()
+    if not text or text.endswith("?") or _PLEASANTRY.match(text):
+        return True
+    root = sent.root
+    subjects = [c for c in root.children if c.dep_ in _SUBJECT_DEPS]
+    if any(s.text.lower() in _SPEAKER_OR_READER for s in subjects):
+        return True  # about the speaker or the reader: "I think ...", "You should ..."
+    if root.lemma_.lower() == "let" and any(c.text.lower() in ("me", "us") for c in root.children):
+        return True  # "Let me explain ...", "Let us look at ..."
+    # a command ("Visit it in winter."), unless any clause in it has a subject: "Note that
+    # X is Y", or a list heading run into a fact ("Provide instructions ... DNA contains ...")
+    if (not subjects and root.tag_ == "VB" and root.i == sent.start
+            and not any(t.dep_ in _SUBJECT_DEPS for t in sent)):
+        return True
+    return False
+
+
+def not_a_claim(text: str, language: Language) -> bool:
+    """True for questions, pleasantries, advice, opinions and other sentences about
+    the speaker or reader: nothing there to verify."""
+    t = text.strip()
+    if language == "en":
+        doc = _get_english_pipeline()(t)
+        sents = list(doc.sents)
+        return bool(sents) and _not_a_claim_en(sents[0])
+    return not t or t.endswith("?") or bool(_HI_SPEAKER_OR_READER.match(t))
+
+
 @dataclass
 class ExtractedClaim:
     claim_id: str
@@ -300,7 +342,7 @@ class ClaimExtractor:
                 if first[:1].isupper() and first[1:].islower():
                     item = item[0].lower() + item[1:]  # "Severe pain" -> "... severe pain"; keeps "WHO"
                 claim = f"{intro} {item}."
-                if not is_well_formed_claim(claim, "en"):
+                if not is_well_formed_claim(claim, "en") or not_a_claim(claim, "en"):
                     continue
                 s = item_start + marker + (len(item_raw[marker:]) - len(item_raw[marker:].lstrip()))
                 e = item_start + len(item_raw.rstrip())
@@ -337,6 +379,8 @@ class ClaimExtractor:
 
         claims: list[ExtractedClaim] = []
         for sent in doc.sents:
+            if _not_a_claim_en(sent):
+                continue  # question, pleasantry, advice, opinion: nothing to verify
             pieces = []
             for method, token_ids, precise_span in self._decompose_sentence(sent):
                 claim_text, had_unresolved = self._render_tokens(doc, token_ids, referents)
@@ -642,7 +686,7 @@ class ClaimExtractor:
 
         claims = []
         cursor = 0
-        for i, sentence in enumerate(sentences):
+        for sentence in sentences:
             sentence = sentence.strip()
             if not sentence:
                 continue
@@ -651,9 +695,11 @@ class ClaimExtractor:
                 start = cursor
             end = start + len(sentence)
             cursor = end
+            if not_a_claim(sentence, language):
+                continue  # question, pleasantry, advice: nothing to verify
             claims.append(
                 ExtractedClaim(
-                    claim_id=f"claim_{i}",
+                    claim_id=f"claim_{len(claims)}",
                     # blanked asides leave runs of spaces: collapse them in the claim
                     # text only (the offsets above still index the original input)
                     text=" ".join(sentence.split()),

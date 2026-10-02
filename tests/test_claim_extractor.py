@@ -237,3 +237,32 @@ def test_a_heading_before_a_blank_line_is_not_glued_to_the_next_sentence(extract
 def test_a_possessive_pronoun_becomes_a_possessive_name(extractor):
     claims = extractor.extract("Marie Curie won two Nobel Prizes. Her research was on radioactivity.", "en")
     assert claims[1].text == "Marie Curie's research was on radioactivity."
+
+# --- Sentences that are not factual claims are skipped ----------------------------
+
+from member3_backend.claim_extractor import not_a_claim
+
+
+def test_questions_pleasantries_advice_and_opinions_are_not_claims():
+    for s in ("I hope this helps!", "Let me know if you have any other questions.", "Great question!",
+              "Let me explain how it works.", "Is it worth visiting?", "You should visit it in winter.",
+              "I think it is the most beautiful building ever made.", "Visit it early in the morning.",
+              "Make sure to carry water."):
+        assert not_a_claim(s, "en"), s
+    for s in ("The Taj Mahal is closed on Fridays.", "Note that Agra is in Uttar Pradesh.",
+              "In summary, DNA is a molecule that carries genetic information.",
+              "Keep in mind that the monument is closed on Fridays.",
+              # a list heading run into a fact (an annotated test-set claim, verbatim)
+              "Provide instructions for protein synthesis DNA contains the instructions for the production "
+              "of proteins which are essential for various cellular functions."):
+        assert not not_a_claim(s, "en"), s
+    assert not_a_claim("आपको इसे सर्दियों में देखना चाहिए।", "hi") and not_a_claim("क्या आप जाना चाहेंगे?", "hi")
+    assert not not_a_claim("ताजमहल आगरा में स्थित है।", "hi")
+
+
+def test_a_chatbot_answer_keeps_only_its_facts(extractor):
+    text = ("Great question! The Taj Mahal is located in Agra. You should definitely visit it in winter! "
+            "Is it worth visiting? I hope this helps!")
+    assert [c.text for c in extractor.extract(text, "en")] == ["The Taj Mahal is located in Agra."]
+    hi = extractor.extract("ताजमहल आगरा में स्थित है। मुझे उम्मीद है कि इससे मदद मिलेगी।", "hi")
+    assert [c.text for c in hi] == ["ताजमहल आगरा में स्थित है।"] and hi[0].claim_id == "claim_0"

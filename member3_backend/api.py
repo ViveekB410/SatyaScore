@@ -121,6 +121,16 @@ class SourceRef(BaseModel):
     rating: str | None = None
 
 
+class KGFact(BaseModel):
+    """The fact Wikidata holds for a claim the knowledge graph decided, e.g.
+    subject "Mahatma Gandhi", property "place of birth", values ["Porbandar"]."""
+    subject: str
+    property: str
+    values: list[str]
+    status: Literal["supported", "contradicted"]
+    url: str
+
+
 class ClaimResult(BaseModel):
     claim_id: str
     text: str
@@ -139,6 +149,12 @@ class ClaimResult(BaseModel):
     calibration_n: int | None = None
     # Where the claim was checked (Wikipedia articles, Wikidata), deciding one first.
     sources: list[SourceRef] = []
+    # Explanation (does not affect the verdict): the sentence of the deciding passage
+    # that most supports / contradicts the claim (NLI-decided claims) or the claim the
+    # fact-checker checked (fact-checked claims); and the fact Wikidata holds
+    # (KG-decided claims).
+    evidence_excerpt: str | None = None
+    kg_fact: KGFact | None = None
 
 
 class DocumentResult(BaseModel):
@@ -503,6 +519,9 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
 
     hi_titles = _pipeline.subjects.hi_titles
 
+    def _ev(i: int) -> dict:
+        return result.evidence[i] if i < len(result.evidence) else {}
+
     def _sources(i: int, score) -> list[SourceRef]:
         ev = result.evidence[i] if i < len(result.evidence) else {"passage_ids": [], "deciding": None}
         refs, seen = [], set()
@@ -511,8 +530,9 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
             refs.append(SourceRef(title=fc["publisher"] or "Fact-check", language=request.language,
                                   url=fc["url"], role="fact-check", rating=fc["rating"]))
         if score.note == KG_NOTE:
-            refs.append(SourceRef(title="Wikidata", language="mul", url="https://www.wikidata.org/",
-                                  role="knowledge graph"))
+            kf = ev.get("kg_fact")
+            refs.append(SourceRef(title="Wikidata", language="mul",
+                                  url=kf["url"] if kf else "https://www.wikidata.org/", role="knowledge graph"))
         # the NLI's deciding passage is only "the" source when NLI made the verdict
         nli_decided = score.note != KG_NOTE and not (score.note or "").startswith(("judged by LLM", FC_NOTE_PREFIX))
         deciding = ev.get("deciding") if nli_decided else None
@@ -539,6 +559,8 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
             extraction_method=claim.extraction_method,
             **_calib(score),
             sources=_sources(i, score),
+            evidence_excerpt=_ev(i).get("excerpt"),
+            kg_fact=_ev(i).get("kg_fact"),
         )
         for i, (claim, score) in enumerate(zip(result.claims, result.scores))
     ]

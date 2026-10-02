@@ -149,7 +149,7 @@ http://localhost:8000/docs.
 Code map: `member1_model/` (embeddings, NLI, scoring, calibration, LLM verifier) ·
 `member2_data/` (Wikidata connector, entity linker) · `member3_backend/` (API, accounts, pipeline,
 claim extractor, retriever, Wikipedia expander, evidence rules) · `web/` (the web app) ·
-`results/` (every measured result) · `tests/` (200 automated tests).
+`results/` (every measured result) · `tests/` (213 automated tests).
 
 ---
 
@@ -275,6 +275,15 @@ measures *topic*, not *truth* (below chance in Hindi). When the KG answers, it o
   the CSV/JSON export; not shown on the results page. Honestly reported: for English the
   score adds little beyond the base rate (`results/calibration.md`).
 - **Sources:** each claim shows the article, Wikidata check or fact-check that decided it, linked.
+- **Explanations** (shown with each claim; they never change a verdict):
+  - *Correct fact* (knowledge graph): the value Wikidata holds, in English or Hindi, e.g.
+    *"Correct fact: Mahatma Gandhi · place of birth: **Porbandar**"*.
+  - *Evidence sentence* (Wikipedia): the one sentence of the deciding passage that most supports
+    or contradicts the claim (chosen by NLI). It is quoted only if it visibly addresses the claim:
+    it must share a word with the claim beyond the article's name. Otherwise only the article is
+    named. Example: for *"The capital of Japan is Beijing"* the deciding passage was about Beijing's
+    ring roads; the verdict is right, but that passage is weak evidence, so no sentence is quoted.
+  - *Checked claim* (fact-checks): the claim the fact-checker rated.
 
 ### Optional, not yet switched on — LLM verifier (`member1_model/llm_verifier.py`)
 A large language model (gpt-oss-120b via Groq) reads the claim and its passages and gives a verdict.
@@ -310,7 +319,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 | Data | SQLite (`instance/satyascore.db`, never committed): users, sessions, each user's saved checks |
 | Rate limits | 100 checks/min per signed-in user or API key; 20/min per network when anonymous |
 | Speed | NVIDIA GPU (RTX 4050): typically **1–5 s per check**; a topic seen for the first time can take 10–15 s (live Wikipedia/Wikidata lookups) |
-| Quality | **206 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
+| Quality | **213 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
 
 ---
 
@@ -320,7 +329,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 |---|---|
 | Stack | **React + TypeScript**, built with **Vite**; **Tailwind CSS**; **Radix/shadcn** primitives (dialogs, menus); Framer Motion (subtle transitions); React Router |
 | Pages | Connecting (waits for the backend), **Analyse**, **History**, Sign in, Create account |
-| Analyse page | text box (paste or upload), language **Auto / English / हिन्दी**, examples, Clear; results: whole-text verdict with the overall score beside it, the text with each claim highlighted (red / amber / green), claims grouped by verdict with their evidence, optional scores table, one-line sources, export CSV/JSON |
+| Analyse page | text box (paste or upload), language **Auto / English / हिन्दी**, examples, Clear; results: whole-text verdict with the overall score beside it, the text with each claim highlighted (red / amber / green), claims grouped by verdict with their evidence (the deciding sentence, the correct fact, or the fact-checked claim), optional scores table, one-line sources, export CSV/JSON |
 | Design | quiet "research instrument" style (Lora + Inter fonts, Noto for Hindi), accessible (keyboard, focus rings, contrast, verdicts never by colour alone), works on phone-sized screens |
 | Details | highlights are exact even after emoji; saved checks reopen without re-running |
 

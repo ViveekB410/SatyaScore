@@ -49,7 +49,7 @@ from member1_model.nli_scorer import NLIScorer
 from member2_data.entity_linker import EntityLinker
 from member2_data.wikidata_connector import WikidataConnector
 from member3_backend.claim_extractor import ClaimExtractor, ExtractedClaim
-from member3_backend.evidence_rules import RULES as AGGREGATION_RULES, SubjectIndex, deciding
+from member3_backend.evidence_rules import RULES as AGGREGATION_RULES, SubjectIndex, deciding, passage_source
 from member3_backend.factcheck_rules import FC_FALSE_SCORE, FC_NOTE_PREFIX, FC_TRUE_SCORE
 from member3_backend.factcheck_rules import decide as decide_fact_check
 from member3_backend.factcheck_rules import match as match_fact_checks
@@ -99,6 +99,22 @@ NLI_EVIDENCE_TOP_K = 3
 # Gated behind SATYASCORE_SENTENCE_PREMISES (default OFF) so the live API keeps
 # its old behaviour until the A/B comparison justifies turning this on.
 MAX_SENTENCES_PER_PASSAGE = 8
+MAX_EXCERPT_SENTENCES = 20  # sentences of the deciding passage scanned for the evidence excerpt
+# A sentence is quoted only if the NLI gives it at least this much for the deciding
+# direction AND it shares a content word with the claim beyond the article's name
+# (otherwise the quote would not visibly address the claim, e.g. a sentence about
+# Beijing's ring roads for "The capital of Japan is Beijing").
+MIN_EXCERPT_PROB = 0.3
+_EXCERPT_STOP = set(
+    "the and was were is are with that this from for has have had which its his her their also into "
+    "been being there other than then they them these those such about after before during most more "
+    "many some only who whom whose what when where while known called usually often first".split()
+) | set("का की के में है हैं था थी थे और से को ने पर एक यह वह भी हो जाता जाती गया गई किया हुआ हुई लिए तक".split())
+_WORD_SPLIT = re.compile(r"[\s,.;:!?।()\[\]\"'“”‘’\-–—/]+")
+
+
+def _content_words(text: str) -> set[str]:
+    return {w for w in _WORD_SPLIT.split(text.casefold()) if len(w) > 2 and w not in _EXCERPT_STOP}
 
 
 def _sentence_premises_enabled() -> bool:
@@ -133,6 +149,11 @@ def passage_to_premises(passage_text: str, sentence_level: bool | None = None) -
     if not sentences:  # nothing splittable -- fall back to the whole passage
         return [passage_text]
     return sentences[:MAX_SENTENCES_PER_PASSAGE]
+
+
+def _decided_elsewhere(note: str | None) -> bool:
+    """Was this claim's verdict set by the KG, the LLM judge or a fact-check (not by NLI)?"""
+    return bool(note) and (note == KG_NOTE or note.startswith(("judged by LLM", FC_NOTE_PREFIX)))
 
 
 def _naive_split_into_claims(text: str) -> list[ExtractedClaim]:
@@ -242,7 +263,7 @@ class DetectionPipeline:
         """
         timings = {k: 0.0 for k in
                    ("claim_extraction", "expansion", "embedding", "retrieval", "nli", "kg", "llm",
-                    "factcheck", "fusion", "total")}
+                    "factcheck", "explain", "fusion", "total")}
         t_start = time.perf_counter()
 
         t = time.perf_counter()
@@ -294,13 +315,13 @@ class DetectionPipeline:
                 # which is inherently a top-1 question, unlike NLI below.
                 sem_sim = max(0.0, min(1.0, relevant_passages[0].score))
 
-            kg_conf = None
+            kg_conf, kg_v = None, None
             if "kg" in enabled and self.entity_linker and self.wikidata:
                 t = time.perf_counter()
-                kg_conf = self._try_kg_verification(claim_id, claim_text, language)
+                kg_conf, kg_v = self._kg_lookup(claim_text, language)
                 timings["kg"] += (time.perf_counter() - t) * 1000
 
-            per_claim.append({"sem_sim": sem_sim, "nli_prob": None, "kg_conf": kg_conf,
+            per_claim.append({"sem_sim": sem_sim, "nli_prob": None, "kg_conf": kg_conf, "kg_v": kg_v,
                               "passages": [p.text for p in relevant_passages],
                               "passage_ids": [p.passage_id for p in relevant_passages], "deciding": None})
             if "nli" in enabled and self.nli_scorer and relevant_passages:
@@ -375,6 +396,22 @@ class DetectionPipeline:
                 scores[i], fact_checks[i] = self._fact_check(s, claim_texts[i], language)
             timings["factcheck"] = (time.perf_counter() - t_fc) * 1000
 
+        # --- Explanation only (no verdict changes): the evidence sentence of the
+        # passage that decided each NLI-decided claim, and the fact Wikidata holds
+        # for each KG-decided claim (e.g. the correct birthplace).
+        t_ex = time.perf_counter()
+        nli_decided = [not _decided_elsewhere(s.note) for s in scores]
+        excerpts: list[str | None] = [None] * len(scores)
+        if self.nli_scorer is not None and any(nli_decided):
+            excerpts = self._excerpts(claim_texts, [pc if ok else {**pc, "deciding": None}
+                                                    for pc, ok in zip(per_claim, nli_decided)])
+        for i, fc in enumerate(fact_checks):  # fact-checked: the claim the fact-checker checked
+            if fc:
+                excerpts[i] = fc["claim_text"] or None
+        kg_facts = [self._kg_fact(pc["kg_v"], language) if s.note == KG_NOTE else None
+                    for pc, s in zip(per_claim, scores)]
+        timings["explain"] = (time.perf_counter() - t_ex) * 1000
+
         # overall_score (mean) is kept for backward compatibility; `document`
         # is the whole-text verdict and should be what a reader looks at.
         overall_score = sum(s.hallu_score for s in scores) / len(scores)
@@ -390,8 +427,9 @@ class DetectionPipeline:
             processing_time_ms=timings["total"],
             timings_ms=timings,
             document=document,
-            evidence=[{"passage_ids": pc["passage_ids"], "deciding": pc["deciding"], "fact_check": fc}
-                      for pc, fc in zip(per_claim, fact_checks)],
+            evidence=[{"passage_ids": pc["passage_ids"], "deciding": pc["deciding"], "fact_check": fc,
+                       "excerpt": ex, "kg_fact": kf}
+                      for pc, fc, ex, kf in zip(per_claim, fact_checks, excerpts, kg_facts)],
         )
 
     def _fact_check(self, score: ClaimScore, claim_text: str, language: Language
@@ -457,23 +495,28 @@ class DetectionPipeline:
         """Returns kg_conf if the claim's entities+relation could be
         resolved to a Wikidata triple, else None (handled gracefully by
         the scorer's renormalisation — see module docstring)."""
+        return self._kg_lookup(claim_text, language)[0]
+
+    def _kg_lookup(self, claim_text: str, language: Language):
+        """(kg_conf, TripleVerification | None): the verification is kept so the
+        API can show the fact Wikidata holds (e.g. the correct birthplace)."""
         if language == "hi":
-            return self._try_kg_verification_hi(claim_text)
+            return self._kg_lookup_hi(claim_text)
         if self.claim_extractor is None:
-            return None
+            return None, None
         # No known relation phrase -> the claim can never link. Return before
         # any network call (this was ~1 s of Wikidata lookups per claim).
         if not self.entity_linker.find_relation_pid(claim_text):
-            return None
+            return None, None
         entities = self.claim_extractor.extract_entities(claim_text, language)
         if len(entities) < 2:
-            return None
+            return None, None
 
         linked = self.entity_linker.link_claim(
             claim_text=claim_text, subject_text=entities[0], object_text=entities[1], language=language
         )
         if not linked.linkable:
-            return None
+            return None, None
 
         verification = self.wikidata.verify_triple(
             subject_qid=linked.subject_qid,
@@ -482,20 +525,72 @@ class DetectionPipeline:
             language=language,
             alternatives=linked.object_candidates,
         )
-        return verification.confidence
+        return verification.confidence, verification
 
     def _try_kg_verification_hi(self, claim_text: str) -> float | None:
+        return self._kg_lookup_hi(claim_text)[0]
+
+    def _kg_lookup_hi(self, claim_text: str):
         """Hindi: template-based relation + exact Hindi-name linking
         (EntityLinker.link_hindi_claim). The first same-named subject with a
         definite answer is used; a namesake with no value gives no signal."""
         from member2_data.entity_linker import hindi_relation_candidates
         if not hindi_relation_candidates(claim_text):  # no template fits: no network call
-            return None
+            return None, None
         for linked in self.entity_linker.link_hindi_claim(claim_text):
             v = self.wikidata.verify_triple(
                 subject_qid=linked.subject_qid, property_pid=linked.property_pid,
                 expected_value=linked.object_qid, language="hi",
                 alternatives=linked.object_candidates)
             if v.status in ("supported", "contradicted"):
-                return v.confidence
-        return None
+                return v.confidence, v
+        return None, None
+
+    def _kg_fact(self, v, language: Language) -> dict | None:
+        """The fact Wikidata holds, named in the claim's language (English fallback):
+        {subject, property, values, status, url}. None if it cannot be named."""
+        if v is None or v.status not in ("supported", "contradicted") or not v.actual_values:
+            return None
+        try:
+            names = self.wikidata.labels([v.subject_qid, v.property_pid, *v.actual_values], language)
+        except Exception:
+            return None
+        values = [names[q] for q in v.actual_values if q in names]
+        if v.subject_qid not in names or v.property_pid not in names or not values:
+            return None
+        return {"subject": names[v.subject_qid], "property": names[v.property_pid], "values": values,
+                "status": v.status, "url": f"https://www.wikidata.org/wiki/{v.subject_qid}"}
+
+    def _excerpts(self, claim_texts: list[str], per_claim: list[dict]) -> list[str | None]:
+        """For each claim decided by a passage: the one sentence of that passage that
+        most supports (or contradicts) the claim, by NLI, to show as the evidence.
+        Explanation only: the verdict was already decided on the whole passage."""
+        out: list[str | None] = [None] * len(per_claim)
+        pairs: list[tuple[int, str, str]] = []  # (claim index, sentence, role)
+        for i, pc in enumerate(per_claim):
+            dec = pc.get("deciding")
+            if not dec or dec[0] not in pc["passage_ids"]:
+                continue
+            text = pc["passages"][pc["passage_ids"].index(dec[0])]
+            hi_titles = getattr(getattr(self, "subjects", None), "hi_titles", None) or {}
+            title_words = (_content_words(passage_source(dec[0], {})[0])
+                           | _content_words(passage_source(dec[0], hi_titles)[0]))
+            claim_words = _content_words(claim_texts[i]) - title_words
+            sentences = [s.strip() for s in _SENTENCE_SPLIT.split(text) if len(s.strip()) > 15][:MAX_EXCERPT_SENTENCES]
+            pairs += [(i, s, dec[1]) for s in sentences if claim_words & _content_words(s)]
+        if not pairs:
+            return out
+        try:
+            res = self.nli_scorer.score_batch(claim_ids=[f"ex{k}" for k in range(len(pairs))],
+                                              premises=[s for _, s, _ in pairs],
+                                              hypotheses=[claim_texts[i] for i, _, _ in pairs])
+        except Exception:
+            return out
+        best: dict[int, tuple[float, str]] = {}
+        for (i, s, role), r in zip(pairs, res):
+            p = r.entailment_prob if role == "supports" else r.contradiction_prob
+            if p >= MIN_EXCERPT_PROB and (i not in best or p > best[i][0]):
+                best[i] = (p, s)
+        for i, (_, s) in best.items():
+            out[i] = s
+        return out

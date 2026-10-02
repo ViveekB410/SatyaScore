@@ -55,6 +55,9 @@ class TripleVerification:
     used_fallback_label: bool  # True if we had to fall back to English label
     source: Literal["cache", "live"]
     status: Literal["supported", "contradicted", "unknown"] = "unknown"
+    # The subject's own values for the property on Wikidata (QIDs), e.g. Gandhi's
+    # place of birth = (Q200017,) Porbandar. Shown to the user as the correct fact.
+    actual_values: tuple[str, ...] = ()
 
 
 class _TTLCache:
@@ -161,6 +164,9 @@ class WikidataConnector:
             used_fallback_label=used_fallback,
             source="live",
             status=status,
+            # already fetched (cached) by the entity check: no extra request
+            actual_values=tuple(sorted(self._claim_values(subject_qid, property_pid) or ()))
+            if status != "unknown" and expected_value.startswith("Q") else (),
         )
         if found is not None:  # never cache a network failure for 24h
             self._cache.set(cache_key, result)
@@ -226,6 +232,36 @@ class WikidataConnector:
             if reached:
                 return True, True
         return False, bool(values)
+
+    def labels(self, ids: list[str], language: Language = "en") -> dict[str, str]:
+        """Names of items/properties (Q.../P...) in `language`, falling back to the
+        multilingual "mul" label (Wikidata now stores many personal names only there,
+        e.g. Albert Einstein) and then English, in one entity-API request. Missing ids
+        are left out; {} on failure."""
+        ids = list(dict.fromkeys(i for i in ids if i))[:50]
+        if not ids:
+            return {}
+        key = f"labels|{'|'.join(ids)}|{language}"
+        cached = self._cache.get(key)
+        if cached is not None:
+            return cached
+        langs = list(dict.fromkeys([language, "mul", "en"]))
+        try:
+            response = polite_get(self._session, WIKIDATA_ENTITY_API, params={
+                "action": "wbgetentities", "ids": "|".join(ids), "props": "labels",
+                "languages": "|".join(langs), "format": "json"}, timeout=10)
+            entities = response.json()["entities"]
+        except Exception:
+            return {}
+        out = {}
+        for i in ids:
+            lab = entities.get(i, {}).get("labels", {})
+            for lang in langs:
+                if lang in lab:
+                    out[i] = lab[lang]["value"]
+                    break
+        self._cache.set(key, out)
+        return out
 
     def get_label(self, qid: str, language: Language = "en") -> tuple[str | None, bool]:
         """

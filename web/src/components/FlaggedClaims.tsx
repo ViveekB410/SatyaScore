@@ -82,7 +82,44 @@ function EvidenceLine({ claim }: { claim: Claim }) {
   )
 }
 
+/** Why the verdict: the fact Wikidata holds (KG-decided), the claim a fact-checker
+ * rated (fact-checked), or the sentence of the deciding Wikipedia passage. */
+function Explanation({ claim, language }: { claim: Claim; language: Language }) {
+  const kf = claim.kg_fact
+  if (kf) {
+    const wrong = kf.status === 'contradicted'
+    return (
+      <p lang={language} className="mt-2 text-[14px] text-ink">
+        <span className={cn('font-medium', wrong ? 'text-flag-yes' : 'text-muted')}>
+          {wrong ? 'Correct fact:' : 'Wikidata:'}
+        </span>{' '}
+        {kf.subject} · {kf.property}: <strong className="font-semibold">{kf.values.join(' / ')}</strong>{' '}
+        <a href={kf.url} target="_blank" rel="noopener noreferrer"
+           className="text-[13px] text-navy underline decoration-rule underline-offset-2 hover:decoration-navy">
+          (Wikidata)
+        </a>
+      </p>
+    )
+  }
+  const ex = claim.evidence_excerpt
+  const deciding = (claim.sources ?? []).find((s) => s.role !== 'checked')
+  if (!ex || !deciding || deciding.role === 'knowledge graph') return null
+  const factCheck = deciding.role === 'fact-check'
+  const bar = factCheck ? 'border-navy' : deciding.role === 'supports' ? 'border-flag-yes' : 'border-flag-no'
+  return (
+    <blockquote
+      lang={factCheck ? language : deciding.language === 'hi' ? 'hi' : 'en'}
+      className={cn('mt-2 border-l-2 pl-3 text-[14px] leading-relaxed text-ink', bar)}
+    >
+      {factCheck && <span className="font-medium text-muted">Checked claim: </span>}“{ex}”
+    </blockquote>
+  )
+}
+
 function ClaimCard({ claim, n, language }: { claim: Claim; n: number; language: Language }) {
+  // The KG / fact-check notes repeat what the explanation and evidence line already say.
+  const deciding = (claim.sources ?? []).find((s) => s.role !== 'checked')
+  const showNote = claim.note && !claim.kg_fact && deciding?.role !== 'fact-check'
   return (
     <li className="relative rounded border border-rule bg-card py-4 pl-7 pr-5">
       <span className={cn('absolute inset-y-0 left-0 w-1 rounded-l', VERDICT[claim.verdict].bar)} aria-hidden="true" />
@@ -93,7 +130,8 @@ function ClaimCard({ claim, n, language }: { claim: Claim; n: number; language: 
       <p lang={language} className="mt-2 font-serif text-[17px] font-semibold leading-relaxed text-ink">
         {claim.text}
       </p>
-      {claim.note && <p className="mt-1.5 text-[14px] text-muted">{claim.note}</p>}
+      <Explanation claim={claim} language={language} />
+      {showNote && <p className="mt-1.5 text-[14px] text-muted">{claim.note}</p>}
       <EvidenceLine claim={claim} />
     </li>
   )

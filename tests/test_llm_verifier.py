@@ -90,7 +90,7 @@ def _pipeline_with(llm, kg_conf):
     # subject, so under "gated" it could not contradict; these tests need NLI to say No
     p = DetectionPipeline(embedder=embedder, retriever=retriever, scorer=scorer, claim_extractor=extractor,
                           nli_scorer=nli, llm_verifier=llm, aggregation="legacy")
-    p._try_kg_verification = lambda *a, **k: kg_conf
+    p._kg_lookup = lambda *a, **k: (kg_conf, None)
     p.entity_linker, p.wikidata = MagicMock(), MagicMock()
     return p
 

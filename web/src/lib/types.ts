@@ -19,6 +19,18 @@ export interface Claim {
   calibration_n?: number | null
   // Where the claim was checked; the article that decided the verdict comes first.
   sources?: SourceRef[]
+  // Explanation: the deciding sentence of the passage (or the fact-checked claim),
+  // and the fact Wikidata holds. Absent in checks saved before this was added.
+  evidence_excerpt?: string | null
+  kg_fact?: KGFact | null
+}
+
+export interface KGFact {
+  subject: string
+  property: string
+  values: string[]
+  status: 'supported' | 'contradicted'
+  url: string
 }
 
 export interface SourceRef {

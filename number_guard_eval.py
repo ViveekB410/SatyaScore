@@ -89,7 +89,10 @@ def guarded(verdict: str, note: str | None, claim: str, deciding, text: str | No
 
 
 def run_text(pipe, text: str, lang: str) -> list[dict]:
-    r = pipe.run(text, lang)
+    try:
+        r = pipe.run(text, lang)
+    except ValueError:  # no claims in the text (a fragment, or not a factual sentence)
+        return []
     return [{"claim": c.text, "off": s.verdict.value,
              "on": guarded(s.verdict.value, s.note, c.text, ev.get("deciding"), ev.get("deciding_text"))}
             for c, s, ev in zip(r.claims, r.scores, r.evidence)]

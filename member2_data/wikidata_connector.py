@@ -35,7 +35,7 @@ CACHE_TTL_SECONDS = 24 * 60 * 60  # 24 hours, per FR-03
 FUNCTIONAL_PIDS = {"P1376", "P36", "P19", "P20"}
 # Place-valued properties: the claimed object may be any enclosing region, so
 # the support query walks the located-in / country chain.
-HIERARCHICAL_PIDS = {"P19", "P20", "P131", "P159"}
+HIERARCHICAL_PIDS = {"P19", "P20", "P131", "P159", "P36"}  # P36: "Delhi is the capital of India" (New Delhi lies in Delhi)
 WIKIDATA_ENTITY_API = "https://www.wikidata.org/w/api.php"
 MAX_HIERARCHY_DEPTH = 6
 MAX_HIERARCHY_NODES = 60

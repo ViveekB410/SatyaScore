@@ -84,7 +84,7 @@ The results below were checked on the live system.
 
 | # | Paste this | Expected result | What it shows |
 |---|---|---|---|
-| 1 | *Cricket is a bat-and-ball sport played between two teams usually with 11 players per team. The capital of Japan is Beijing. Mahatma Gandhi was born in Delhi.* | **Verified** (Cricket, Wikipedia) · **Hallucinated** (Beijing, Wikipedia) · **Hallucinated** (Wikidata); whole text Hallucinated | claim-by-claim checking, in-place highlights, three kinds of evidence, the source of every verdict |
+| 1 | *Cricket is a bat-and-ball sport played between two teams usually with 11 players per team. The capital of Japan is Beijing. Mahatma Gandhi was born in Delhi.* | **Verified** (Cricket, Wikipedia, with the supporting sentence) · **Hallucinated**, *Correct fact: Japan · capital: Tokyo* · **Hallucinated**, *Correct fact: Mahatma Gandhi · place of birth: Porbandar*; whole text Hallucinated, overall score 0.32 | claim-by-claim checking, in-place highlights, Wikipedia and Wikidata evidence, the correct fact for each error |
 | 2 | *UNESCO declared Narendra Modi the best prime minister in the world.* | **Hallucinated**, "fact-checked by FACTLY (fact-check: FALSE)", linked | professional fact-checks; click the link to show the real article |
 | 3 | *Drinking hot water does not kill the coronavirus.* | **not** Hallucinated (Verified), although fact-checks exist for "hot water kills coronavirus" | safety: a fact-check counts only if it is about the same claim; negations are blocked |
 | 4 | *यूनेस्को ने नरेंद्र मोदी को दुनिया का सर्वश्रेष्ठ प्रधानमंत्री घोषित किया है।* (language on **Auto**) | **Hallucinated**, fact-checked by विश्वास न्यूज (Vishvas News) | Hindi end to end; language detected automatically |
@@ -149,7 +149,7 @@ http://localhost:8000/docs.
 Code map: `member1_model/` (embeddings, NLI, scoring, calibration, LLM verifier) ·
 `member2_data/` (Wikidata connector, entity linker) · `member3_backend/` (API, accounts, pipeline,
 claim extractor, retriever, Wikipedia expander, evidence rules) · `web/` (the web app) ·
-`results/` (every measured result) · `tests/` (213 automated tests).
+`results/` (every measured result) · `tests/` (215 automated tests).
 
 ---
 
@@ -230,6 +230,10 @@ of 99 (`results/aggregation_eval.md`).
 - the entity linker finds the Wikidata items (English phrases; **Hindi templates** such as
   "X का जन्म Y में हुआ"); places are matched by **exact name** (so "Erode" is the town, not a given name);
 - it follows the place hierarchy (born in Agra ⇒ born in India);
+- **capital claims**, in either phrasing ("The capital of X is Y", "Y is the capital of X", and the Hindi
+  forms), are checked from the country's side: a country has one current capital on Wikidata, so a
+  different city is a clear contradiction ("The capital of Australia is Sydney" → Canberra). A capital
+  lying inside the claimed city counts as support ("Delhi is the capital of India": New Delhi is in Delhi);
 - three outcomes: **supported**, **contradicted** (a different value for a one-value fact like
   birthplace), or **unknown** (no signal — never counted as false).
 
@@ -268,7 +272,7 @@ measures *topic*, not *truth* (below chance in Hindi). When the KG answers, it o
   Uncertain if any claim is hallucinated/uncertain; Verified only if every claim is verified.
 - **Overall score** (shown beside the whole-text verdict; the PRD's `overall_score`): the average
   support score of the claims, 0 = contradicted, 1 = supported. Example: the cricket/Japan/Gandhi
-  text scores **0.34** (0.96, 0.07 and 0.00 averaged). The verdict, not the average, is the result.
+  text scores **0.32** (0.96, 0.00 and 0.00 averaged). The verdict, not the average, is the result.
   An average can hide one false claim among true ones, which is why the verdict uses the share rule.
 - **P(Verified) with a 95% interval** (PRD FR-04; `member1_model/calibration.py`): the share of
   training claims with a similar score that were truly Verified. Returned by the API and included in
@@ -281,8 +285,9 @@ measures *topic*, not *truth* (below chance in Hindi). When the KG answers, it o
   - *Evidence sentence* (Wikipedia): the one sentence of the deciding passage that most supports
     or contradicts the claim (chosen by NLI). It is quoted only if it visibly addresses the claim:
     it must share a word with the claim beyond the article's name. Otherwise only the article is
-    named. Example: for *"The capital of Japan is Beijing"* the deciding passage was about Beijing's
-    ring roads; the verdict is right, but that passage is weak evidence, so no sentence is quoted.
+    named. Example (measured before capital claims went to Wikidata): for *"The capital of Japan is
+    Beijing"* the deciding passage was about Beijing's ring roads. The verdict was right, but the
+    evidence was weak, so no sentence was quoted.
   - *Checked claim* (fact-checks): the claim the fact-checker rated.
 
 ### Optional, not yet switched on — LLM verifier (`member1_model/llm_verifier.py`)
@@ -304,7 +309,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 | Evidence rule | support first → score 0.96 |
 | Verdict | **Verified**, source: **Cricket (Wikipedia)** |
 
-*"The capital of Japan is Beijing."* → the **Beijing** article contradicts it → **Hallucinated**.
+*"The capital of Japan is Beijing."* → Wikidata: Japan's capital is Tokyo → **Hallucinated** (knowledge graph).
 *"Mahatma Gandhi was born in Delhi."* → Wikidata: birthplace Porbandar → **Hallucinated** (knowledge graph).
 
 ---
@@ -319,7 +324,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 | Data | SQLite (`instance/satyascore.db`, never committed): users, sessions, each user's saved checks |
 | Rate limits | 100 checks/min per signed-in user or API key; 20/min per network when anonymous |
 | Speed | NVIDIA GPU (RTX 4050): typically **1–5 s per check**; a topic seen for the first time can take 10–15 s (live Wikipedia/Wikidata lookups) |
-| Quality | **213 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
+| Quality | **215 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
 
 ---
 

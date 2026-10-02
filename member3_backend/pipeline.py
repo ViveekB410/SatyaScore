@@ -46,7 +46,7 @@ from member1_model.cmhsa import (
 )
 from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
-from member2_data.entity_linker import EntityLinker
+from member2_data.entity_linker import EntityLinker, english_capital_claim
 from member2_data.wikidata_connector import WikidataConnector
 from member3_backend.claim_extractor import ClaimExtractor, ExtractedClaim
 from member3_backend.evidence_rules import RULES as AGGREGATION_RULES, SubjectIndex, deciding, passage_source
@@ -502,6 +502,15 @@ class DetectionPipeline:
         API can show the fact Wikidata holds (e.g. the correct birthplace)."""
         if language == "hi":
             return self._kg_lookup_hi(claim_text)
+        cap = english_capital_claim(claim_text)
+        if cap:  # capital claims: checked from the country's side (entity_linker.CAPITAL_PID)
+            linked = self.entity_linker.link_capital(*cap, language)
+            if not linked.linkable:
+                return None, None
+            v = self.wikidata.verify_triple(subject_qid=linked.subject_qid, property_pid=linked.property_pid,
+                                            expected_value=linked.object_qid, language=language,
+                                            alternatives=linked.object_candidates)
+            return v.confidence, v
         if self.claim_extractor is None:
             return None, None
         # No known relation phrase -> the claim can never link. Return before

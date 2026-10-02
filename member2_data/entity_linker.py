@@ -119,9 +119,36 @@ _NOT_A_PLACE = ("given name", "family name", "surname", "genus", "species",
 _HI_PUNCT = re.compile(r"[\s।.!?]+$")
 _HI_LIFE = re.compile(r"^(.+?) (का जन्म|का निधन|की मृत्यु) (.+?) में (?:हुआ|हुई)")
 _HI_CAPITAL_OF = re.compile(r"^(.+?) की राजधानी (.+?) है$")      # "X की राजधानी Y है": country P36 city
-_HI_IS_CAPITAL = re.compile(r"^(.+) की राजधानी है$")               # "Y (,) X की राजधानी है": city P1376 country
+_HI_IS_CAPITAL = re.compile(r"^(.+) की राजधानी है$")               # "Y (,) X की राजधानी है": also country P36 city
 _HI_LOCATED = re.compile(r"^(.+) में स्थित (?:है|था|थी)$")          # "X Y में स्थित है": P131
 MAX_HI_CANDIDATES = 4
+
+# Capital claims, both phrasings, are checked from the COUNTRY's side: (country,
+# P36 "capital", city). A country has one current capital on Wikidata, so a
+# different city is a clear contradiction. The city side (P1376 "capital of") cannot
+# contradict: Sydney is the capital of New South Wales, so "Sydney is the capital of
+# Australia" came back "unknown" and the NLI step wrongly verified it. The city is
+# matched as every place with exactly that name (as for birthplaces).
+CAPITAL_PID = "P36"
+_EN_CAPITAL_OF = re.compile(r"^\s*the capital (?:city )?of (?P<country>.+?) is (?P<city>.+?)[\s.!]*$", re.I)
+_EN_IS_CAPITAL = re.compile(r"^\s*(?P<city>.+?) is the capital (?:city )?of (?P<country>.+?)[\s.!]*$", re.I)
+_MAX_NAME_WORDS = 5
+
+
+def english_capital_claim(claim_text: str) -> tuple[str, str] | None:
+    """(country, city) if the claim is exactly "The capital of X is Y." or "Y is the
+    capital of X."; None otherwise (e.g. "Canberra, the capital of Australia, is a
+    planned city" or "Delhi was the capital of ..." -- past tense is not checked
+    against today's capital)."""
+    t = " ".join(claim_text.split())
+    m = _EN_CAPITAL_OF.match(t) or _EN_IS_CAPITAL.match(t)
+    if not m:
+        return None
+    country = re.sub(r"^the\s+", "", m["country"].strip(" ,"), flags=re.I)
+    city = re.sub(r"^the\s+", "", m["city"].strip(" ,"), flags=re.I)
+    if not country or not city or any(len(x.split()) > _MAX_NAME_WORDS for x in (country, city)):
+        return None
+    return country, city
 
 
 def _splits(span: str, pid: str) -> list[tuple[str, str, str]]:
@@ -144,7 +171,8 @@ def hindi_relation_candidates(claim_text: str) -> list[tuple[str, str, str]]:
     elif m := _HI_CAPITAL_OF.match(t):
         out.append((m.group(1), m.group(2), "P36"))
     elif m := _HI_IS_CAPITAL.match(t):
-        out += _splits(m.group(1), "P1376")
+        # checked from the country's side, like every capital claim (see CAPITAL_PID)
+        out += [(country, city, CAPITAL_PID) for city, country, _ in _splits(m.group(1), CAPITAL_PID)]
     elif m := _HI_LOCATED.match(t):
         out += _splits(m.group(1), "P131")
     return [c for c in out if c[0] and c[1]][:MAX_HI_CANDIDATES]
@@ -232,11 +260,22 @@ class EntityLinker:
             objects = self.search_places(obj, "hi")
             if not objects:
                 continue
-            place = pid in PLACE_PIDS
+            place = pid in PLACE_PIDS or pid == CAPITAL_PID
             return [LinkedTriple(subject_qid=s, property_pid=pid, object_qid=objects[0], linkable=True,
                                  object_candidates=objects if place else ())
                     for s in subjects[:3]]
         return []
+
+    def link_capital(self, country: str, city: str, language: Language = "en") -> LinkedTriple:
+        """(country, P36, city): the country by the top search hit, the city as every
+        place named exactly `city`. Unlinkable (no KG signal) if either is missing."""
+        country_qid = self.search_entity(country, language).qid
+        cities = self.search_places(city, language) or ()
+        if not cities and re.search(r"\.[A-Z]$", city):  # "Washington, D.C" lost its final dot to the sentence end
+            cities = self.search_places(city + ".", language) or ()
+        return LinkedTriple(subject_qid=country_qid, property_pid=CAPITAL_PID,
+                            object_qid=cities[0] if cities else None,
+                            linkable=bool(country_qid and cities), object_candidates=cities)
 
     def find_relation_pid(self, claim_text: str) -> str | None:
         """Substring match against RELATION_TO_PID, case-insensitive. Tries the

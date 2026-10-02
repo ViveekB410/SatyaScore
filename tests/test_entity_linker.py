@@ -181,9 +181,11 @@ def test_hindi_templates_read_birth_death_capital_and_location():
         "महात्मा गांधी", "पोरबंदर", "P19")
     assert hindi_relation_candidates("स्वामी विवेकानंद का निधन कोलकाता में हुआ।")[0][2] == "P20"
     assert hindi_relation_candidates("जापान की राजधानी टोक्यो है।") == [("जापान", "टोक्यो", "P36")]
+    # "Y X की राजधानी है" is checked from the country's side too (P36), since the city side
+    # (P1376) can never contradict (changed with the Sydney fix; was ("नई", "दिल्ली भारत", "P1376") ...)
     assert hindi_relation_candidates("नई दिल्ली भारत की राजधानी है।") == [
-        ("नई", "दिल्ली भारत", "P1376"), ("नई दिल्ली", "भारत", "P1376")]
-    assert hindi_relation_candidates("पेरिस, फ्रांस की राजधानी है") == [("पेरिस", "फ्रांस", "P1376")]
+        ("दिल्ली भारत", "नई", "P36"), ("भारत", "नई दिल्ली", "P36")]
+    assert hindi_relation_candidates("पेरिस, फ्रांस की राजधानी है") == [("फ्रांस", "पेरिस", "P36")]
     assert hindi_relation_candidates("ताजमहल आगरा में स्थित है।") == [("ताजमहल", "आगरा", "P131")]
     assert hindi_relation_candidates("सूर्य एक तारा है।") == []
 
@@ -195,4 +197,35 @@ def test_hindi_linking_uses_only_a_split_where_both_names_match_exactly():
         [{"id": exact[params["search"]], "match": {"text": params["search"]}, "description": "place"}]
         if params["search"] in exact else [])
     triples = EntityLinker(session=session).link_hindi_claim("नई दिल्ली भारत की राजधानी है।")
-    assert [(t.subject_qid, t.property_pid, t.object_qid) for t in triples] == [("Q987", "P1376", "Q668")]
+    assert [(t.subject_qid, t.property_pid, t.object_qid) for t in triples] == [("Q668", "P36", "Q987")]
+
+# --- Capital claims: both phrasings, checked from the country's side (the Sydney fix) ----
+
+from member2_data.entity_linker import english_capital_claim
+
+
+def test_capital_claims_are_read_in_both_phrasings():
+    assert english_capital_claim("The capital of Australia is Sydney.") == ("Australia", "Sydney")
+    assert english_capital_claim("Sydney is the capital of Australia.") == ("Australia", "Sydney")
+    assert english_capital_claim("The capital of the United States is Washington, D.C.") == (
+        "United States", "Washington, D.C")
+    assert english_capital_claim("The capital city of Japan is Tokyo") == ("Japan", "Tokyo")
+    # not a plain capital statement: no KG check
+    assert english_capital_claim("Canberra, the capital of Australia, is a planned city.") is None
+    assert english_capital_claim("Kolkata was the capital of British India.") is None
+    assert english_capital_claim("Mumbai is the financial capital of India.") is None
+
+
+def test_sydney_is_contradicted_from_the_country_side():
+    from member2_data.wikidata_connector import WikidataConnector
+    places = {"Australia": [{"id": "Q408", "match": {"text": "Australia"}, "description": "country"}],
+              "Sydney": [{"id": "Q3130", "match": {"text": "Sydney"}, "description": "city in New South Wales"},
+                         {"id": "Q1001x", "match": {"text": "Sydney"}, "description": "city in Nova Scotia"}]}
+    session = MagicMock()
+    session.get.side_effect = lambda url, params, headers, timeout: _mock_search_response(places.get(params["search"], []))
+    t = EntityLinker(session=session).link_capital("Australia", "Sydney")
+    assert (t.subject_qid, t.property_pid, t.object_candidates, t.linkable) == ("Q408", "P36", ("Q3130", "Q1001x"), True)
+    wd = WikidataConnector(session=MagicMock())
+    wd._claim_values = lambda qid, pid: {"Q3114"} if (qid, pid) == ("Q408", "P36") else set()  # Canberra
+    assert wd.verify_triple("Q408", "P36", "Q3130", alternatives=t.object_candidates).status == "contradicted"
+    assert wd.verify_triple("Q408", "P36", "Q3114").status == "supported"

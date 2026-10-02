@@ -7,6 +7,9 @@ import { cn } from '@/lib/utils'
 // hallucinated claims; a text with any hallucinated claim is never Verified.
 // Beside it, the overall support score (average of the claims' scores); side by
 // side on wide screens, stacked on phones.
+// The two lists in "How is this decided?" share a fixed first column so they line up.
+const ROWS = 'grid gap-x-6 gap-y-2.5 sm:grid-cols-[7.5rem_1fr]'
+
 export default function WholeTextVerdict({ doc, score }: { doc: DocumentSummary; score: number | null }) {
   const v = VERDICT[doc.verdict]
   return (
@@ -34,21 +37,27 @@ export default function WholeTextVerdict({ doc, score }: { doc: DocumentSummary;
       <details className="group mt-3">
         <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 rounded text-[13px] text-navy underline decoration-rule underline-offset-4 hover:decoration-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy [&::-webkit-details-marker]:hidden">
           How is this decided?
-          <span aria-hidden="true" className="text-[13px] leading-none no-underline transition-transform group-open:rotate-180">▾</span>
+          <svg aria-hidden="true" viewBox="0 0 12 12" className="h-3 w-3 transition-transform group-open:rotate-180">
+            <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
         </summary>
-        <dl className="mt-3 grid gap-x-6 gap-y-2.5 rounded border border-rule px-4 py-3 text-[13px] sm:grid-cols-[auto_1fr]">
-          <dt className="font-medium text-flag-no">Hallucinated</dt>
-          <dd className="text-muted">a third or more of the claims are hallucinated</dd>
-          <dt className="font-medium text-flag-unc">Uncertain</dt>
-          <dd className="text-muted">some claims are hallucinated or uncertain, but fewer than a third hallucinated</dd>
-          <dt className="font-medium text-flag-yes">Verified</dt>
-          <dd className="text-muted">every claim is verified</dd>
-          <dt className="mt-1 border-t border-rule pt-2.5 font-medium text-ink sm:mt-0">Overall score</dt>
-          <dd className="border-rule text-muted sm:border-t sm:pt-2.5">
-            the average of the claims’ support scores: 0 = contradicted by evidence, 1 = supported (bar ticks at{' '}
-            {LOW} and {HIGH}). The verdict above is the result; the average can hide one false claim among true ones.
-          </dd>
-        </dl>
+        <div className="mt-3 rounded border border-rule px-4 text-[13px]">
+          <dl className={cn(ROWS, 'py-3')}>
+            <dt className="font-medium text-flag-no">Hallucinated</dt>
+            <dd className="text-muted">a third or more of the claims are hallucinated</dd>
+            <dt className="font-medium text-flag-unc">Uncertain</dt>
+            <dd className="text-muted">some claims are hallucinated or uncertain, but fewer than a third hallucinated</dd>
+            <dt className="font-medium text-flag-yes">Verified</dt>
+            <dd className="text-muted">every claim is verified</dd>
+          </dl>
+          <dl className={cn(ROWS, 'border-t border-rule py-3')}>
+            <dt className="font-medium text-ink">Overall score</dt>
+            <dd className="text-muted">
+              the average of the claims’ support scores: 0 = contradicted by evidence, 1 = supported (bar ticks at{' '}
+              {LOW} and {HIGH}). The verdict above is the result; the average can hide one false claim among true ones.
+            </dd>
+          </dl>
+        </div>
       </details>
     </section>
   )

@@ -149,7 +149,7 @@ http://localhost:8000/docs.
 Code map: `member1_model/` (embeddings, NLI, scoring, calibration, LLM verifier) ·
 `member2_data/` (Wikidata connector, entity linker) · `member3_backend/` (API, accounts, pipeline,
 claim extractor, retriever, Wikipedia expander, evidence rules) · `web/` (the web app) ·
-`results/` (every measured result) · `tests/` (225 automated tests).
+`results/` (every measured result) · `tests/` (229 automated tests).
 
 ---
 
@@ -338,7 +338,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 | Data | SQLite (`instance/satyascore.db`, never committed): users, sessions, each user's saved checks |
 | Rate limits | 100 checks/min per signed-in user or API key; 20/min per network when anonymous |
 | Speed | NVIDIA GPU (RTX 4050): typically **1–5 s per check**; a topic seen for the first time can take 10–15 s (live Wikipedia/Wikidata lookups) |
-| Quality | **225 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
+| Quality | **229 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
 
 ---
 
@@ -416,6 +416,14 @@ measured before adoption.
 4. **Round-3 labels were AI-assisted** and checked by annotators (recorded as a deviation).
 5. The knowledge graph covers relational facts only; other facts depend on Wikipedia text and NLI.
 6. Needs internet for live Wikipedia/Wikidata; the dataset is smaller than the PRD's 3,000-claim target.
+7. **The NLI model largely ignores numbers:** "India became independent in 1950" can be Verified from a
+   passage saying 1947. Dates of birth, death and founding are checked exactly by Wikidata, but other
+   numbers are not. A "number guard" (Verified only if the evidence contains the claim's numbers) was
+   built and tested under a rule fixed in advance (`results/number_guard_eval.md`). It cut wrongly
+   Verified false-number claims from 27 to 3, but also removed Verified from too many true claims
+   (−12% on Wikipedia, −29% on the annotated claims), so it was **not adopted** and stays off.
+8. **Pronoun resolution is rule-based:** much better since following the sentence topic (93 → 277 right
+   on held-out text), but still wrong sometimes ("Mumbai is its financial hub" → "Mumbai's").
 
 ---
 

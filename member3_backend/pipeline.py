@@ -154,6 +154,12 @@ def passage_to_premises(passage_text: str, sentence_level: bool | None = None) -
     return sentences[:MAX_SENTENCES_PER_PASSAGE]
 
 
+def _same_article_texts(pc: dict, deciding_pid: str) -> list[str]:
+    """The retrieved passages from the same Wikipedia article as the deciding passage."""
+    title = passage_source(deciding_pid, {})[0]
+    return [t for pid, t in zip(pc["passage_ids"], pc["passages"]) if passage_source(pid, {})[0] == title]
+
+
 def _decided_elsewhere(note: str | None) -> bool:
     """Was this claim's verdict set by the KG, the LLM judge or a fact-check (not by NLI)?"""
     return bool(note) and (note == KG_NOTE or note.startswith(("judged by LLM", FC_NOTE_PREFIX)))
@@ -409,8 +415,7 @@ class DetectionPipeline:
             if not (self.number_guard and s.verdict == Verdict.VERIFIED and not _decided_elsewhere(s.note)
                     and dec and dec[1] == "supports" and dec[0] in per_claim[i]["passage_ids"]):
                 continue
-            text = per_claim[i]["passages"][per_claim[i]["passage_ids"].index(dec[0])]
-            if missing := missing_numbers(claim_texts[i], text):
+            if missing := missing_numbers(claim_texts[i], _same_article_texts(per_claim[i], dec[0])):
                 scores[i] = ClaimScore(claim_id=s.claim_id, hallu_score=0.5, verdict=Verdict.UNCERTAIN,
                                        active_signals=s.active_signals,
                                        note=f"{NUMBER_NOTE} ({', '.join(missing)})")
@@ -449,7 +454,8 @@ class DetectionPipeline:
             evidence=[{"passage_ids": pc["passage_ids"], "deciding": pc["deciding"], "fact_check": fc,
                        "excerpt": ex, "kg_fact": kf,
                        "deciding_text": (pc["passages"][pc["passage_ids"].index(pc["deciding"][0])]
-                                         if pc["deciding"] and pc["deciding"][0] in pc["passage_ids"] else None)}
+                                         if pc["deciding"] and pc["deciding"][0] in pc["passage_ids"] else None),
+                       "article_texts": _same_article_texts(pc, pc["deciding"][0]) if pc["deciding"] else []}
                       for pc, fc, ex, kf in zip(per_claim, fact_checks, excerpts, kg_facts)],
         )
 

@@ -1,4 +1,4 @@
-import { HIGH, LOW, ScoreBar } from '@/components/ScoresPanel'
+import { ScoreBar } from '@/components/ScoresPanel'
 import { VERDICT, summaryLine } from '@/lib/verdicts'
 import type { DocumentSummary } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -44,17 +44,16 @@ export default function WholeTextVerdict({ doc, score }: { doc: DocumentSummary;
         <div className="mt-3 rounded border border-rule px-4 text-[13px]">
           <dl className={cn(ROWS, 'py-3')}>
             <dt className="font-medium text-flag-no">Hallucinated</dt>
-            <dd className="text-muted">a third or more of the claims are hallucinated</dd>
+            <dd className="text-muted">One third or more of the claims are hallucinated</dd>
             <dt className="font-medium text-flag-unc">Uncertain</dt>
-            <dd className="text-muted">some claims are hallucinated or uncertain, but fewer than a third hallucinated</dd>
+            <dd className="text-muted">Some claims are hallucinated or uncertain, but fewer than one third of hallucinated</dd>
             <dt className="font-medium text-flag-yes">Verified</dt>
-            <dd className="text-muted">every claim is verified</dd>
+            <dd className="text-muted">All claim are verified</dd>
           </dl>
           <dl className={cn(ROWS, 'border-t border-rule py-3')}>
             <dt className="font-medium text-ink">Overall score</dt>
             <dd className="text-muted">
-              the average of the claims’ support scores: 0 = contradicted by evidence, 1 = supported (bar ticks at{' '}
-              {LOW} and {HIGH}). The verdict above is the result; the average can hide one false claim among true ones.
+              Average of all claim scores, from 0 (contradicted) to 1 (supported). A high average can still hide one false claim.{' '}
             </dd>
           </dl>
         </div>

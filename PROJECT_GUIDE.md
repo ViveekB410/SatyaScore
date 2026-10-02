@@ -271,7 +271,8 @@ measures *topic*, not *truth* (below chance in Hindi). When the KG answers, it o
   text scores **0.34** (0.96, 0.07 and 0.00 averaged). The verdict, not the average, is the result.
   An average can hide one false claim among true ones, which is why the verdict uses the share rule.
 - **P(Verified) with a 95% interval** (PRD FR-04; `member1_model/calibration.py`): the share of
-  training claims with a similar score that were truly Verified. Honestly reported: for English the
+  training claims with a similar score that were truly Verified. Returned by the API and included in
+  the CSV/JSON export; not shown on the results page. Honestly reported: for English the
   score adds little beyond the base rate (`results/calibration.md`).
 - **Sources:** each claim shows the article, Wikidata check or fact-check that decided it, linked.
 

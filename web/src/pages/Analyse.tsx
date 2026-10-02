@@ -243,7 +243,7 @@ export default function Analyse() {
               </div>
             ) : (
               <p className="mt-2 text-[13px] text-muted">
-                The HalluScore behind each verdict, with its calibrated P(Verified). Hidden by default: the verdicts
+                The support score (HalluScore) behind each verdict. Hidden by default: the verdicts
                 above are the result.
               </p>
             )}

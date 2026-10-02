@@ -5,7 +5,8 @@ import { cn } from '@/lib/utils'
 export const LOW = 0.35
 export const HIGH = 0.65
 
-// Per-claim scores (PRD FR-04 / FR-06), shown only on request. The support score
+// Per-claim scores (PRD FR-04 / FR-06), shown only on request. The calibrated P(Verified)
+// is not shown (removed by request); it stays in the API response and the CSV/JSON export. The support score
 // is drawn as a plain CSS bar against the two verdict cut-offs; no chart library.
 export function ScoreBar({ score, bar, className = 'w-24' }: { score: number; bar: string; className?: string }) {
   const pct = Math.max(0, Math.min(1, score)) * 100
@@ -22,21 +23,19 @@ export default function ScoresPanel({ claims, language }: { claims: Claim[]; lan
   return (
     <div className="rounded border border-rule bg-card">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] text-left text-sm">
-          <caption className="sr-only">Support score and P(Verified) for every claim</caption>
+        <table className="w-full min-w-[520px] text-left text-sm">
+          <caption className="sr-only">Support score for every claim</caption>
           <thead className="border-b border-rule">
             <tr className="label-caps">
               <th scope="col" className="px-4 py-2.5 font-medium">#</th>
               <th scope="col" className="px-4 py-2.5 font-medium">Claim</th>
               <th scope="col" className="px-4 py-2.5 font-medium">Verdict</th>
               <th scope="col" className="px-4 py-2.5 font-medium">Support score</th>
-              <th scope="col" className="px-4 py-2.5 text-right font-medium">P(Verified) [95% CI]</th>
             </tr>
           </thead>
           <tbody>
             {claims.map((c, i) => {
               const v = VERDICT[c.verdict]
-              const ci = c.p_verified_ci95
               return (
                 <tr key={c.claim_id} className="border-b border-rule align-top last:border-0">
                   <td className="px-4 py-3 tabular-nums text-muted">{i + 1}</td>
@@ -48,11 +47,6 @@ export default function ScoresPanel({ claims, language }: { claims: Claim[]; lan
                       <span className="tabular-nums text-ink">{c.hallu_score.toFixed(2)}</span>
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-ink">
-                    {c.p_verified == null || !ci
-                      ? '—'
-                      : `${c.p_verified.toFixed(2)} [${ci[0].toFixed(2)}, ${ci[1].toFixed(2)}]`}
-                  </td>
                 </tr>
               )
             })}
@@ -61,9 +55,7 @@ export default function ScoresPanel({ claims, language }: { claims: Claim[]; lan
       </div>
       <p className="border-t border-rule px-4 py-3 text-[13px] leading-relaxed text-muted">
         Support score: 0 = contradicted by evidence, 1 = supported. Below {LOW} is Hallucinated, above {HIGH}{' '}
-        Verified, in between Uncertain (the ticks on each bar). The score itself is not a probability; P(Verified) is the share
-        of training claims with a similar score that were Verified, with a 95% interval. Wide or overlapping
-        intervals mean the score is weak evidence either way.
+        Verified, in between Uncertain (the ticks on each bar). The score is not a probability.
       </p>
     </div>
   )

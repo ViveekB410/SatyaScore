@@ -422,6 +422,10 @@ measured before adoption.
    built and tested under a rule fixed in advance (`results/number_guard_eval.md`). It cut wrongly
    Verified false-number claims from 27 to 3, but also removed Verified from too many true claims
    (−12% on Wikipedia, −29% on the annotated claims), so it was **not adopted** and stays off.
+   Version 2 (years and numbers ≥ 100 only, the whole article as evidence; fresh test data,
+   `results/number_guard_eval_v2.md`) cut wrongly Verified claims from 36 to 11 with **no** loss on
+   the annotated chatbot claims, but true Wikipedia claims lost Verified 109 → 103 (−5.5%, limit 5%).
+   It missed the fixed rule by one claim, so it is also **off**.
 8. **Pronoun resolution is rule-based:** much better since following the sentence topic (93 → 277 right
    on held-out text), but still wrong sometimes ("Mumbai is its financial hub" → "Mumbai's").
 

@@ -147,6 +147,7 @@ def _get_english_pipeline() -> SpacyLanguage:
     if "en" not in _nlp_cache:
         nlp = spacy.load("en_core_web_sm")
         nlp.add_pipe("paragraph_breaks", before="parser")
+        nlp.add_pipe("no_mid_sentence_breaks", before="parser")
         _nlp_cache["en"] = nlp
     return _nlp_cache["en"]
 
@@ -173,6 +174,29 @@ def _paragraph_breaks(doc: Doc) -> Doc:
     for tok in doc[:-1]:
         if tok.is_space and tok.text.count("\n") >= 2:
             doc[tok.i + 1].is_sent_start = True
+    return doc
+
+
+_SENT_END = (".", "!", "?", ":", ";", "…", "।")
+_CLOSERS = ('"', "'", ")", "]", "”", "’")
+
+
+@SpacyLanguage.component("no_mid_sentence_breaks")
+def _no_mid_sentence_breaks(doc: Doc) -> Doc:
+    """A sentence can only start after sentence-ending punctuation (or a closing quote
+    or bracket right after it) or at a line break. The parser sometimes split mid-
+    sentence after a capitalised word: "The Taj Mahal has been a UNESCO | World Heritage
+    Site since 1983." gave the claim "The Taj Mahal has been a UNESCO." Line breaks are
+    still left to the parser (headings, list items, PDF text)."""
+    for tok in doc[1:]:
+        prev = doc[tok.i - 1]
+        if tok.is_space or prev.is_space or "\n" in prev.whitespace_ or tok.is_sent_start:
+            continue
+        if prev.text.endswith(_SENT_END):
+            continue
+        if prev.text in _CLOSERS and tok.i >= 2 and doc[tok.i - 2].text.endswith(_SENT_END):
+            continue
+        tok.is_sent_start = False
     return doc
 
 

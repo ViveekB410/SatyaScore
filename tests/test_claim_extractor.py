@@ -283,3 +283,10 @@ def test_pronouns_follow_the_topic_not_the_last_name(extractor):
     assert people[-1] == "Gandhi later led the Salt March."  # was: "Nehru later led ..."
     paris = [c.text for c in extractor.extract("Paris is the capital of France. It has many museums.", "en")]
     assert paris[-1] == "Paris has many museums."  # was: "France has many museums."
+
+def test_no_sentence_break_without_punctuation(extractor):
+    # spaCy split after "UNESCO": the claim became "The Taj Mahal has been a UNESCO."
+    claims = [c.text for c in extractor.extract("The Taj Mahal has been a UNESCO World Heritage Site since 1983.", "en")]
+    assert claims == ["The Taj Mahal has been a UNESCO World Heritage Site since 1983."]
+    assert [c.text for c in extractor.extract("Dr. Smith works at AIIMS. He is a surgeon.", "en")] == [
+        "Dr. Smith works at AIIMS.", "Smith is a surgeon."]

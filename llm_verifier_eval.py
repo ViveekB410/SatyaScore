@@ -72,6 +72,8 @@ def run_llm(model: str, mode: str, sets: dict, ev: dict) -> tuple[dict, bool]:
     CACHE.mkdir(parents=True, exist_ok=True)
     cache = load_cache(path)
     verifier = LLMVerifier(model=model, mode=mode)
+    if wait_s:
+        verifier.MAX_WAIT_S = wait_s
     todo = [(name, c, e) for name in SET_ORDER for c, e in zip(sets[name].claim_text, ev[name])
             if _key(model, mode, c, e) not in cache]
     print(f"[{mode}] {len(cache)} cached, {len(todo)} to ask", flush=True)
@@ -141,6 +143,8 @@ def main() -> None:
     ap.add_argument("--model", default=DEFAULT_MODEL)
     ap.add_argument("--modes", nargs="+", default=["grounded", "open"], choices=["grounded", "open"])
     ap.add_argument("--evidence", choices=["demo", "expanded"], default="demo")
+    ap.add_argument("--wait", type=float, default=0, metavar="MIN",
+                    help="wait out Groq rate-limit pauses of up to MIN minutes instead of stopping (e.g. --wait 15)")
     ap.add_argument("--rebuild-evidence", action="store_true",
                     help="rebuild (and re-freeze) the expanded evidence instead of reusing the frozen copy")
     args = ap.parse_args()
@@ -187,7 +191,7 @@ def main() -> None:
     llm, finished = {}, {}
     for mode in args.modes:
         try:
-            llm[mode], finished[mode] = run_llm(args.model, mode, sets, ev)
+            llm[mode], finished[mode] = run_llm(args.model, mode, sets, ev, wait_s=args.wait * 60)
         except LLMVerifierError as e:
             sys.exit(f"Stopping: {e}")
 

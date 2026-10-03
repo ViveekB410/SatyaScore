@@ -42,7 +42,7 @@ from member2_data.entity_linker import EntityLinker
 from member2_data.wikidata_connector import WikidataConnector
 from member3_backend import auth
 from member3_backend.claim_extractor import ClaimExtractor
-from member3_backend.evidence_rules import SubjectIndex, passage_source
+from member3_backend.evidence_rules import SubjectIndex, passage_site, passage_source
 from member3_backend.faiss_retriever import FAISSRetriever
 from member3_backend.pipeline import DetectionPipeline
 
@@ -120,6 +120,7 @@ class SourceRef(BaseModel):
     url: str
     role: Literal["supports", "contradicts", "knowledge graph", "fact-check", "checked"]
     rating: str | None = None
+    site: str = "Wikipedia"  # Wikipedia / MedlinePlus / Wikidata / fact-check publisher
 
 
 class KGFact(BaseModel):
@@ -130,6 +131,7 @@ class KGFact(BaseModel):
     values: list[str]
     status: Literal["supported", "contradicted"]
     url: str
+    authority: str = "Wikidata"  # or "World Bank", "WHO", "World Bank, WHO"
 
 
 class ClaimResult(BaseModel):
@@ -435,6 +437,17 @@ def load_starter_corpus():
                 has_key = bool(_os.environ.get("GROQ_API_KEY"))
                 print(f"[api] LLM judge ON ({llm_mode}); GROQ_API_KEY "
                       f"{'set' if has_key else 'MISSING: claims will fall back to NLI'}", flush=True)
+            # World Bank / WHO country statistics (member2_data/official_stats.py). OFF unless
+            # official_sources_eval.py meets its fixed rule; SATYASCORE_OFFICIAL_STATS=true turns it on.
+            _pipeline.official_stats = _os.environ.get("SATYASCORE_OFFICIAL_STATS", "false").lower() in ("1", "true", "yes")
+            # MedlinePlus health topics as a second evidence source (member3_backend/
+            # medline_expander.py). OFF unless official_sources_eval.py meets its fixed rule;
+            # SATYASCORE_MEDLINE=true turns it on. Needs internet; cached in instance/medline_cache.
+            if _os.environ.get("SATYASCORE_MEDLINE", "false").lower() in ("1", "true", "yes"):
+                from member3_backend.medline_expander import MedlineExpander
+                _pipeline.medline = MedlineExpander(_embedder, _retriever, base / "instance" / "medline_cache",
+                                                    wiki=_pipeline.expander)
+                print("[api] MedlinePlus evidence ON", flush=True)
             # Number guard (member3_backend/number_guard.py): OFF unless number_guard_eval.py
             # meets its fixed rule. SATYASCORE_NUMBER_GUARD=true turns it on.
             _pipeline.number_guard = _os.environ.get("SATYASCORE_NUMBER_GUARD", "false").lower() in ("1", "true", "yes")
@@ -532,11 +545,13 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
         fc = ev.get("fact_check")
         if fc and (score.note or "").startswith(FC_NOTE_PREFIX):
             refs.append(SourceRef(title=fc["publisher"] or "Fact-check", language=request.language,
-                                  url=fc["url"], role="fact-check", rating=fc["rating"]))
+                                  url=fc["url"], role="fact-check", rating=fc["rating"], site="fact-check"))
         if score.note == KG_NOTE:
             kf = ev.get("kg_fact")
-            refs.append(SourceRef(title="Wikidata", language="mul",
-                                  url=kf["url"] if kf else "https://www.wikidata.org/", role="knowledge graph"))
+            authority = (kf or {}).get("authority", "Wikidata")
+            refs.append(SourceRef(title=authority, language="mul",
+                                  url=kf["url"] if kf else "https://www.wikidata.org/", role="knowledge graph",
+                                  site=authority))
         # the NLI's deciding passage is only "the" source when NLI made the verdict
         # (nor when the number guard overrode it: the passage lacks the claim's numbers)
         nli_decided = score.note != KG_NOTE and not (score.note or "").startswith(
@@ -549,7 +564,7 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
                 continue
             seen.add((lang, title))
             role = deciding[1] if deciding and pid == deciding[0] else "checked"
-            refs.append(SourceRef(title=title, language=lang, url=url, role=role))
+            refs.append(SourceRef(title=title, language=lang, url=url, role=role, site=passage_site(pid)))
         return refs
 
     claims = [

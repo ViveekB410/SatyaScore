@@ -73,10 +73,10 @@ function EvidenceLine({ claim }: { claim: Claim }) {
             {deciding.title}
           </a>{' '}
           ({sourceKind(deciding)})
-          {others > 0 && `; ${others} ${deciding.role === 'fact-check' ? 'Wikipedia ' : 'more '}article${others > 1 ? 's' : ''} checked`}
+          {others > 0 && `; ${others} ${deciding.role === 'fact-check' ? '' : 'more '}article${others > 1 ? 's' : ''} checked`}
         </>
       ) : (
-        `Evidence: ${sources.length} Wikipedia article${sources.length > 1 ? 's' : ''} checked; none clearly states or contradicts this claim`
+        `Evidence: ${sources.length} article${sources.length > 1 ? 's' : ''} checked; none clearly states or contradicts this claim`
       )}
     </p>
   )
@@ -91,12 +91,12 @@ function Explanation({ claim, language }: { claim: Claim; language: Language }) 
     return (
       <p lang={language} className="mt-2 text-[14px] text-ink">
         <span className={cn('font-medium', wrong ? 'text-flag-yes' : 'text-muted')}>
-          {wrong ? 'Correct fact:' : 'Wikidata:'}
+          {wrong ? 'Correct fact:' : `${kf.authority ?? 'Wikidata'}:`}
         </span>{' '}
         {kf.subject} · {kf.property}: <strong className="font-semibold">{kf.values.join(' / ')}</strong>{' '}
         <a href={kf.url} target="_blank" rel="noopener noreferrer"
            className="text-[13px] text-navy underline decoration-rule underline-offset-2 hover:decoration-navy">
-          (Wikidata)
+          ({kf.authority ?? 'Wikidata'})
         </a>
       </p>
     )

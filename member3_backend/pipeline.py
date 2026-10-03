@@ -46,7 +46,7 @@ from member1_model.cmhsa import (
 )
 from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
-from member2_data import kg_extra
+from member2_data import kg_extra, official_stats
 from member2_data.dates import DATE_PID, parse_date
 from member2_data.entity_linker import EntityLinker, english_capital_claim
 from member2_data.wikidata_connector import WikidataConnector
@@ -263,6 +263,11 @@ class DetectionPipeline:
         # Number guard (member3_backend/number_guard.py); see number_guard_eval.py.
         self.number_guard = number_guard
         self.keep_article_texts = False  # evidence["article_texts"], for number_guard_eval_v2.py only
+        # MedlinePlus as a second evidence source (member3_backend/medline_expander.py);
+        # None unless the API switches it on (official_sources_eval.py decides).
+        self.medline = None
+        # World Bank / WHO statistics; False unless the API switches them on.
+        self.official_stats = False
 
     def run(
         self,
@@ -294,6 +299,10 @@ class DetectionPipeline:
             t = time.perf_counter()
             self.expander.expand(list(zip(claim_texts, languages)))  # never raises; failures are skipped
             timings["expansion"] = (time.perf_counter() - t) * 1000
+        if self.medline is not None:  # MedlinePlus health topics (member3_backend/medline_expander.py)
+            t = time.perf_counter()
+            self.medline.expand(list(zip(claim_texts, languages)))  # never raises
+            timings["expansion"] += (time.perf_counter() - t) * 1000
 
         t = time.perf_counter()
         embedding_result = self.embedder.embed(
@@ -531,6 +540,10 @@ class DetectionPipeline:
     def _kg_lookup(self, claim_text: str, language: Language):
         """(kg_conf, TripleVerification | None): the verification is kept so the
         API can show the fact Wikidata holds (e.g. the correct birthplace)."""
+        if self.official_stats:  # World Bank / WHO country statistics (member2_data/official_stats.py)
+            stats = official_stats.check(claim_text, language, self.entity_linker, self.wikidata)
+            if stats is not None:
+                return stats.confidence, (stats if stats.status != "unknown" else None)
         extra = kg_extra.check(claim_text, language, self.entity_linker, self.wikidata)
         if extra is not None:  # authorship / current office / quantity / currency (member2_data/kg_extra.py)
             return extra.confidence, (extra if extra.status != "unknown" else None)
@@ -615,6 +628,8 @@ class DetectionPipeline:
         {subject, property, values, status, url}. None if it cannot be named."""
         if v is None or v.status not in ("supported", "contradicted") or not (v.actual_values or v.actual_text):
             return None
+        if v.display:  # World Bank / WHO: already named and linked
+            return {**v.display, "values": list(v.actual_text), "status": v.status}
         try:
             names = self.wikidata.labels([v.subject_qid, v.property_pid, *v.actual_values], language)
         except Exception:

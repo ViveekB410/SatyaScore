@@ -31,6 +31,7 @@ export interface KGFact {
   values: string[]
   status: 'supported' | 'contradicted'
   url: string
+  authority?: string // 'Wikidata' (default), 'World Bank', 'WHO', 'World Bank, WHO'
 }
 
 export interface SourceRef {
@@ -39,13 +40,15 @@ export interface SourceRef {
   url: string
   role: 'supports' | 'contradicts' | 'knowledge graph' | 'fact-check' | 'checked'
   rating?: string | null // fact-check only: the publisher's own rating, e.g. "False"
+  site?: string // "Wikipedia" | "MedlinePlus" | "Wikidata" | "fact-check" (absent in older saved checks)
 }
 
 /** What kind of reference this is, for the "(…)" after its name. */
 export function sourceKind(s: SourceRef): string {
   if (s.role === 'fact-check') return s.rating ? `fact-check: ${s.rating}` : 'fact-check'
-  if (s.role === 'knowledge graph' || s.language === 'mul') return 'knowledge graph'
-  return 'Wikipedia'
+  if (s.role === 'knowledge graph' || s.language === 'mul')
+    return !s.site || s.site === 'Wikidata' ? 'knowledge graph' : 'official statistics'
+  return s.site || 'Wikipedia'
 }
 
 // Whole-text verdict: Hallucinated when >= 1/3 of claims are Hallucinated.

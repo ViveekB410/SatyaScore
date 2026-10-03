@@ -61,6 +61,9 @@ class TripleVerification:
     actual_values: tuple[str, ...] = ()
     # Literal values already written out (dates), e.g. ("2 October 1869",).
     actual_text: tuple[str, ...] = ()
+    # For facts from another official source (World Bank / WHO, member2_data/official_stats.py):
+    # {"subject", "property", "url", "authority"} as shown to the user.
+    display: dict | None = None
 
 
 class _TTLCache:

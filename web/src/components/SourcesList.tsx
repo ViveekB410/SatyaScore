@@ -22,7 +22,7 @@ export default function SourcesList({ claims }: { claims: Claim[] }) {
              className="text-navy underline decoration-rule underline-offset-2 hover:decoration-navy">
             {s.title}
           </a>
-          {s.role === 'fact-check' ? ` (${sourceKind(s)})` : s.language !== 'mul' && ' (Wikipedia)'}
+          {s.role === 'fact-check' ? ` (${sourceKind(s)})` : s.language !== 'mul' && ` (${sourceKind(s)})`}
         </Fragment>
       ))}
     </p>

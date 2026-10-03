@@ -80,6 +80,11 @@ class SubjectIndex:
                    strict=strict)
 
     def names(self, passage_id: str) -> list[str]:
+        if passage_id.startswith("medline:"):  # the topic title and its "also called" names
+            from member3_backend.medline_expander import SOURCES
+            title = passage_id.split(":", 2)[2].rsplit("::", 1)[0]
+            return [f for t in [title, *(SOURCES.get(title) or {}).get("alt", [])]
+                    for f in title_forms(t, self.strict)]
         if passage_id.startswith("wiki:"):
             _, _, rest = passage_id.split(":", 2)
             return title_forms(rest.rsplit("::", 1)[0], self.strict)
@@ -142,9 +147,19 @@ def deciding(rows: list[tuple[float, float, bool, str]], aggregation: str = "gat
     return None
 
 
+def passage_site(passage_id: str) -> str:
+    """Which reference site a passage comes from: "MedlinePlus" or "Wikipedia"."""
+    return "MedlinePlus" if passage_id.startswith("medline:") else "Wikipedia"
+
+
 def passage_source(passage_id: str, hi_titles: dict[str, str] | None = None) -> tuple[str, str, str]:
-    """(title, language, Wikipedia URL) of the article a passage comes from."""
+    """(title, language, URL) of the article a passage comes from."""
     from urllib.parse import quote
+    if passage_id.startswith("medline:"):
+        from member3_backend.medline_expander import SOURCES
+        title = passage_id.split(":", 2)[2].rsplit("::", 1)[0]
+        url = (SOURCES.get(title) or {}).get("url") or f"https://medlineplus.gov/search/?query={quote(title)}"
+        return title, "en", url
     if passage_id.startswith("wiki:"):
         _, lang, rest = passage_id.split(":", 2)
         title = rest.rsplit("::", 1)[0]

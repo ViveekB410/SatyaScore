@@ -141,6 +141,8 @@ def main() -> None:
     ap.add_argument("--model", default=DEFAULT_MODEL)
     ap.add_argument("--modes", nargs="+", default=["grounded", "open"], choices=["grounded", "open"])
     ap.add_argument("--evidence", choices=["demo", "expanded"], default="demo")
+    ap.add_argument("--rebuild-evidence", action="store_true",
+                    help="rebuild (and re-freeze) the expanded evidence instead of reusing the frozen copy")
     args = ap.parse_args()
 
     def nli_on(texts: dict) -> dict:
@@ -158,8 +160,21 @@ def main() -> None:
         nli = nli_on(ev)  # the reference: NLI on the same evidence
         ref_label, suffix = "NLI (current)", ""
     else:
-        from wiki_expansion_eval import build_evidence
-        base, exp, totals, n0, n1 = build_evidence(sets)
+        # The expanded evidence is FROZEN at its first complete build (added 2026-10-04):
+        # live Wikipedia search results drift, so every rebuild gave slightly different
+        # passages (34,342 / 34,321 / 34,631 indexed), the cached LLM answers (keyed on the
+        # passages) stopped matching, and resumed runs re-asked instead of progressing.
+        # Freezing keeps the LLM and the reference scored on identical evidence across runs.
+        frozen = CACHE / "evidence_expanded.json"
+        if frozen.exists() and not args.rebuild_evidence:
+            base, exp, totals, n0, n1 = json.loads(frozen.read_text(encoding="utf-8"))
+            print(f"[evidence] frozen copy reused ({frozen.name})", flush=True)
+        else:
+            from wiki_expansion_eval import build_evidence
+            base, exp, totals, n0, n1 = build_evidence(sets)
+            CACHE.mkdir(parents=True, exist_ok=True)
+            frozen.write_text(json.dumps([base, exp, totals, n0, n1], ensure_ascii=False), encoding="utf-8")
+            print(f"[evidence] built and frozen ({frozen.name})", flush=True)
         ev = {n: [[t for _, t, _ in e] for e in exp[n]] for n in sets}
         nli = nli_on({n: [[t for _, t, _ in e] for e in base[n]] for n in sets})  # live system when the rule was fixed
         extra["NLI on expanded evidence"] = nli_on(ev)

@@ -156,17 +156,28 @@ def stats_part(sets) -> tuple[list[str], bool]:
 
 
 def main() -> None:
-    import member3_backend.api as api
-    api.load_starter_corpus()
-    api._warmup_models()
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--part", choices=["all", "stats", "medline"], default="all",
+                    help="run one part (each writes its own section file); 'all' runs both")
+    part = ap.parse_args().part
     sets = load_sets()
-    L = ["# Official sources: MedlinePlus, World Bank, WHO\n"]
-    s, _ = stats_part(sets)
-    L += s + [""]
-    m, _ = medline_part(api, sets)
-    L += m
-    (ROOT / "results" / "official_sources_eval.md").write_text("\n".join(L) + "\n", encoding="utf-8")
-    print("\n".join(L))
+    out = ROOT / "results"
+    if part in ("all", "stats"):
+        s, _ = stats_part(sets)
+        (out / "official_sources_eval_stats.md").write_text("\n".join(s) + "\n", encoding="utf-8")
+        print("\n".join(s), flush=True)
+    if part in ("all", "medline"):
+        import member3_backend.api as api
+        api.load_starter_corpus()
+        api._warmup_models()
+        m, _ = medline_part(api, sets)
+        (out / "official_sources_eval_medline.md").write_text("\n".join(m) + "\n", encoding="utf-8")
+        print("\n".join(m), flush=True)
+    sections = [p.read_text(encoding="utf-8") for p in (out / "official_sources_eval_stats.md",
+                                                       out / "official_sources_eval_medline.md") if p.exists()]
+    (out / "official_sources_eval.md").write_text("# Official sources: MedlinePlus, World Bank, WHO\n\n"
+                                                  + "\n".join(sections), encoding="utf-8")
 
 
 if __name__ == "__main__":

@@ -254,6 +254,14 @@ of 99 (`results/aggregation_eval.md`).
   **quantities** (height, length, population, area, with units and tolerances: "Mount Everest is
   7,200 metres tall" → *8,849 m*) and **currency** ("जापान की मुद्रा यूरो है" → *जापानी येन*). On a probe
   of 30 unseen claims, wrong verdicts went from 6 to 0 (2 left Uncertain); no annotated claim changed;
+- **official statistics** (`member2_data/official_stats.py`): a country's population, GDP, life expectancy,
+  literacy rate and infant mortality, in English and Hindi, are checked against **World Bank Open Data** and the
+  **WHO Global Health Observatory** (most recent year). The country is identified by its ISO code on Wikidata;
+  where both agencies have a figure, both must agree, otherwise there is no verdict. A rounded figure is
+  accepted at the precision it is written to. Tested on 40 random countries the checks were not built on, with
+  the rule fixed in advance: false claims caught 137 of 137, true claims contradicted 0
+  (`results/official_sources_eval_stats_seed6.md`). The first attempt failed the rule on one rounded figure and
+  is recorded too (`…_seed5.md`);
 - three outcomes: **supported**, **contradicted** (a different value for a one-value fact like
   birthplace), or **unknown** (no signal — never counted as false).
 
@@ -366,6 +374,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 |---|---|---|
 | **Wikipedia (English + Hindi)** | evidence passages (102,069 stored + live search) | largest open, multilingual, citable encyclopedia; covers Hindi; free official API; the PRD names it |
 | **Wikidata** | knowledge-graph facts (birthplace, capital, location, office, founder…) | structured, curated facts with Hindi labels; free official API; the PRD names it |
+| **World Bank Open Data**, **WHO Global Health Observatory** | official country statistics (population, GDP, life expectancy, literacy, infant mortality) | the official figures; free official APIs; two agencies cross-check each other |
 | **Google Fact Check Tools API** | professional fact-checks of viral claims (EN + HI) | verdicts by accredited fact-checkers (PIB, Factly, Vishvas News, AFP…) in the open ClaimReview standard; free official API; each result links to the fact-check article |
 | **Wikipedia Vital Articles** | which articles to pre-load | ~1,000 core topics chosen by Wikipedia editors: broad, neutral coverage |
 | Groq (llama-3.3-70b, gpt-oss-120b, qwen3.8-27b) | generating the chatbot answers used as **test data** | real LLM output, as the system will see in use |

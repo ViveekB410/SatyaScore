@@ -437,9 +437,11 @@ def load_starter_corpus():
                 has_key = bool(_os.environ.get("GROQ_API_KEY"))
                 print(f"[api] LLM judge ON ({llm_mode}); GROQ_API_KEY "
                       f"{'set' if has_key else 'MISSING: claims will fall back to NLI'}", flush=True)
-            # World Bank / WHO country statistics (member2_data/official_stats.py). OFF unless
-            # official_sources_eval.py meets its fixed rule; SATYASCORE_OFFICIAL_STATS=true turns it on.
-            _pipeline.official_stats = _os.environ.get("SATYASCORE_OFFICIAL_STATS", "false").lower() in ("1", "true", "yes")
+            # World Bank / WHO country statistics (member2_data/official_stats.py). ON by default:
+            # attempt 2 met official_sources_eval.py's fixed rule (results/official_sources_eval_stats_seed6.md:
+            # 40 fresh countries, true claims contradicted 0 of 137, false claims caught 137 of 137; attempt 1,
+            # seed 5, was not adopted). SATYASCORE_OFFICIAL_STATS=false turns it off. Needs internet.
+            _pipeline.official_stats = _os.environ.get("SATYASCORE_OFFICIAL_STATS", "true").lower() in ("1", "true", "yes")
             # MedlinePlus health topics as a second evidence source (member3_backend/
             # medline_expander.py). OFF unless official_sources_eval.py meets its fixed rule;
             # SATYASCORE_MEDLINE=true turns it on. Needs internet; cached in instance/medline_cache.

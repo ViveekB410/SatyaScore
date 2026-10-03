@@ -1,0 +1,283 @@
+country,kind,gold,got,claim
+Ukraine,population,Verified,Verified,"Ukraine has a population of about 38,980,376."
+Ukraine,population,Hallucinated,Hallucinated,"Ukraine has a population of about 19,490,188."
+Ukraine,life,Verified,no answer,Life expectancy in Ukraine is 75 years.
+Ukraine,life,Hallucinated,Hallucinated,Life expectancy in Ukraine is 37 years.
+Ukraine,literacy,Verified,Verified,The literacy rate of Ukraine is 99%.
+Ukraine,literacy,Hallucinated,Hallucinated,The literacy rate of Ukraine is 50%.
+Ukraine,gdp,Verified,Verified,The GDP of Ukraine is about $214.2 billion.
+Ukraine,gdp,Hallucinated,Hallucinated,The GDP of Ukraine is about $107.1 billion.
+Northern Mariana Islands,population,Verified,Verified,"Northern Mariana Islands has a population of about 43,541."
+Northern Mariana Islands,population,Hallucinated,Hallucinated,"Northern Mariana Islands has a population of about 87,082."
+Northern Mariana Islands,life,Verified,Verified,Life expectancy in Northern Mariana Islands is 79 years.
+Northern Mariana Islands,life,Hallucinated,Hallucinated,Life expectancy in Northern Mariana Islands is 158 years.
+Northern Mariana Islands,gdp,Verified,Verified,The GDP of Northern Mariana Islands is about $1.1 billion.
+Northern Mariana Islands,gdp,Hallucinated,Hallucinated,The GDP of Northern Mariana Islands is about $0.5 billion.
+"Venezuela, RB",population,-,country not found,
+"Venezuela, RB",life,-,country not found,
+"Venezuela, RB",literacy,-,country not found,
+"Venezuela, RB",gdp,-,country not found,
+Benin,population,Verified,Verified,"Benin has a population of about 14,814,460."
+Benin,population,Hallucinated,Hallucinated,"Benin has a population of about 29,628,920."
+Benin,life,Verified,no answer,Life expectancy in Benin is 61 years.
+Benin,life,Hallucinated,Hallucinated,Life expectancy in Benin is 122 years.
+Benin,literacy,Verified,Verified,The literacy rate of Benin is 51%.
+Benin,literacy,Hallucinated,Hallucinated,The literacy rate of Benin is 103%.
+Benin,gdp,Verified,Verified,The GDP of Benin is about $24.6 billion.
+Benin,gdp,Hallucinated,Hallucinated,The GDP of Benin is about $12.3 billion.
+Marshall Islands,life,Verified,Verified,Life expectancy in Marshall Islands is 67 years.
+Marshall Islands,life,Hallucinated,Hallucinated,Life expectancy in Marshall Islands is 34 years.
+Tonga,population,Verified,Verified,"Tonga has a population of about 103,742."
+Tonga,population,Hallucinated,Hallucinated,"Tonga has a population of about 207,484."
+Tonga,life,Verified,Verified,Life expectancy in Tonga is 73 years.
+Tonga,life,Hallucinated,Hallucinated,Life expectancy in Tonga is 146 years.
+Tonga,literacy,Verified,Verified,The literacy rate of Tonga is 99%.
+Tonga,literacy,Hallucinated,Hallucinated,The literacy rate of Tonga is 50%.
+Fiji,population,Verified,Verified,"Fiji has a population of about 933,154."
+Fiji,population,Hallucinated,Hallucinated,"Fiji has a population of about 1,866,308."
+Fiji,life,Verified,Verified,Life expectancy in Fiji is 67 years.
+Fiji,life,Hallucinated,Hallucinated,Life expectancy in Fiji is 34 years.
+Fiji,gdp,Verified,Verified,The GDP of Fiji is about $6.2 billion.
+Fiji,gdp,Hallucinated,Hallucinated,The GDP of Fiji is about $3.1 billion.
+Aruba,population,Verified,Verified,"Aruba has a population of about 108,785."
+Aruba,population,Hallucinated,Hallucinated,"Aruba has a population of about 54,392."
+Aruba,life,Verified,Verified,Life expectancy in Aruba is 76 years.
+Aruba,life,Hallucinated,Hallucinated,Life expectancy in Aruba is 153 years.
+Aruba,literacy,Verified,Verified,The literacy rate of Aruba is 97%.
+Aruba,literacy,Hallucinated,Hallucinated,The literacy rate of Aruba is 194%.
+Aruba,gdp,Verified,Verified,The GDP of Aruba is about $4.2 billion.
+Aruba,gdp,Hallucinated,Hallucinated,The GDP of Aruba is about $8.3 billion.
+Afghanistan,population,Verified,Verified,"Afghanistan has a population of about 43,844,111."
+Afghanistan,population,Hallucinated,Hallucinated,"Afghanistan has a population of about 87,688,222."
+Afghanistan,life,Verified,Verified,Life expectancy in Afghanistan is 66 years.
+Afghanistan,life,Hallucinated,Hallucinated,Life expectancy in Afghanistan is 33 years.
+Afghanistan,literacy,Verified,Verified,The literacy rate of Afghanistan is 37%.
+Afghanistan,literacy,Hallucinated,Hallucinated,The literacy rate of Afghanistan is 19%.
+Afghanistan,gdp,Verified,Verified,The GDP of Afghanistan is about $17.8 billion.
+Afghanistan,gdp,Hallucinated,Hallucinated,The GDP of Afghanistan is about $35.6 billion.
+Central African Republic,population,Verified,Verified,"Central African Republic has a population of about 5,513,282."
+Central African Republic,population,Hallucinated,Hallucinated,"Central African Republic has a population of about 2,756,641."
+Central African Republic,life,Verified,no answer,Life expectancy in Central African Republic is 58 years.
+Central African Republic,life,Hallucinated,Hallucinated,Life expectancy in Central African Republic is 29 years.
+Central African Republic,literacy,Verified,Verified,The literacy rate of Central African Republic is 42%.
+Central African Republic,literacy,Hallucinated,Hallucinated,The literacy rate of Central African Republic is 85%.
+Central African Republic,gdp,Verified,Verified,The GDP of Central African Republic is about $3.1 billion.
+Central African Republic,gdp,Hallucinated,Hallucinated,The GDP of Central African Republic is about $6.1 billion.
+Seychelles,population,Verified,Verified,"Seychelles has a population of about 122,730."
+Seychelles,population,Hallucinated,Hallucinated,"Seychelles has a population of about 245,460."
+Seychelles,life,Verified,Verified,Life expectancy in Seychelles is 76 years.
+Seychelles,life,Hallucinated,Hallucinated,Life expectancy in Seychelles is 153 years.
+Seychelles,literacy,Verified,Verified,The literacy rate of Seychelles is 94%.
+Seychelles,literacy,Hallucinated,Hallucinated,The literacy rate of Seychelles is 188%.
+Seychelles,gdp,Verified,Verified,The GDP of Seychelles is about $2.4 billion.
+Seychelles,gdp,Hallucinated,Hallucinated,The GDP of Seychelles is about $4.8 billion.
+Palau,population,Verified,Verified,"Palau has a population of about 17,663."
+Palau,population,Hallucinated,Hallucinated,"Palau has a population of about 35,326."
+Palau,life,Verified,Verified,Life expectancy in Palau is 69 years.
+Palau,life,Hallucinated,Hallucinated,Life expectancy in Palau is 35 years.
+Palau,literacy,Verified,Verified,The literacy rate of Palau is 100%.
+Palau,literacy,Hallucinated,Hallucinated,The literacy rate of Palau is 50%.
+Palau,gdp,Verified,Verified,The GDP of Palau is about $0.3 billion.
+Palau,gdp,Hallucinated,Hallucinated,The GDP of Palau is about $0.2 billion.
+Malaysia,population,Verified,Verified,"Malaysia has a population of about 35,977,838."
+Malaysia,population,Hallucinated,Hallucinated,"Malaysia has a population of about 17,988,919."
+Malaysia,life,Verified,Verified,Life expectancy in Malaysia is 77 years.
+Malaysia,life,Hallucinated,Hallucinated,Life expectancy in Malaysia is 38 years.
+Malaysia,literacy,Verified,Verified,The literacy rate of Malaysia is 96%.
+Malaysia,literacy,Hallucinated,Hallucinated,The literacy rate of Malaysia is 48%.
+Malaysia,gdp,Verified,Verified,The GDP of Malaysia is about $472.2 billion.
+Malaysia,gdp,Hallucinated,Hallucinated,The GDP of Malaysia is about $944.4 billion.
+Togo,population,Verified,Verified,"Togo has a population of about 8,591,626."
+Togo,population,Hallucinated,Hallucinated,"Togo has a population of about 4,295,813."
+Togo,life,Verified,Verified,Life expectancy in Togo is 63 years.
+Togo,life,Hallucinated,Hallucinated,Life expectancy in Togo is 126 years.
+Togo,literacy,Verified,Verified,The literacy rate of Togo is 73%.
+Togo,literacy,Hallucinated,Hallucinated,The literacy rate of Togo is 145%.
+Togo,gdp,Verified,Verified,The GDP of Togo is about $11.9 billion.
+Togo,gdp,Hallucinated,Hallucinated,The GDP of Togo is about $5.9 billion.
+Switzerland,population,Verified,Verified,"Switzerland has a population of about 9,092,436."
+Switzerland,population,Hallucinated,Hallucinated,"Switzerland has a population of about 4,546,218."
+Switzerland,life,Verified,Verified,Life expectancy in Switzerland is 84 years.
+Switzerland,life,Hallucinated,Hallucinated,Life expectancy in Switzerland is 169 years.
+Switzerland,gdp,Verified,Verified,The GDP of Switzerland is about $1043.5 billion.
+Switzerland,gdp,Hallucinated,Hallucinated,The GDP of Switzerland is about $521.8 billion.
+Israel,population,Verified,Verified,"Israel has a population of about 10,122,800."
+Israel,population,Hallucinated,Hallucinated,"Israel has a population of about 20,245,600."
+Israel,life,Verified,Verified,Life expectancy in Israel is 83 years.
+Israel,life,Hallucinated,Hallucinated,Life expectancy in Israel is 166 years.
+Israel,literacy,Verified,Verified,The literacy rate of Israel is 92%.
+Israel,literacy,Hallucinated,Hallucinated,The literacy rate of Israel is 46%.
+Israel,gdp,Verified,Verified,The GDP of Israel is about $610.8 billion.
+Israel,gdp,Hallucinated,Hallucinated,The GDP of Israel is about $305.4 billion.
+Guinea,population,Verified,Verified,"Guinea has a population of about 15,099,727."
+Guinea,population,Hallucinated,Hallucinated,"Guinea has a population of about 7,549,864."
+Guinea,life,Verified,Verified,Life expectancy in Guinea is 61 years.
+Guinea,life,Hallucinated,Hallucinated,Life expectancy in Guinea is 122 years.
+Guinea,literacy,Verified,Verified,The literacy rate of Guinea is 40%.
+Guinea,literacy,Hallucinated,Hallucinated,The literacy rate of Guinea is 20%.
+Guinea,gdp,Verified,Verified,The GDP of Guinea is about $28.3 billion.
+Guinea,gdp,Hallucinated,Hallucinated,The GDP of Guinea is about $14.2 billion.
+Tunisia,population,Verified,Verified,"Tunisia has a population of about 12,348,573."
+Tunisia,population,Hallucinated,Hallucinated,"Tunisia has a population of about 6,174,286."
+Tunisia,life,Verified,Verified,Life expectancy in Tunisia is 77 years.
+Tunisia,life,Hallucinated,Hallucinated,Life expectancy in Tunisia is 38 years.
+Tunisia,literacy,Verified,Verified,The literacy rate of Tunisia is 86%.
+Tunisia,literacy,Hallucinated,Hallucinated,The literacy rate of Tunisia is 172%.
+Tunisia,gdp,Verified,Verified,The GDP of Tunisia is about $57.5 billion.
+Tunisia,gdp,Hallucinated,Hallucinated,The GDP of Tunisia is about $115.0 billion.
+Angola,population,Verified,Verified,"Angola has a population of about 39,040,039."
+Angola,population,Hallucinated,Hallucinated,"Angola has a population of about 19,520,020."
+Angola,life,Verified,Verified,Life expectancy in Angola is 65 years.
+Angola,life,Hallucinated,Hallucinated,Life expectancy in Angola is 32 years.
+Angola,literacy,Verified,Verified,The literacy rate of Angola is 68%.
+Angola,literacy,Hallucinated,Hallucinated,The literacy rate of Angola is 34%.
+Angola,gdp,Verified,Verified,The GDP of Angola is about $122.2 billion.
+Angola,gdp,Hallucinated,Hallucinated,The GDP of Angola is about $244.3 billion.
+French Polynesia,population,Verified,Verified,"French Polynesia has a population of about 282,465."
+French Polynesia,population,Hallucinated,Hallucinated,"French Polynesia has a population of about 564,930."
+French Polynesia,life,Verified,Verified,Life expectancy in French Polynesia is 84 years.
+French Polynesia,life,Hallucinated,Hallucinated,Life expectancy in French Polynesia is 168 years.
+French Polynesia,gdp,Verified,Verified,The GDP of French Polynesia is about $6.3 billion.
+French Polynesia,gdp,Hallucinated,Hallucinated,The GDP of French Polynesia is about $12.6 billion.
+Mauritania,population,Verified,Verified,"Mauritania has a population of about 5,315,065."
+Mauritania,population,Hallucinated,Hallucinated,"Mauritania has a population of about 2,657,532."
+Mauritania,life,Verified,Verified,Life expectancy in Mauritania is 69 years.
+Mauritania,life,Hallucinated,Hallucinated,Life expectancy in Mauritania is 34 years.
+Mauritania,literacy,Verified,Verified,The literacy rate of Mauritania is 60%.
+Mauritania,literacy,Hallucinated,Hallucinated,The literacy rate of Mauritania is 119%.
+Mauritania,gdp,Verified,Verified,The GDP of Mauritania is about $11.7 billion.
+Mauritania,gdp,Hallucinated,Hallucinated,The GDP of Mauritania is about $5.8 billion.
+Curacao,population,-,country not found,
+Curacao,life,-,country not found,
+Curacao,literacy,-,country not found,
+Curacao,gdp,-,country not found,
+Suriname,population,Verified,Verified,"Suriname has a population of about 639,850."
+Suriname,population,Hallucinated,Hallucinated,"Suriname has a population of about 319,925."
+Suriname,life,Verified,Verified,Life expectancy in Suriname is 74 years.
+Suriname,life,Hallucinated,Hallucinated,Life expectancy in Suriname is 37 years.
+Suriname,literacy,Verified,Verified,The literacy rate of Suriname is 93%.
+Suriname,literacy,Hallucinated,Hallucinated,The literacy rate of Suriname is 46%.
+Suriname,gdp,Verified,Verified,The GDP of Suriname is about $4.5 billion.
+Suriname,gdp,Hallucinated,Hallucinated,The GDP of Suriname is about $2.3 billion.
+Naoero,population,Verified,Verified,"Naoero has a population of about 12,025."
+Naoero,population,Hallucinated,Hallucinated,"Naoero has a population of about 6,012."
+Naoero,life,Verified,Verified,Life expectancy in Naoero is 62 years.
+Naoero,life,Hallucinated,Hallucinated,Life expectancy in Naoero is 31 years.
+Naoero,literacy,Verified,Verified,The literacy rate of Naoero is 97%.
+Naoero,literacy,Hallucinated,Hallucinated,The literacy rate of Naoero is 48%.
+Naoero,gdp,Verified,Verified,The GDP of Naoero is about $0.2 billion.
+Naoero,gdp,Hallucinated,Hallucinated,The GDP of Naoero is about $0.1 billion.
+Nepal,population,Verified,Verified,"Nepal has a population of about 29,618,118."
+Nepal,population,Hallucinated,Hallucinated,"Nepal has a population of about 14,809,059."
+Nepal,life,Verified,Verified,Life expectancy in Nepal is 71 years.
+Nepal,life,Hallucinated,Hallucinated,Life expectancy in Nepal is 35 years.
+Nepal,literacy,Verified,Verified,The literacy rate of Nepal is 69%.
+Nepal,literacy,Hallucinated,Hallucinated,The literacy rate of Nepal is 137%.
+Nepal,gdp,Verified,Verified,The GDP of Nepal is about $45.5 billion.
+Nepal,gdp,Hallucinated,Hallucinated,The GDP of Nepal is about $22.7 billion.
+Slovenia,population,Verified,Verified,"Slovenia has a population of about 2,130,986."
+Slovenia,population,Hallucinated,Hallucinated,"Slovenia has a population of about 1,065,493."
+Slovenia,life,Verified,Verified,Life expectancy in Slovenia is 82 years.
+Slovenia,life,Hallucinated,Hallucinated,Life expectancy in Slovenia is 41 years.
+Slovenia,literacy,Verified,Verified,The literacy rate of Slovenia is 100%.
+Slovenia,literacy,Hallucinated,Hallucinated,The literacy rate of Slovenia is 50%.
+Slovenia,gdp,Verified,Verified,The GDP of Slovenia is about $79.6 billion.
+Slovenia,gdp,Hallucinated,Hallucinated,The GDP of Slovenia is about $39.8 billion.
+Bosnia and Herzegovina,population,Verified,Verified,"Bosnia and Herzegovina has a population of about 3,140,095."
+Bosnia and Herzegovina,population,Hallucinated,Hallucinated,"Bosnia and Herzegovina has a population of about 1,570,048."
+Bosnia and Herzegovina,life,Verified,Verified,Life expectancy in Bosnia and Herzegovina is 78 years.
+Bosnia and Herzegovina,life,Hallucinated,Hallucinated,Life expectancy in Bosnia and Herzegovina is 156 years.
+Bosnia and Herzegovina,literacy,Verified,Verified,The literacy rate of Bosnia and Herzegovina is 97%.
+Bosnia and Herzegovina,literacy,Hallucinated,Hallucinated,The literacy rate of Bosnia and Herzegovina is 48%.
+Bosnia and Herzegovina,gdp,Verified,Verified,The GDP of Bosnia and Herzegovina is about $32.6 billion.
+Bosnia and Herzegovina,gdp,Hallucinated,Hallucinated,The GDP of Bosnia and Herzegovina is about $16.3 billion.
+Cuba,population,Verified,Verified,"Cuba has a population of about 10,937,203."
+Cuba,population,Hallucinated,Hallucinated,"Cuba has a population of about 5,468,602."
+Cuba,life,Verified,Verified,Life expectancy in Cuba is 78 years.
+Cuba,life,Hallucinated,Hallucinated,Life expectancy in Cuba is 39 years.
+Cuba,literacy,Verified,Verified,The literacy rate of Cuba is 98%.
+Cuba,literacy,Hallucinated,Hallucinated,The literacy rate of Cuba is 49%.
+Cuba,gdp,Verified,Verified,The GDP of Cuba is about $107.4 billion.
+Cuba,gdp,Hallucinated,Hallucinated,The GDP of Cuba is about $214.7 billion.
+Nigeria,population,Verified,Verified,"Nigeria has a population of about 237,527,782."
+Nigeria,population,Hallucinated,Hallucinated,"Nigeria has a population of about 118,763,891."
+Nigeria,life,Verified,no answer,Life expectancy in Nigeria is 55 years.
+Nigeria,life,Hallucinated,Hallucinated,Life expectancy in Nigeria is 109 years.
+Nigeria,literacy,Verified,Verified,The literacy rate of Nigeria is 70%.
+Nigeria,literacy,Hallucinated,Hallucinated,The literacy rate of Nigeria is 35%.
+Nigeria,gdp,Verified,Verified,The GDP of Nigeria is about $290.8 billion.
+Nigeria,gdp,Hallucinated,Hallucinated,The GDP of Nigeria is about $581.6 billion.
+New Zealand,population,Verified,Verified,"New Zealand has a population of about 5,324,700."
+New Zealand,population,Hallucinated,Hallucinated,"New Zealand has a population of about 10,649,400."
+New Zealand,life,Verified,Verified,Life expectancy in New Zealand is 82 years.
+New Zealand,life,Hallucinated,Hallucinated,Life expectancy in New Zealand is 164 years.
+New Zealand,gdp,Verified,Verified,The GDP of New Zealand is about $264.1 billion.
+New Zealand,gdp,Hallucinated,Hallucinated,The GDP of New Zealand is about $528.1 billion.
+Spain,population,Verified,Verified,"Spain has a population of about 49,355,143."
+Spain,population,Hallucinated,Hallucinated,"Spain has a population of about 24,677,572."
+Spain,life,Verified,Verified,Life expectancy in Spain is 84 years.
+Spain,life,Hallucinated,Hallucinated,Life expectancy in Spain is 42 years.
+Spain,literacy,Verified,Verified,The literacy rate of Spain is 100%.
+Spain,literacy,Hallucinated,Hallucinated,The literacy rate of Spain is 50%.
+Spain,gdp,Verified,Verified,The GDP of Spain is about $1906.5 billion.
+Spain,gdp,Hallucinated,Hallucinated,The GDP of Spain is about $3812.9 billion.
+Finland,population,Verified,Verified,"Finland has a population of about 5,646,436."
+Finland,population,Hallucinated,Hallucinated,"Finland has a population of about 11,292,872."
+Finland,life,Verified,Verified,Life expectancy in Finland is 82 years.
+Finland,life,Hallucinated,Hallucinated,Life expectancy in Finland is 165 years.
+Finland,gdp,Verified,Verified,The GDP of Finland is about $317.0 billion.
+Finland,gdp,Hallucinated,Hallucinated,The GDP of Finland is about $158.5 billion.
+United States,population,Verified,Verified,"United States has a population of about 341,784,857."
+United States,population,Hallucinated,Hallucinated,"United States has a population of about 683,569,714."
+United States,life,Verified,Verified,Life expectancy in United States is 79 years.
+United States,life,Hallucinated,Hallucinated,Life expectancy in United States is 39 years.
+United States,gdp,Verified,Verified,The GDP of United States is about $30769.7 billion.
+United States,gdp,Hallucinated,Hallucinated,The GDP of United States is about $15384.9 billion.
+Poland,population,Verified,Verified,"Poland has a population of about 36,435,861."
+Poland,population,Hallucinated,Hallucinated,"Poland has a population of about 72,871,722."
+Poland,life,Verified,Verified,Life expectancy in Poland is 78 years.
+Poland,life,Hallucinated,Hallucinated,Life expectancy in Poland is 39 years.
+Poland,literacy,Verified,Verified,The literacy rate of Poland is 99%.
+Poland,literacy,Hallucinated,Hallucinated,The literacy rate of Poland is 197%.
+Poland,gdp,Verified,Verified,The GDP of Poland is about $1035.5 billion.
+Poland,gdp,Hallucinated,Hallucinated,The GDP of Poland is about $2071.0 billion.
+Solomon Islands,population,Verified,Verified,"Solomon Islands has a population of about 838,645."
+Solomon Islands,population,Hallucinated,Hallucinated,"Solomon Islands has a population of about 419,322."
+Solomon Islands,life,Verified,no answer,Life expectancy in Solomon Islands is 71 years.
+Solomon Islands,life,Hallucinated,Hallucinated,Life expectancy in Solomon Islands is 35 years.
+Solomon Islands,literacy,Verified,Verified,The literacy rate of Solomon Islands is 77%.
+Solomon Islands,literacy,Hallucinated,Hallucinated,The literacy rate of Solomon Islands is 153%.
+Solomon Islands,gdp,Verified,Verified,The GDP of Solomon Islands is about $1.7 billion.
+Solomon Islands,gdp,Hallucinated,Hallucinated,The GDP of Solomon Islands is about $3.5 billion.
+Bhutan,population,Verified,Verified,"Bhutan has a population of about 796,682."
+Bhutan,population,Hallucinated,Hallucinated,"Bhutan has a population of about 398,341."
+Bhutan,life,Verified,Verified,Life expectancy in Bhutan is 73 years.
+Bhutan,life,Hallucinated,Hallucinated,Life expectancy in Bhutan is 147 years.
+Bhutan,literacy,Verified,Verified,The literacy rate of Bhutan is 65%.
+Bhutan,literacy,Hallucinated,Hallucinated,The literacy rate of Bhutan is 130%.
+Bhutan,gdp,Verified,Verified,The GDP of Bhutan is about $3.6 billion.
+Bhutan,gdp,Hallucinated,Hallucinated,The GDP of Bhutan is about $7.2 billion.
+Lao PDR,population,Verified,Verified,"Lao PDR has a population of about 7,873,046."
+Lao PDR,population,Hallucinated,Hallucinated,"Lao PDR has a population of about 15,746,092."
+Lao PDR,life,Verified,Verified,Life expectancy in Lao PDR is 69 years.
+Lao PDR,life,Hallucinated,Hallucinated,Life expectancy in Lao PDR is 138 years.
+Lao PDR,literacy,Verified,Verified,The literacy rate of Lao PDR is 76%.
+Lao PDR,literacy,Hallucinated,Hallucinated,The literacy rate of Lao PDR is 38%.
+Lao PDR,gdp,Verified,Verified,The GDP of Lao PDR is about $18.3 billion.
+Lao PDR,gdp,Hallucinated,Hallucinated,The GDP of Lao PDR is about $9.2 billion.
+Honduras,population,Verified,Verified,"Honduras has a population of about 11,005,850."
+Honduras,population,Hallucinated,Hallucinated,"Honduras has a population of about 22,011,700."
+Honduras,life,Verified,Verified,Life expectancy in Honduras is 73 years.
+Honduras,life,Hallucinated,Hallucinated,Life expectancy in Honduras is 146 years.
+Honduras,literacy,Verified,Verified,The literacy rate of Honduras is 88%.
+Honduras,literacy,Hallucinated,Hallucinated,The literacy rate of Honduras is 176%.
+Honduras,gdp,Verified,Verified,The GDP of Honduras is about $39.6 billion.
+Honduras,gdp,Hallucinated,Hallucinated,The GDP of Honduras is about $79.2 billion.
+Bolivia,population,Verified,Verified,"Bolivia has a population of about 12,581,843."
+Bolivia,population,Hallucinated,Hallucinated,"Bolivia has a population of about 25,163,686."
+Bolivia,life,Verified,no answer,Life expectancy in Bolivia is 69 years.
+Bolivia,life,Hallucinated,Hallucinated,Life expectancy in Bolivia is 34 years.
+Bolivia,literacy,Verified,Verified,The literacy rate of Bolivia is 97%.
+Bolivia,literacy,Hallucinated,Hallucinated,The literacy rate of Bolivia is 48%.
+Bolivia,gdp,Verified,Verified,The GDP of Bolivia is about $64.8 billion.
+Bolivia,gdp,Hallucinated,Hallucinated,The GDP of Bolivia is about $32.4 billion.

@@ -16,18 +16,54 @@ export function AuthCard({ title, children }: { title: string; children: React.R
   )
 }
 
+function EyeIcon({ open }: { open: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" fill="none" stroke="currentColor" strokeWidth="1.75"
+         strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+      <circle cx="12" cy="12" r="3" />
+      {!open && <path d="M4 4l16 16" />}
+    </svg>
+  )
+}
+
 export function Field({
   id,
   label,
   hint,
+  type,
   ...props
 }: { id: string; label: string; hint?: string } & React.InputHTMLAttributes<HTMLInputElement>) {
+  // Password fields get a show/hide button (eye icon); the password is never shown by default.
+  const [shown, setShown] = useState(false)
+  const isPassword = type === 'password'
   return (
     <div>
       <label htmlFor={id} className="label-caps">
         {label}
       </label>
-      <Input id={id} className="mt-1.5" aria-describedby={hint ? `${id}-hint` : undefined} {...props} />
+      <div className="relative mt-1.5">
+        <Input
+          id={id}
+          type={isPassword && shown ? 'text' : type}
+          className={isPassword ? 'pr-11' : undefined}
+          aria-describedby={hint ? `${id}-hint` : undefined}
+          {...props}
+        />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShown((s) => !s)}
+            aria-label={shown ? 'Hide password' : 'Show password'}
+            aria-pressed={shown}
+            aria-controls={id}
+            title={shown ? 'Hide password' : 'Show password'}
+            className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r text-muted hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-navy"
+          >
+            <EyeIcon open={!shown} />
+          </button>
+        )}
+      </div>
       {hint && (
         <p id={`${id}-hint`} className="mt-1 text-[13px] text-muted">
           {hint}

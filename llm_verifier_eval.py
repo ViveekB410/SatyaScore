@@ -66,8 +66,10 @@ def load_cache(path: Path) -> dict:
     return out
 
 
-def run_llm(model: str, mode: str, sets: dict, ev: dict) -> tuple[dict, bool]:
-    """Fill the cache for every claim; returns (cache, finished)."""
+def run_llm(model: str, mode: str, sets: dict, ev: dict, wait_s: float = 0) -> tuple[dict, bool]:
+    """Fill the cache for every claim; returns (cache, finished). With wait_s > 0, a
+    rate-limit pause of up to wait_s seconds is waited out instead of stopping (a longer
+    one, e.g. the daily limit, still stops)."""
     path = CACHE / f"{model.replace('/', '_')}_{mode}.jsonl"
     CACHE.mkdir(parents=True, exist_ok=True)
     cache = load_cache(path)

@@ -68,23 +68,47 @@ _MONEY = {"trillion": 1e12, "ट्रिलियन": 1e12, "billion": 1e9, "�
 _cache: dict[tuple, object] = {}
 
 
-def parse(t: str, language: str) -> tuple[str, str, float] | None:
-    """(kind, country text, claimed value) or None."""
+def parse(t: str, language: str) -> tuple[str, str, float, float] | None:
+    """(kind, country text, claimed value, half a unit of its last written digit) or None.
+    "about $0.1 billion" is written to 0.1 billion, so it means 0.05-0.15 billion."""
     for kind, p in (_EN if language == "en" else _HI):
         if m := p.match(t):
-            n = float(m["n"].replace(",", ""))
+            raw = m["n"].replace(",", "")
+            n = float(raw)
+            half = 0.5 * 10 ** -(len(raw.split(".")[1]) if "." in raw else 0)
             if kind == "gdp":
                 n *= _MONEY[m["mult"].lower()]
-            return kind, _clean(m["s"]), n
+                half *= _MONEY[m["mult"].lower()]
+            return kind, _clean(m["s"]), n, half
     q = _quantity(t, language)  # population, same patterns as the Wikidata check
     if q and q[0] == "population":
-        return "population", q[1], q[2]
+        return "population", q[1], q[2], 0.0
     return None
+
+
+CACHE_DIR = None  # a folder to keep World Bank / WHO answers on disk (set by the evaluation)
 
 
 def _get_json(session, url: str, params: dict, attempts: int = 3):
     """Cached GET; the World Bank API is sometimes slow, so a timeout is retried."""
     key = (url, tuple(sorted(params.items())))
+    if key not in _cache and CACHE_DIR is not None:
+        import hashlib
+        import json
+        from pathlib import Path
+        f = Path(CACHE_DIR) / (hashlib.sha1(repr(key).encode()).hexdigest()[:20] + ".json")
+        if f.exists():
+            _cache[key] = json.loads(f.read_text(encoding="utf-8"))
+        else:
+            for i in range(attempts):
+                try:
+                    _cache[key] = polite_get(session, url, params=params, timeout=30).json()
+                    break
+                except requests.exceptions.Timeout:
+                    if i == attempts - 1:
+                        raise
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text(json.dumps(_cache[key]), encoding="utf-8")
     if key not in _cache:
         for i in range(attempts):
             try:
@@ -126,8 +150,10 @@ def who(session, iso3: str, code: str) -> tuple[int, float] | None:
     return int(r["TimeDim"]), float(r["NumericValue"])
 
 
-def _agrees(claimed: float, official: float, tol: float, absolute: bool) -> bool:
-    return abs(claimed - official) <= (tol if absolute else tol * official)
+def _agrees(claimed: float, official: float, tol: float, absolute: bool, half: float = 0.0) -> bool:
+    """Within the tolerance, or within the precision the claim is written to (a rounded
+    figure: "$0.1 billion" for 0.066 billion)."""
+    return abs(claimed - official) <= max(tol if absolute else tol * official, half)
 
 
 def _fmt(kind: str, x: float) -> str:
@@ -145,7 +171,7 @@ def check(claim_text: str, language: str, linker, wd, session=None) -> TripleVer
     parsed = parse(t, language)
     if parsed is None:
         return None
-    kind, country, claimed = parsed
+    kind, country, claimed, half = parsed
     ind, who_code, tol, absolute, _, prop = KINDS[kind]
     found = country_iso3(country, language, linker, wd)
     if found is None:
@@ -165,7 +191,7 @@ def check(claim_text: str, language: str, linker, wd, session=None) -> TripleVer
         return _unknown(kind, claimed)
     if not figures:
         return _unknown(kind, claimed)
-    votes = {_agrees(claimed, v, tol, absolute) for _, _, v, _ in figures}
+    votes = {_agrees(claimed, v, tol, absolute, half) for _, _, v, _ in figures}
     if len(votes) > 1:  # the official sources disagree about this claim: no verdict
         return _unknown(kind, claimed)
     status = "supported" if votes == {True} else "contradicted"

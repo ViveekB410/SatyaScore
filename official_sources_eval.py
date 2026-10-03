@@ -26,6 +26,12 @@ official_sources_eval.py -- should the official sources be ON in the live app?
      (c) robustness: at least 80% of the FALSE claims that get an answer are contradicted.
 
     .venv/Scripts/python.exe official_sources_eval.py      -> results/official_sources_eval.md
+
+ATTEMPT 2 for the statistics (fixed 2026-10-04, committed before running): attempt 1 (seed 5)
+contradicted one TRUE claim, "The GDP of Tuvalu is about $0.1 billion" (0.066 billion rounded),
+so rule (b) was not met. The check now also accepts a figure within the precision it is written
+to. Attempt 2 uses 40 FRESH countries (--seed 6) and the SAME rules (a)-(c).
+    .venv/Scripts/python.exe official_sources_eval.py --part stats --seed 6
 """
 from __future__ import annotations
 
@@ -90,7 +96,7 @@ def medline_part(api, sets) -> tuple[list[str], bool]:
     return L, decision
 
 
-def stats_part(sets) -> tuple[list[str], bool]:
+def stats_part(sets, seed: int = SEED) -> tuple[list[str], bool]:
     from member2_data import official_stats as st
     from member2_data.entity_linker import EntityLinker
     from member2_data.wikidata_connector import WikidataConnector
@@ -106,7 +112,7 @@ def stats_part(sets) -> tuple[list[str], bool]:
     # robustness: countries from the World Bank list (real countries, not aggregates)
     data = st._get_json(session, "https://api.worldbank.org/v2/country", {"format": "json", "per_page": 400})
     countries = sorted(c["name"] for c in data[1] if (c.get("region") or {}).get("id") not in ("NA", ""))
-    rng = random.Random(SEED)
+    rng = random.Random(seed)
     picked = rng.sample(countries, N_COUNTRIES)
     rows = []
     templates = {"population": ("{c} has a population of about {v:,.0f}.", 1),
@@ -133,14 +139,14 @@ def stats_part(sets) -> tuple[list[str], bool]:
                     "Verified" if v.status == "supported" else "Hallucinated")
                 rows.append({"country": c, "kind": kind, "gold": gold, "got": got, "claim": claim})
     res = pd.DataFrame(rows)
-    res.to_csv(ROOT / "results" / "official_sources_eval_stats.csv", index=False, encoding="utf-8")
+    res.to_csv(ROOT / "results" / f"official_sources_eval_stats_seed{seed}.csv", index=False, encoding="utf-8")
     t, f = res[res.gold == "Verified"], res[res.gold == "Hallucinated"]
     t_contra = int((t.got == "Hallucinated").sum())
     f_ans = f[f.got.isin(["Verified", "Hallucinated"])]
     f_caught = int((f_ans.got == "Hallucinated").sum())
     not_found = sorted(set(res[res.got == "country not found"].country))
     ok = (not wrong, t_contra == 0, len(f_ans) > 0 and f_caught >= 0.8 * len(f_ans))
-    L = ["## 2. World Bank / WHO statistics\n",
+    L = [f"## 2. World Bank / WHO statistics (countries: seed {seed})\n",
          "**Rule (fixed before running):** adopt only if (a) no wrong decision on the annotated claims, (b) no TRUE "
          "robustness claim contradicted, (c) at least 80% of answered FALSE robustness claims contradicted.\n",
          f"- Annotated claims (train, test, round 3): {decided} decided by the statistics, {len(wrong)} wrong.",
@@ -160,12 +166,16 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--part", choices=["all", "stats", "medline"], default="all",
                     help="run one part (each writes its own section file); 'all' runs both")
-    part = ap.parse_args().part
+    ap.add_argument("--seed", type=int, default=SEED, help="countries for the robustness check (attempt 2: 6)")
+    args = ap.parse_args()
+    part = args.part
+    from member2_data import official_stats
+    official_stats.CACHE_DIR = ROOT / "results" / "_stats_cache"
     sets = load_sets()
     out = ROOT / "results"
     if part in ("all", "stats"):
-        s, _ = stats_part(sets)
-        (out / "official_sources_eval_stats.md").write_text("\n".join(s) + "\n", encoding="utf-8")
+        s, _ = stats_part(sets, args.seed)
+        (out / f"official_sources_eval_stats_seed{args.seed}.md").write_text("\n".join(s) + "\n", encoding="utf-8")
         print("\n".join(s), flush=True)
     if part in ("all", "medline"):
         import member3_backend.api as api
@@ -174,8 +184,8 @@ def main() -> None:
         m, _ = medline_part(api, sets)
         (out / "official_sources_eval_medline.md").write_text("\n".join(m) + "\n", encoding="utf-8")
         print("\n".join(m), flush=True)
-    sections = [p.read_text(encoding="utf-8") for p in (out / "official_sources_eval_stats.md",
-                                                       out / "official_sources_eval_medline.md") if p.exists()]
+    sections = [p.read_text(encoding="utf-8") for p in sorted(out.glob("official_sources_eval_stats_seed*.md"))
+                + [out / "official_sources_eval_medline.md"] if p.exists()]
     (out / "official_sources_eval.md").write_text("# Official sources: MedlinePlus, World Bank, WHO\n\n"
                                                   + "\n".join(sections), encoding="utf-8")
 

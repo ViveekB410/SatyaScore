@@ -82,10 +82,17 @@ def parse(t: str, language: str) -> tuple[str, str, float] | None:
     return None
 
 
-def _get_json(session, url: str, params: dict):
+def _get_json(session, url: str, params: dict, attempts: int = 3):
+    """Cached GET; the World Bank API is sometimes slow, so a timeout is retried."""
     key = (url, tuple(sorted(params.items())))
     if key not in _cache:
-        _cache[key] = polite_get(session, url, params=params, timeout=20).json()
+        for i in range(attempts):
+            try:
+                _cache[key] = polite_get(session, url, params=params, timeout=30).json()
+                break
+            except requests.exceptions.Timeout:
+                if i == attempts - 1:
+                    raise
     return _cache[key]
 
 

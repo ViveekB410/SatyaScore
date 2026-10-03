@@ -119,7 +119,10 @@ def stats_part(sets) -> tuple[list[str], bool]:
             if found is None:
                 rows.append({"country": c, "kind": kind, "gold": "-", "got": "country not found"})
                 continue
-            wb = st.world_bank(session, found[0], st.KINDS[kind][0])
+            try:
+                wb = st.world_bank(session, found[0], st.KINDS[kind][0])
+            except Exception:  # lookup failed after retries: no figure to build the claims from
+                wb = None
             if wb is None:
                 continue
             value = wb[1]

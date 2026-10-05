@@ -58,7 +58,7 @@ def test_expansion_adds_new_articles_incrementally_and_skips_known_ones(tmp_path
     calls = session.get.call_count
     st2 = ex.expand([("Gandhi was born in Porbandar.", "en")])
     assert st2.articles_added == 0 and len(r) == 8 + st.passages_added
-    assert session.get.call_count == calls + 1  # only the search, no fetch
+    assert session.get.call_count == calls  # no request at all: the search is remembered, the text is on disk
 
 
 def test_hindi_claims_also_bring_the_english_article(tmp_path):

@@ -25,6 +25,8 @@ import hashlib
 import json
 import re
 import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -37,6 +39,8 @@ SEARCH_LIMIT = 3
 MAX_NEW_ARTICLES_PER_CLAIM = 4
 MIN_CHARS, MAX_CHARS = 40, 1000        # identical to build_corpus.chunk (tested)
 MAX_QUERY_CHARS = 300                  # the search API rejects very long queries
+SEARCH_TTL_S = 24 * 3600               # search results / language links remembered for a day
+MAX_PARALLEL = 6                       # concurrent lookups per expansion (each host still paced)
 _SENTENCE_END = re.compile(r"(?<=[।.!?])\s+")
 
 
@@ -88,17 +92,41 @@ class WikiExpander:
         self._session = session or requests.Session()
         self._session.headers.setdefault("User-Agent", USER_AGENT)
         self._lock = threading.Lock()
+        self._memo: dict[tuple, tuple[float, object]] = {}
 
     # -- Wikipedia API --------------------------------------------------------
 
     def search(self, text: str, lang: str) -> list[str]:
+        """Wikipedia's top articles for a text; remembered in memory for SEARCH_TTL_S (speed)."""
         q = " ".join(text.split())[:MAX_QUERY_CHARS]
+        key = ("search", lang, q)
+        if (hit := self._memo_get(key)) is not None:
+            return hit
         r = polite_get(self._session, api_url(lang), params={
             "action": "query", "list": "search", "srsearch": q, "srlimit": SEARCH_LIMIT,
             "srnamespace": 0, "format": "json"}, timeout=15)
-        return [h["title"] for h in r.json().get("query", {}).get("search", [])]
+        out = [h["title"] for h in r.json().get("query", {}).get("search", [])]
+        self._memo_set(key, out)
+        return out
+
+    def _memo_get(self, key):
+        with self._lock:
+            hit = self._memo.get(key)
+        return hit[1] if hit and time.monotonic() - hit[0] < SEARCH_TTL_S else None
+
+    def _memo_set(self, key, value) -> None:
+        with self._lock:
+            self._memo[key] = (time.monotonic(), value)
 
     def langlink(self, title: str, from_lang: str, to_lang: str) -> str | None:
+        key = ("langlink", title, from_lang, to_lang)
+        if (hit := self._memo_get(key)) is not None:
+            return hit or None
+        out = self._langlink(title, from_lang, to_lang)
+        self._memo_set(key, out or "")
+        return out
+
+    def _langlink(self, title: str, from_lang: str, to_lang: str) -> str | None:
         r = polite_get(self._session, api_url(from_lang), params={
             "action": "query", "prop": "langlinks", "lllang": to_lang, "redirects": 1,
             "titles": title, "format": "json"}, timeout=15)
@@ -144,18 +172,32 @@ class WikiExpander:
         """Search, fetch, chunk, embed and add new articles for (text, lang) claims.
         A failed lookup is counted and skipped: expansion never breaks a request."""
         stats = ExpansionStats()
-        todo: list[tuple[str, str]] = []
-        for text, lang in claims:
-            stats.searched += 1
+
+        def candidates(claim):  # searches run in parallel; results are used in claim order
             try:
-                todo += [c for c in self._candidates(text, lang) if c not in todo]
+                return self._candidates(*claim)
             except Exception:
-                stats.failures += 1
+                return None
+
+        def fetch(c):
+            try:
+                return self.fetch(c[1], c[0])
+            except Exception:
+                return None
+
+        with ThreadPoolExecutor(max_workers=MAX_PARALLEL) as pool:
+            found = list(pool.map(candidates, claims))
+            todo: list[tuple[str, str]] = []
+            for f in found:
+                stats.searched += 1
+                if f is None:
+                    stats.failures += 1
+                    continue
+                todo += [c for c in f if c not in todo]
+            bodies = list(pool.map(fetch, todo))
         ids, texts, langs = [], [], []
-        for lang, title in todo:
-            try:
-                body = self.fetch(title, lang)
-            except Exception:
+        for (lang, title), body in zip(todo, bodies):
+            if body is None:
                 stats.failures += 1
                 continue
             pieces = chunk(body)

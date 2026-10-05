@@ -25,6 +25,8 @@ Expanding relation coverage is a good, scoped task for later — see the
 from __future__ import annotations
 
 import re
+import threading
+import time
 from dataclasses import dataclass
 from typing import Literal
 
@@ -216,12 +218,32 @@ class LinkedTriple:
     object_candidates: tuple[str, ...] = ()
 
 
+SEARCH_CACHE_TTL_S = 24 * 3600  # name searches are remembered for a day (speed; results rarely change)
+
+
 class EntityLinker:
     def __init__(self, session: requests.Session | None = None):
         self._session = session or requests.Session()
+        self._memo: dict[tuple, tuple[float, object]] = {}
+        self._memo_lock = threading.Lock()
+
+    def _remembered(self, key: tuple, compute):
+        """compute() once per key per SEARCH_CACHE_TTL_S; a failed lookup (None) is not kept."""
+        with self._memo_lock:
+            hit = self._memo.get(key)
+        if hit and time.monotonic() - hit[0] < SEARCH_CACHE_TTL_S:
+            return hit[1]
+        value = compute()
+        if value is not None and not (isinstance(value, EntityMatch) and value.qid is None):
+            with self._memo_lock:
+                self._memo[key] = (time.monotonic(), value)
+        return value
 
     def search_entity(self, text: str, language: Language = "en", limit: int = 1) -> EntityMatch:
         """Looks up the best-matching Wikidata entity for a text mention."""
+        return self._remembered(("entity", text, language, limit), lambda: self._search_entity(text, language, limit))
+
+    def _search_entity(self, text: str, language: Language = "en", limit: int = 1) -> EntityMatch:
         try:
             response = polite_get(self._session, WIKIDATA_SEARCH_ENDPOINT, params={
                     "action": "wbsearchentities",
@@ -254,6 +276,9 @@ class EntityLinker:
         # as a birthplace contradicted "Gandhi was born in 1869". A date is never a place.
         if parse_date(text) is not None:
             return ()
+        return self._remembered(("places", text, language), lambda: self._search_places(text, language))
+
+    def _search_places(self, text: str, language: Language = "en") -> tuple[str, ...] | None:
         try:
             response = polite_get(self._session, WIKIDATA_SEARCH_ENDPOINT, params={
                     "action": "wbsearchentities",

@@ -354,7 +354,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 | Accounts & security | passwords hashed with **scrypt** + random salt (never stored in plain text); sessions in **HttpOnly, SameSite cookies** (JavaScript cannot read them; only a hash is stored; expire in 7 days); **CSRF** protection (requests from other websites refused); **5 failed sign-ins → 15-minute lock**; same message for "wrong password" and "no such email" (no account guessing); security headers |
 | Data | SQLite (`instance/satyascore.db`, never committed): users, sessions, each user's saved checks |
 | Rate limits | 100 checks/min per signed-in user or API key; 20/min per network when anonymous |
-| Speed | NVIDIA GPU (RTX 4050): typically **1–5 s per check**; a topic seen for the first time can take 10–15 s (live Wikipedia/Wikidata lookups) |
+| Speed | NVIDIA GPU (RTX 4050): a 6-claim answer in **~5 s the first time, under 1 s when repeated**; lookups run in parallel, each web service is paced separately, searches are remembered (`results/latency_realtime.md`) |
 | Quality | **245 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
 
 ---

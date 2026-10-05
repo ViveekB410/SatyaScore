@@ -62,6 +62,7 @@ HONESTY NOTE — scope and known limitations (read before relying on this):
 from __future__ import annotations
 
 import re
+import threading
 from dataclasses import dataclass
 from typing import Literal
 
@@ -141,6 +142,7 @@ def _blank_bracketed(text: str) -> str:
     return _BRACKETED.sub(lambda m: " " * len(m.group(0)), text)
 
 _nlp_cache: dict[str, SpacyLanguage] = {}
+_NLP_LOCK = threading.Lock()
 
 
 def _get_english_pipeline() -> SpacyLanguage:
@@ -312,7 +314,8 @@ class ClaimExtractor:
         wired in for those yet), for downstream entity linking
         (member2_data/entity_linker.py)."""
         if language == "en":
-            doc = _get_english_pipeline()(text)
+            with _NLP_LOCK:  # called from parallel knowledge-graph lookups; spaCy is not thread-safe
+                doc = _get_english_pipeline()(text)
             return [ent.text for ent in doc.ents]
         # No Hindi/Marathi NER model wired in — return empty rather than
         # guessing, so downstream KG linking correctly skips (kg_conf=None)

@@ -37,6 +37,7 @@ from __future__ import annotations
 import re
 import time
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from typing import Literal
 
@@ -102,6 +103,7 @@ NLI_EVIDENCE_TOP_K = 3
 # Gated behind SATYASCORE_SENTENCE_PREMISES (default OFF) so the live API keeps
 # its old behaviour until the A/B comparison justifies turning this on.
 MAX_SENTENCES_PER_PASSAGE = 8
+MAX_PARALLEL_LOOKUPS = 6  # claims whose knowledge-graph / fact-check lookups run at the same time
 MAX_DATE_SUBJECTS = 5  # namesakes checked for a date claim (one Wikidata request each)
 MAX_EXCERPT_SENTENCES = 20  # sentences of the deciding passage scanned for the evidence excerpt
 # A sentence is quoted only if the NLI gives it at least this much for the deciding
@@ -294,22 +296,38 @@ class DetectionPipeline:
         claim_texts = [c.text for c in extracted]
         claim_ids = [f"claim_{i}" for i in range(len(claim_texts))]
         languages = [language] * len(claim_texts)
-
-        if self.expander is not None:
-            t = time.perf_counter()
-            self.expander.expand(list(zip(claim_texts, languages)))  # never raises; failures are skipped
-            timings["expansion"] = (time.perf_counter() - t) * 1000
-        if self.medline is not None:  # MedlinePlus health topics (member3_backend/medline_expander.py)
-            t = time.perf_counter()
-            self.medline.expand(list(zip(claim_texts, languages)))  # never raises
-            timings["expansion"] += (time.perf_counter() - t) * 1000
-
-        t = time.perf_counter()
-        embedding_result = self.embedder.embed(
-            claim_ids, claim_texts, languages, use_muril=self.retriever_muril is not None)
-        timings["embedding"] = (time.perf_counter() - t) * 1000
-
         enabled = active_signals or self._default_enabled_signals()
+
+        # Knowledge-graph / statistics lookups are network-bound, independent per claim and
+        # independent of the Wikipedia expansion: start them now, in parallel, and collect
+        # them after retrieval (each web service is still paced, member2_data/_http.py).
+        kg_pool, kg_futures, t_kg = None, None, time.perf_counter()
+        if "kg" in enabled and self.entity_linker and self.wikidata:
+            kg_pool = ThreadPoolExecutor(max_workers=MAX_PARALLEL_LOOKUPS)
+            kg_futures = [kg_pool.submit(self._kg_lookup, c, language) for c in claim_texts]
+
+        try:
+            if self.expander is not None:
+                t = time.perf_counter()
+                self.expander.expand(list(zip(claim_texts, languages)))  # never raises; failures are skipped
+                timings["expansion"] = (time.perf_counter() - t) * 1000
+            if self.medline is not None:  # MedlinePlus health topics (member3_backend/medline_expander.py)
+                t = time.perf_counter()
+                self.medline.expand(list(zip(claim_texts, languages)))  # never raises
+                timings["expansion"] += (time.perf_counter() - t) * 1000
+
+            t = time.perf_counter()
+            embedding_result = self.embedder.embed(
+                claim_ids, claim_texts, languages, use_muril=self.retriever_muril is not None)
+            timings["embedding"] = (time.perf_counter() - t) * 1000
+
+            kg_results: list[tuple] = [(None, None)] * len(claim_ids)
+            if kg_futures is not None:
+                kg_results = [f.result() for f in kg_futures]
+                timings["kg"] = (time.perf_counter() - t_kg) * 1000  # wall time; overlaps the expansion
+        finally:
+            if kg_pool is not None:
+                kg_pool.shutdown(wait=True)
 
         # --- Phase A: retrieval + relevance + SemSim + KG (per claim); collect NLI pairs ---
         # NLI is deliberately NOT called in this loop. We gather every
@@ -338,11 +356,7 @@ class DetectionPipeline:
                 # which is inherently a top-1 question, unlike NLI below.
                 sem_sim = max(0.0, min(1.0, relevant_passages[0].score))
 
-            kg_conf, kg_v = None, None
-            if "kg" in enabled and self.entity_linker and self.wikidata:
-                t = time.perf_counter()
-                kg_conf, kg_v = self._kg_lookup(claim_text, language)
-                timings["kg"] += (time.perf_counter() - t) * 1000
+            kg_conf, kg_v = kg_results[i]
 
             per_claim.append({"sem_sim": sem_sim, "nli_prob": None, "kg_conf": kg_conf, "kg_v": kg_v,
                               "passages": [p.text for p in relevant_passages],
@@ -413,10 +427,17 @@ class DetectionPipeline:
         fact_checks: list[dict | None] = [None] * len(scores)
         if self.fact_checker is not None and self.nli_scorer is not None:
             t_fc = time.perf_counter()
-            for i, s in enumerate(scores):
-                if s.note == KG_NOTE:
-                    continue
-                scores[i], fact_checks[i] = self._fact_check(s, claim_texts[i], language)
+            todo = [i for i, s in enumerate(scores) if s.note != KG_NOTE]
+
+            def search(i):  # web searches in parallel; matching (GPU) stays sequential below
+                try:
+                    return self.fact_checker.search(claim_texts[i], language)
+                except Exception:
+                    return None
+            with ThreadPoolExecutor(max_workers=MAX_PARALLEL_LOOKUPS) as pool:
+                found = dict(zip(todo, pool.map(search, todo)))
+            for i in todo:
+                scores[i], fact_checks[i] = self._fact_check(scores[i], claim_texts[i], language, found[i])
             timings["factcheck"] = (time.perf_counter() - t_fc) * 1000
 
         # --- Number guard (member3_backend/number_guard.py): Verified by a passage only if
@@ -443,8 +464,9 @@ class DetectionPipeline:
         for i, fc in enumerate(fact_checks):  # fact-checked: the claim the fact-checker checked
             if fc:
                 excerpts[i] = fc["claim_text"] or None
-        kg_facts = [self._kg_fact(pc["kg_v"], language) if s.note == KG_NOTE else None
-                    for pc, s in zip(per_claim, scores)]
+        with ThreadPoolExecutor(max_workers=MAX_PARALLEL_LOOKUPS) as pool:  # name lookups: network-bound
+            kg_facts = list(pool.map(lambda ps: self._kg_fact(ps[0]["kg_v"], language) if ps[1].note == KG_NOTE else None,
+                                     zip(per_claim, scores)))
         timings["explain"] = (time.perf_counter() - t_ex) * 1000
 
         # overall_score (mean) is kept for backward compatibility; `document`
@@ -472,12 +494,14 @@ class DetectionPipeline:
                       for pc, fc, ex, kf in zip(per_claim, fact_checks, excerpts, kg_facts)],
         )
 
-    def _fact_check(self, score: ClaimScore, claim_text: str, language: Language
+    def _fact_check(self, score: ClaimScore, claim_text: str, language: Language, checks: list | None = None
                     ) -> tuple[ClaimScore, dict | None]:
         """A fact-check of the same claim with a clear rating replaces the score;
-        otherwise (none found, none matching, mixed rating, lookup failed) it stays."""
+        otherwise (none found, none matching, mixed rating, lookup failed) it stays.
+        `checks`: the search results if already fetched (run() searches in parallel)."""
         try:
-            checks = self.fact_checker.search(claim_text, language)
+            if checks is None:
+                checks = self.fact_checker.search(claim_text, language)
             m = decide_fact_check(match_fact_checks(claim_text, language, checks, self.embedder, self.nli_scorer))
         except Exception:
             return score, None

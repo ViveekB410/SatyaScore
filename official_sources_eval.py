@@ -171,6 +171,7 @@ def main() -> None:
     part = args.part
     from member2_data import official_stats
     official_stats.CACHE_DIR = ROOT / "results" / "_stats_cache"
+    official_stats.TIMEOUT_S, official_stats.ATTEMPTS = 30, 3  # the evaluation can wait for a slow API
     sets = load_sets()
     out = ROOT / "results"
     if part in ("all", "stats"):

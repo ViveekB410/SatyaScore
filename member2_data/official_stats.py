@@ -87,10 +87,14 @@ def parse(t: str, language: str) -> tuple[str, str, float, float] | None:
 
 
 CACHE_DIR = None  # a folder to keep World Bank / WHO answers on disk (set by the evaluation)
+# Live checks must stay fast: a slow agency API gives no signal rather than stalling the request.
+# The evaluation raises these (it can wait).
+TIMEOUT_S, ATTEMPTS = 8, 2
 
 
-def _get_json(session, url: str, params: dict, attempts: int = 3):
+def _get_json(session, url: str, params: dict, attempts: int | None = None):
     """Cached GET; the World Bank API is sometimes slow, so a timeout is retried."""
+    attempts = attempts or ATTEMPTS
     key = (url, tuple(sorted(params.items())))
     if key not in _cache and CACHE_DIR is not None:
         import hashlib
@@ -102,7 +106,7 @@ def _get_json(session, url: str, params: dict, attempts: int = 3):
         else:
             for i in range(attempts):
                 try:
-                    _cache[key] = polite_get(session, url, params=params, timeout=30).json()
+                    _cache[key] = polite_get(session, url, params=params, timeout=TIMEOUT_S).json()
                     break
                 except requests.exceptions.Timeout:
                     if i == attempts - 1:
@@ -112,7 +116,7 @@ def _get_json(session, url: str, params: dict, attempts: int = 3):
     if key not in _cache:
         for i in range(attempts):
             try:
-                _cache[key] = polite_get(session, url, params=params, timeout=30).json()
+                _cache[key] = polite_get(session, url, params=params, timeout=TIMEOUT_S).json()
                 break
             except requests.exceptions.Timeout:
                 if i == attempts - 1:

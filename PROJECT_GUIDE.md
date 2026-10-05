@@ -441,7 +441,11 @@ measured before adoption.
    `results/number_guard_eval_v2.md`) cut wrongly Verified claims from 36 to 11 with **no** loss on
    the annotated chatbot claims, but true Wikipedia claims lost Verified 109 → 103 (−5.5%, limit 5%).
    It missed the fixed rule by one claim, so it is also **off**.
-8. **Pronoun resolution is rule-based:** much better since following the sentence topic (93 → 277 right
+8. **MedlinePlus** (US National Library of Medicine health topics) was built as a second evidence source and
+   tested under a rule fixed in advance (`results/official_sources_eval_medline.md`): on the training claims it gave
+   more correct verdicts (160 → 166) but 2 more false alarms (9 → 11), so it was **not adopted** and stays off
+   (`SATYASCORE_MEDLINE`). Health claims still rely on Wikipedia.
+9. **Pronoun resolution is rule-based:** much better since following the sentence topic (93 → 277 right
    on held-out text), but still wrong sometimes ("Mumbai is its financial hub" → "Mumbai's").
 
 ---

@@ -28,3 +28,4 @@ corpus_vectors_expanded.npy
 results/_factcheck_cache/
 results/_medline_cache/
 results/_stats_cache/
+results/_wiki_search_cache/

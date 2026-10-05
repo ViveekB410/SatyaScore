@@ -119,7 +119,23 @@ def aggregate_legacy(rows: list[tuple[float, float, bool]]) -> float:
     return max(nets, key=lambda s: abs(s - 0.5))
 
 
-RULES = {"gated": aggregate, "legacy": aggregate_legacy}
+def aggregate_strict(rows: list[tuple[float, float, bool]]) -> float:
+    """Like `aggregate`, but SUPPORT must also come from an on-topic passage (its article
+    title appears in the claim). Found by the analysis of missed hallucinations
+    (results/missed_hallucinations_analysis.md): 8 of 14 genuine hallucinations were
+    Verified by loosely related passages ("viral infections spread more easily" by a Hindi
+    herpes passage; the President's election by an article on simple-majority voting).
+    Off-topic passages now neither verify nor contradict: no on-topic evidence -> 0.5."""
+    on = [(e, c) for e, c, t in rows if t]
+    if not on:
+        return 0.5
+    max_e = max(e for e, _ in on)
+    if max_e >= ENTAIL_WINS:
+        return 0.5 + 0.5 * max_e
+    return 0.5 + 0.5 * (max_e - max(c for _, c in on))
+
+
+RULES = {"gated": aggregate, "legacy": aggregate_legacy, "strict": aggregate_strict}
 
 # --- which passage decided, and where it comes from (shown to users as sources) ----------
 
@@ -136,6 +152,10 @@ def deciding(rows: list[tuple[float, float, bool, str]], aggregation: str = "gat
         best = max(rows, key=lambda r: abs(r[0] - r[1]))
         net = 0.5 + 0.5 * (best[0] - best[1])
         return (best[3], "supports") if net > HIGH else (best[3], "contradicts") if net < LOW else None
+    if aggregation == "strict":  # only on-topic passages count, for support too
+        rows = [r for r in rows if r[2]]
+        if not rows:
+            return None
     top_e = max(rows, key=lambda r: r[0])
     if top_e[0] >= ENTAIL_WINS:
         return top_e[3], "supports"

@@ -57,3 +57,15 @@ def test_sources_link_to_the_right_wikipedia():
     title, lang, url = passage_source("Cricket::hi::0", {"Cricket": "क्रिकेट"})
     assert (title, lang) == ("क्रिकेट", "hi") and url.startswith("https://hi.wikipedia.org/wiki/")
     assert passage_source("Cricket::hi::0", {})[1] == "en"  # no Hindi title known: English article
+
+def test_strict_rule_only_on_topic_passages_verify():
+    from member3_backend.evidence_rules import aggregate_strict, deciding
+    # measured: "Viral infections tend to be more easily spread." Verified by a Hindi herpes passage
+    off_topic_support = [(0.92, 0.01, False), (0.10, 0.05, True)]
+    assert verdict(aggregate(off_topic_support)) == "Verified"
+    assert verdict(aggregate_strict(off_topic_support)) == "Uncertain"
+    # on-topic support still verifies (the cricket case), on-topic contradiction still contradicts
+    assert verdict(aggregate_strict([(0.096, 0.008, True), (0.025, 0.934, False), (0.916, 0.033, True)])) == "Verified"
+    assert verdict(aggregate_strict([(0.01, 0.95, True)])) == "Hallucinated"
+    assert aggregate_strict([]) == 0.5 and aggregate_strict([(0.9, 0.0, False)]) == 0.5
+    assert deciding([(0.9, 0.0, False, "off"), (0.2, 0.1, True, "on")], "strict") is None

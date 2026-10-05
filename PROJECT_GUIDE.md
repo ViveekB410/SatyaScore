@@ -452,7 +452,14 @@ measured before adoption.
    may verify it) cut hallucinations wrongly Verified from 28 to 7 but removed Verified from most true claims
    (152 → 47) and added false alarms, so it was **not adopted** (`results/strict_support_eval.md`). Catching these
    reasoning errors would need an LLM judge, which this project deliberately does not use.
-10. **Pronoun resolution is rule-based:** much better since following the sentence topic (93 → 277 right
+10. **Simple false common-sense statements can be Verified.** A user test found "Humans can breathe naturally
+    underwater" Verified. On 15 common-sense statements (`results/evidence_rule_eval.md`, reported only) the live rule
+    Verified **all 9 false ones** ("The Sun revolves around the Earth", "Humans have three lungs"): Wikipedia passages
+    that describe or mention the idea are read by the NLI model as supporting it. Two fixes (Verified only with a
+    supporting passage; strong support required from unrelated articles) were tested under a rule fixed in advance on
+    fresh unseen sentences and **not adopted**: they removed Verified from too many true claims. This is the main
+    weakness of NLI-based checking for general statements.
+11. **Pronoun resolution is rule-based:** much better since following the sentence topic (93 → 277 right
    on held-out text), but still wrong sometimes ("Mumbai is its financial hub" → "Mumbai's").
 
 ---

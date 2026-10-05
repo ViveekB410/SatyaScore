@@ -388,6 +388,60 @@ def models_block() -> list[str]:
     return L
 
 
+LATER = [  # (results file, what was tested) -- each with a decision rule fixed before its run
+    ("results/aggregation_eval.md", "Evidence rule: support first, only on-topic passages may contradict"),
+    ("results/unseen_eval.md", "On-demand Wikipedia expansion"),
+    ("results/topk_eval.md", "Passages checked per claim (top-k)"),
+    ("results/factcheck_eval.md", "Professional fact-checks (Google Fact Check Tools)"),
+    ("results/coref_eval.md", "Pronoun resolution: sentence topic vs nearest name"),
+    ("results/number_guard_eval.md", "Number guard, version 1"),
+    ("results/number_guard_eval_v2.md", "Number guard, version 2"),
+    ("results/official_sources_eval_stats_seed5.md", "World Bank / WHO statistics, attempt 1"),
+    ("results/official_sources_eval_stats_seed6.md", "World Bank / WHO statistics, attempt 2"),
+    ("results/official_sources_eval_medline.md", "MedlinePlus as a second evidence source"),
+    ("results/strict_support_eval.md", "Strict support (only on-topic passages verify)"),
+    ("results/evidence_rule_eval.md", "Verified only with a supporting passage (capped / capped_strong)"),
+    ("results/llm_verifier_expanded.md", "LLM verifier (open mode)"),
+]
+_VERDICT_LINE = re.compile(r"^\(a\)|\*\*(adopt|do not adopt|not adopted)|product decision", re.I)
+
+
+def _section(lines: list[str], heading: str) -> list[str]:
+    """The non-empty lines under '## <heading>' up to the next '## ' heading."""
+    out, inside = [], False
+    for ln in lines:
+        if ln.startswith("## "):
+            inside = ln[3:].strip().lower().startswith(heading.lower())
+            continue
+        if inside and ln.strip():
+            s = ln.strip()
+            if out and ln.startswith("  ") and not s.startswith(("-", "|", "(")):
+                out[-1] += " " + s  # a wrapped continuation of the previous line
+            else:
+                out.append(s)
+    return out
+
+
+def later_block() -> list[str]:
+    """The outcome of each later evaluation, copied from its results file: its '## Decision'
+    (and '## Product decision') section, or else its explicit verdict lines."""
+    L = ["Each change below was tested with its decision rule written and committed before the run; the "
+         "outcome is copied from the results file.\n"]
+    for path, what in LATER:
+        p = Path(path)
+        if not p.exists():
+            L.append(f"- **{what}** — `{path}` not found.")
+            continue
+        lines = p.read_text(encoding="utf-8").splitlines()
+        picked = (_section(lines, "Decision") + _section(lines, "Product decision")[:2]
+                  + [ln for ln in _section(lines, "Note added") if "product decision" in ln.lower()])
+        if not picked:
+            picked = [ln.strip() for ln in lines if _VERDICT_LINE.search(ln.strip(" -*"))
+                      and not ln.lstrip(" -").startswith(("[", "#", "|"))]
+        text = " ".join(ln.strip(" -").replace("**", "") for ln in picked)
+        L.append(f"- **{what}** (`{path}`): {text[:700]}")
+    return L + [""]
+
 def extraction_block(q: pd.DataFrame) -> list[str]:
     n_en = int((q.language == "en").sum())
     nb = int(((q.language == "en") & (q.quality_flag == "broken")).sum())
@@ -516,7 +570,10 @@ def main() -> None:
     L.append("## 10. Improving the judge (NLI model search, LLM verifier)\n")
     L += models_block()
 
-    L.append("## 11. Defensible findings\n")
+    L.append("## 11. Later evaluations (rules fixed in advance)\n")
+    L += later_block()
+
+    L.append("## 12. Defensible findings\n")
     L.append("1. On descriptive claims (the 456-claim set), multi-signal fusion does **not** beat NLI alone, "
              "and nothing clears a trivial majority baseline: naturally-occurring hallucinations in "
              "explanatory text are hard to detect.\n"
@@ -530,9 +587,14 @@ def main() -> None:
              "bottleneck; evidence coverage and claim type are.\n"
              "4. Semantic similarity measures **topicality, not truth** (below chance in Hindi).\n"
              "5. Rule-based English claim decomposition produced broken fragments; a sentence-level safety "
-             "net removes them (section 3).\n")
+             "net removes them (section 3).\n"
+             "6. Facts that a structured source can check (Wikidata relations and dates, World Bank / WHO "
+             "statistics, professional fact-checks) are decided with almost no errors; general statements judged "
+             "by NLI over Wikipedia remain the weak spot (section 11; results/missed_hallucinations_analysis.md).\n"
+             "7. An LLM judge ranks claims much better than NLI but raises false alarms about four-fold; it was "
+             "kept off as a recorded product choice (section 11).\n")
 
-    L.append("## 12. Limitations\n")
+    L.append("## 13. Limitations\n")
     try:
         te = pd.read_csv("gold_test_clean.csv")
         counts = ", ".join(f"{lang.upper()} {int(((te.language == lang) & (te.gold_verdict == 'Hallucinated')).sum())}"
@@ -546,7 +608,12 @@ def main() -> None:
              "- Round-3 labels are AI-assisted, annotator-verified (Deviation 3); the KG fixes were made "
              "after labels were seen and are reported as exploratory.\n"
              "- The KG checks one relation per claim; other facts in the same claim are not checked when "
-             "it decides. It covers people, places and capitals only.\n"
+             "it decides. It covers birth/death places and dates, capitals, locations, founders and founding "
+             "dates, authorship, current office-holders, height/length/population/area and currency; country "
+             "statistics come from the World Bank and WHO (section 11).\n"
+             "- General statements about the world are judged by NLI over Wikipedia and can be wrongly "
+             "Verified (all 9 false common-sense statements in results/evidence_rule_eval.md); fixes and an "
+             "LLM judge were tested and not adopted (section 11).\n"
              f"- Hindi has too few Hallucinated claims ({int(((gold.language == 'hi') & (gold.gold_verdict == 'Hallucinated')).sum())} "
              f"in the gold set) to evaluate any Hindi change.\n"
              "- Label reliability: single primary annotator, anchored review (section 2); round-1 3-class "

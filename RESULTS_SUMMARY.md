@@ -137,20 +137,41 @@ Verdict accuracy on the round-3 gold claims (thresholds 0.35 / 0.65; Uncertain c
 - **102,069-passage index** (`build_corpus_expanded.py`: base corpus + Wikipedia Vital Articles with Hindi versions + expansion articles) and **top-10 passages per claim with strict title matching** (`results/topk_eval.md`): on train, correct verdicts 130 → 170 of 303, true claims Verified 127 → 165, real hallucinations caught 3 → 5 of 45, but false alarms 8 → 11 of 258, failing the pre-fixed check; **adopted as a recorded product choice**.
 - **LLM verifier** (`member1_model/llm_verifier.py`, gpt-oss-120b judging claim + retrieved passages, grounded and open modes): evaluation **in progress** (paused on the provider's daily quota); decision rule fixed before running. Not used by the live system.
 
-## 11. Defensible findings
+## 11. Later evaluations (rules fixed in advance)
+
+Each change below was tested with its decision rule written and committed before the run; the outcome is copied from the results file.
+
+- **Evidence rule: support first, only on-topic passages may contradict** (`results/aggregation_eval.md`): (a) fewer false alarms on fresh true statements: yes (33 → 8) (b) train false-alarm rate not higher: yes (c) train ΔAUC -0.031 [-0.093, +0.028], lower bound above -0.03: no Keep legacy as the default. The pre-fixed rule says keep legacy: check (c) failed. The project owner chose gated as the live default anyway, as a product decision: a fact-checker should answer "Uncertain — not enough evidence" rather than wrongly call genuine text Hallucinated. Measured cost, stated plainly: false alarms on fresh true statements fall 33 → 8 of 99, but real hallucinations caught fall on every labelled set (train 11 → 3 of 45; test 3 → 0 of 10; round 3 12 → 2 of 15). The legacy rule's catches were largely m
+- **On-demand Wikipedia expansion** (`results/unseen_eval.md`): (a) false alarms not more: yes (b) real hallucinations caught not fewer: yes (c) more correct verdicts: yes Switch expansion on by default.
+- **Passages checked per claim (top-k)** (`results/topk_eval.md`): (a) false alarms not more: no (b) real hallucinations caught not fewer: yes (c) more correct verdicts: yes Keep the current setup. The pre-fixed rule says keep the current setup: check (a) failed (train false alarms 8 → 11 of 258). The project owner chose the candidate (top-10 passages, strict title matching) as the live default, as a product decision. Measured gain: train correct verdicts 130 → 170 of 303 (true claims Verified 127 → 165, real hallucinations caught 3 → 5); fresh true Wikipedia sentences Verified 82 → 92 of 106 with false alarms unchanged (3); test correct 29 → 42 of 76 (false alarms 0 → 2); round 3 24 → 25 of 40 (false alarms 3 → 2). Cost, stated plainly: 3 more of 258 true 
+- **Professional fact-checks (Google Fact Check Tools)** (`results/factcheck_eval.md`): Decision: (a) no wrong decision: met (0 wrong); (b) at least 5 corrected: met (7). Adopt: set SATYASCORE_FACTCHECK=true as the default.
+- **Pronoun resolution: sentence topic vs nearest name** (`results/coref_eval.md`): (a) fewer wrong: met (206 -> 117); (b) right not fewer: met (93 -> 287). Adopt: COREF_RULE = "salience".
+- **Number guard, version 1** (`results/number_guard_eval.md`): (a) met (27 -> 3); (b) NOT met (115 -> 101); (c) NOT met (55 -> 39). Do not adopt.
+- **Number guard, version 2** (`results/number_guard_eval_v2.md`): (a) met (36 -> 11); (b) NOT met (109 -> 103); (c) met (58 -> 58). Do not adopt.
+- **World Bank / WHO statistics, attempt 1** (`results/official_sources_eval_stats_seed5.md`): (b) NOT met (1 TRUE claim contradicted). Not adopted. Attempt 2: the check also accepts a figure
+- **World Bank / WHO statistics, attempt 2** (`results/official_sources_eval_stats_seed6.md`): (a) met; (b) met; (c) met. Adopt the statistics.
+- **MedlinePlus as a second evidence source** (`results/official_sources_eval_medline.md`): (a) NOT met; (b) met; (c) met. Do not adopt MedlinePlus.
+- **Strict support (only on-topic passages verify)** (`results/strict_support_eval.md`): (a) hallucinations Verified 28 -> 7: met; (b) false alarms 9 -> 11: NOT met; (c) true claims Verified 152 -> 47: NOT met; (d) fresh Verified 115 -> 86, false alarms 3 -> 6: NOT met. Do not adopt; the live rule stays "gated".
+- **Verified only with a supporting passage (capped / capped_strong)** (`results/evidence_rule_eval.md`): capped: (a) hallucinations Verified 27 -> 27: NOT met; (b) false alarms 9 -> 9: met; (c) true claims Verified 152 -> 135: NOT met; (d) fresh Verified 113 -> 104, false alarms 4 -> 4: met. capped_strong: (a) hallucinations Verified 27 -> 12: met; (b) false alarms 9 -> 10: NOT met; (c) true claims Verified 152 -> 107: NOT met; (d) fresh Verified 113 -> 97, false alarms 4 -> 4: NOT met. Do not adopt; the live rule stays "gated".
+- **LLM verifier (open mode)** (`results/llm_verifier_expanded.md`): Adopt LLM open (train ΔAUC +0.165 [+0.057, +0.274]). Used for Hindi too (Hindi train AUC not below NLI's). Product decision: the LLM verifier stays OFF (SATYASCORE_LLM_VERIFIER unset). It catches more hallucinations but marks about 1 in 7 true claims Hallucinated (live: about 1 in 30). The project's first requirement is not to flag genuine text, so this is recorded as a product choice overriding the rule's "adopt", as the gated evidence rule's adoption was recorded in results/aggregation_eval.md.
+
+## 12. Defensible findings
 
 1. On descriptive claims (the 456-claim set), multi-signal fusion does **not** beat NLI alone, and nothing clears a trivial majority baseline: naturally-occurring hallucinations in explanatory text are hard to detect.
 2. On relational claims (round 3), the **knowledge graph is the reliable signal**: when it answers it is right, and letting it decide lifts verdict accuracy well above NLI alone (section 9) — but overall accuracy is still only around the always-Verified rate, because the claims the KG cannot answer are left to NLI. Suggestive only: 40 claims, AI-assisted labels, post-hoc fixes reported as exploratory. On the 456-claim set the KG cannot be evaluated (0 linkable claims).
 3. A stronger or fact-checking NLI model does not help (section 10): the judge is not the bottleneck; evidence coverage and claim type are.
 4. Semantic similarity measures **topicality, not truth** (below chance in Hindi).
 5. Rule-based English claim decomposition produced broken fragments; a sentence-level safety net removes them (section 3).
+6. Facts that a structured source can check (Wikidata relations and dates, World Bank / WHO statistics, professional fact-checks) are decided with almost no errors; general statements judged by NLI over Wikipedia remain the weak spot (section 11; results/missed_hallucinations_analysis.md).
+7. An LLM judge ranks claims much better than NLI but raises false alarms about four-fold; it was kept off as a recorded product choice (section 11).
 
-## 12. Limitations
+## 13. Limitations
 
 - The grouped test split has only **EN 8, HI 2** Hallucinated claims — too few to interpret Hallucinated-F1 in either language.
 - The 456-claim set was generated by a single LLM (llama-3.3-70b-versatile); round 3 adds gpt-oss-120b and qwen3.8-27b, but only 40 gold claims.
 - Round-3 labels are AI-assisted, annotator-verified (Deviation 3); the KG fixes were made after labels were seen and are reported as exploratory.
-- The KG checks one relation per claim; other facts in the same claim are not checked when it decides. It covers people, places and capitals only.
+- The KG checks one relation per claim; other facts in the same claim are not checked when it decides. It covers birth/death places and dates, capitals, locations, founders and founding dates, authorship, current office-holders, height/length/population/area and currency; country statistics come from the World Bank and WHO (section 11).
+- General statements about the world are judged by NLI over Wikipedia and can be wrongly Verified (all 9 false common-sense statements in results/evidence_rule_eval.md); fixes and an LLM judge were tested and not adopted (section 11).
 - Hindi has too few Hallucinated claims (9 in the gold set) to evaluate any Hindi change.
 - Label reliability: single primary annotator, anchored review (section 2); round-1 3-class agreement is low because the annotators used different label schemes; binary kappa is the reliable figure.
 - Dataset small (456) vs the PRD's 3,000; Verified-heavy.

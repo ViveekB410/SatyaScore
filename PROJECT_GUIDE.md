@@ -149,7 +149,7 @@ http://localhost:8000/docs.
 Code map: `member1_model/` (embeddings, NLI, scoring, calibration, LLM verifier) ·
 `member2_data/` (Wikidata connector, entity linker) · `member3_backend/` (API, accounts, pipeline,
 claim extractor, retriever, Wikipedia expander, evidence rules) · `web/` (the web app) ·
-`results/` (every measured result) · `tests/` (237 automated tests).
+`results/` (every measured result) · `tests/` (247 automated tests).
 
 ---
 
@@ -355,7 +355,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 | Data | SQLite (`instance/satyascore.db`, never committed): users, sessions, each user's saved checks |
 | Rate limits | 100 checks/min per signed-in user or API key; 20/min per network when anonymous |
 | Speed | NVIDIA GPU (RTX 4050): typically **1–5 s per check**; a topic seen for the first time can take 10–15 s (live Wikipedia/Wikidata lookups) |
-| Quality | **237 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
+| Quality | **247 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
 
 ---
 

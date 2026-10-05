@@ -28,3 +28,4 @@ pytest>=7.4.0
 
 matplotlib
 pdfminer.six>=20231228   # FR-06 .pdf upload (/extract-text)
+python-multipart>=0.0.9  # required by FastAPI for the file upload (/extract-text); without it the API does not start

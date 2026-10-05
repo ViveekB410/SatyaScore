@@ -445,7 +445,14 @@ measured before adoption.
    tested under a rule fixed in advance (`results/official_sources_eval_medline.md`): on the training claims it gave
    more correct verdicts (160 → 166) but 2 more false alarms (9 → 11), so it was **not adopted** and stays off
    (`SATYASCORE_MEDLINE`). Health claims still rely on Wikipedia.
-9. **Pronoun resolution is rule-based:** much better since following the sentence topic (93 → 277 right
+9. **Missed hallucinations, analysed** (`results/missed_hallucinations_analysis.md`): of the 45 train
+   hallucinations, about 31 are artifacts of the old claim extractor (mostly wrong pronoun substitutions, since
+   fixed) rather than chatbot errors, and about 14 are genuine reasoning errors (misconceptions,
+   over-generalisations) that no lookup source can check. A stricter rule (only passages about the claim's subject
+   may verify it) cut hallucinations wrongly Verified from 28 to 7 but removed Verified from most true claims
+   (152 → 47) and added false alarms, so it was **not adopted** (`results/strict_support_eval.md`). Catching these
+   reasoning errors would need an LLM judge, which this project deliberately does not use.
+10. **Pronoun resolution is rule-based:** much better since following the sentence topic (93 → 277 right
    on held-out text), but still wrong sometimes ("Mumbai is its financial hub" → "Mumbai's").
 
 ---

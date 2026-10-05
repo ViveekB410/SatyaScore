@@ -135,7 +135,31 @@ def aggregate_strict(rows: list[tuple[float, float, bool]]) -> float:
     return 0.5 + 0.5 * (max_e - max(c for _, c in on))
 
 
-RULES = {"gated": aggregate, "legacy": aggregate_legacy, "strict": aggregate_strict}
+OFF_TOPIC_ENTAIL = 0.9  # "capped_strong": support from an off-topic article must be this strong
+
+
+def aggregate_capped(rows: list[tuple[float, float, bool]]) -> float:
+    """Like `aggregate`, but a claim can only reach Verified when a passage SUPPORTS it
+    (entailment >= ENTAIL_WINS). Under `aggregate` a weak entailment (0.3-0.5) with no
+    on-topic contradiction scored up to 0.75, i.e. Verified with no supporting passage:
+    "Humans can breathe naturally underwater" scored 0.72 from entailment 0.44."""
+    s = aggregate(rows)
+    if rows and max(e for e, _, _ in rows) < ENTAIL_WINS:
+        return min(s, HIGH)
+    return s
+
+
+def aggregate_capped_strong(rows: list[tuple[float, float, bool]]) -> float:
+    """`aggregate_capped`, and support from a passage whose article is NOT about the claim's
+    subject counts only if very strong (>= OFF_TOPIC_ENTAIL): "Human can breath naturally
+    underwater" was Verified at 0.79 by a Scuba diving passage ("the diver can inhale and
+    exhale naturally ... regardless of depth")."""
+    usable = [(e if (t or e >= OFF_TOPIC_ENTAIL) else min(e, ENTAIL_WINS - 1e-9), c, t) for e, c, t in rows]
+    return aggregate_capped(usable)
+
+
+RULES = {"gated": aggregate, "legacy": aggregate_legacy, "strict": aggregate_strict,
+         "capped": aggregate_capped, "capped_strong": aggregate_capped_strong}
 
 # --- which passage decided, and where it comes from (shown to users as sources) ----------
 
@@ -156,6 +180,9 @@ def deciding(rows: list[tuple[float, float, bool, str]], aggregation: str = "gat
         rows = [r for r in rows if r[2]]
         if not rows:
             return None
+    if aggregation == "capped_strong":  # weak off-topic support does not count as support
+        rows = [(r[0] if (r[2] or r[0] >= OFF_TOPIC_ENTAIL) else min(r[0], ENTAIL_WINS - 1e-9), r[1], r[2], r[3])
+                for r in rows]
     top_e = max(rows, key=lambda r: r[0])
     if top_e[0] >= ENTAIL_WINS:
         return top_e[3], "supports"

@@ -318,10 +318,13 @@ measures *topic*, not *truth* (below chance in Hindi). When the KG answers, it o
     evidence was weak, so no sentence was quoted.
   - *Checked claim* (fact-checks): the claim the fact-checker rated.
 
-### Optional, not yet switched on — LLM verifier (`member1_model/llm_verifier.py`)
+### Evaluated and kept off — LLM verifier (`member1_model/llm_verifier.py`)
 A large language model (gpt-oss-120b via Groq) reads the claim and its passages and gives a verdict.
-**Why:** it can tell "false" from "about something else" — the NLI weakness. It is built and tested
-in code; its evaluation is waiting on the API quota, under a decision rule fixed in advance.
+**Measured** (`results/llm_verifier_expanded.md`, open mode, rule fixed in advance): it met its ranking rule
+(train AUC 0.72 vs 0.55) and caught far more hallucinations (train 5 → 18 of 45; round 3 2 → 9 of 15), **but it
+marked about 1 in 7 true claims Hallucinated** (train false alarms 9 → 35 of 258; test 3 → 9 of 66). Not flagging
+genuine text is the project's first requirement, so it stays **off**, a recorded product choice. It would also
+make the system depend on an external AI service at run time.
 
 ---
 
@@ -450,8 +453,8 @@ measured before adoption.
    fixed) rather than chatbot errors, and about 14 are genuine reasoning errors (misconceptions,
    over-generalisations) that no lookup source can check. A stricter rule (only passages about the claim's subject
    may verify it) cut hallucinations wrongly Verified from 28 to 7 but removed Verified from most true claims
-   (152 → 47) and added false alarms, so it was **not adopted** (`results/strict_support_eval.md`). Catching these
-   reasoning errors would need an LLM judge, which this project deliberately does not use.
+   (152 → 47) and added false alarms, so it was **not adopted** (`results/strict_support_eval.md`). An LLM judge
+   catches more of them but was not adopted: it raises false alarms about four-fold (`results/llm_verifier_expanded.md`).
 10. **Simple false common-sense statements can be Verified.** A user test found "Humans can breathe naturally
     underwater" Verified. On 15 common-sense statements (`results/evidence_rule_eval.md`, reported only) the live rule
     Verified **all 9 false ones** ("The Sun revolves around the Earth", "Humans have three lungs"): Wikipedia passages

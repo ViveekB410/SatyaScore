@@ -1,0 +1,121 @@
+group,claim,lang,true,nli_max_e,mc_max,mc_best_title
+common sense,Humans can breathe naturally underwater.,en,0,0.4404296875,0.6887689232826233,wiki:en:Freediving blackout
+common sense,Human can breath naturally underwater.,en,0,0.4697265625,0.09391364455223083,wiki:en:Freediving blackout
+common sense,Humans can breathe underwater without any equipment.,en,0,0.8916015625,0.025309013202786446,wiki:en:Diving equipment
+common sense,Fish breathe using gills.,en,1,0.9736328125,0.987728476524353,wiki:en:Fish gill
+common sense,The Sun revolves around the Earth.,en,0,0.98291015625,0.9583268761634827,wiki:en:Sunset
+common sense,The Earth revolves around the Sun.,en,1,0.96533203125,0.9878194332122803,wiki:en:Planets in astrology
+common sense,Water boils at 100 degrees Celsius at sea level.,en,1,0.458984375,0.9064842462539673,Water
+common sense,Humans have three lungs.,en,0,0.88037109375,0.9744540452957153,wiki:en:Lung
+common sense,Humans have two lungs.,en,1,0.990234375,0.9859545826911926,wiki:en:Lung
+common sense,Penguins can fly long distances.,en,0,0.90380859375,0.9712453484535217,wiki:en:Little penguin
+common sense,Snakes have legs.,en,0,0.8525390625,0.5506938695907593,wiki:en:Anatomy
+common sense,Bats are mammals.,en,1,0.986328125,0.9868306517601013,wiki:en:Bat
+common sense,Spiders are insects.,en,0,0.9208984375,0.9744340181350708,wiki:en:Pholcidae
+common sense,The Moon produces its own light.,en,0,0.82958984375,0.9865928292274475,Moon
+common sense,Plants make food by photosynthesis.,en,1,0.98828125,0.9874114394187927,wiki:en:Leaf
+genuine hallucinations (train),Viral infections tend to be more easily spread.,en,0,0.51513671875,0.9787890911102295,"wiki:en:List of common misconceptions about science, technology, and mathematics"
+genuine hallucinations (train),Contagion Both can be contagious.,en,0,0.96484375,0.9458502531051636,wiki:en:Emotional contagion
+genuine hallucinations (train),Incubation period Viral infections often have a shorter incubation period than bacterial infections.,en,0,0.66015625,0.3672438859939575,wiki:en:Gastroenteritis
+genuine hallucinations (train),The World Health Organization recommends a daily water intake of at least 2 liters 67.6 ounces for adults in a temperate climate.,en,0,0.034759521484375,0.04310983419418335,wiki:en:Drinking water
+genuine hallucinations (train),Light energy is used to convert water and carbon dioxide into ATP adenosine triphosphate and NADPH nicotinamide adenine dinucleotide phosphate.,en,0,0.0643310546875,0.02292635478079319,wiki:hi:चयापचय
+genuine hallucinations (train),Restrictions on non residents the Indian Parliament restricted non residents from purchasing land or property in Jammu and Kashmir aiming to preserve the state's distinct cultural and demographic identity.,en,0,0.013702392578125,0.40469202399253845,"wiki:en:Jammu and Kashmir Reorganisation Act, 2019"
+genuine hallucinations (train),The format is as follows Group Stage 10 teams compete in a double round robin format where each team plays the other 9 teams twice home and away.,en,0,0.21142578125,0.18378284573554993,wiki:en:2026 FIFA World Cup qualification
+genuine hallucinations (train),"वजन प्रबंधन में मदद: इंसुलिन वजन प्रबंधन में भी मदद करता है, क्योंकि यह ग्लूकोज को कोशिकाओं में पहुंचाने में मदद करता है, जो ऊर्जा के रूप में उपयोग किया जाता है या भंडारित किया जाता है।",hi,0,0.9970703125,0.23946256935596466,wiki:hi:गर्भकालीन मधुमेह
+genuine hallucinations (train),"इस प्रकार, द्रव्यमान और भार दो अलग-अलग गुण हैं जो वस्तु के स्थान और परिस्थितियों पर निर्भर करते हैं।",hi,0,0.99755859375,0.32003167271614075,Mass versus weight
+genuine hallucinations (train),"मुख्य ग्रीनहाउस गैसें, जैसे कि कार्बन डाइऑक्साइड, मेथेन और नाइट्रस ऑक्साइड, वायुमंडल में जमा होकर सूर्य की किरणों को फंसाती हैं, जिससे पृथ्वी की सतह पर तापमान बढ़ता है।",hi,0,0.0260772705078125,0.14378134906291962,wiki:hi:भूमंडलीय ऊष्मीकरण
+genuine hallucinations (train),"चुनाव  : निर्वाचक मंडल द्वारा मतदान किया जाता है, और उम्मीदवार जो सबसे अधिक मत प्राप्त करता है, वह राष्ट्रपति चुना जाता है।",hi,0,0.9951171875,0.2877425253391266,wiki:hi:सरल बहुमत प्रणाली
+genuine hallucinations (train),"भारतीय संविधान द्वारा प्रदत्त मौलिक अधिकार निम्नलिखित हैं:
+     समानता का अधिकार (अनुच्छेद 14-18)
+    स्वतंत्रता का अधिकार (अनुच्छेद 19-22)
+    धर्म की स्वतंत्रता का अधिकार (अनुच्छेद 25-28)
+    संस्कृति और शिक्षा का अधिकार (अनुच्छेद 29-30)
+    संपत्ति का अधिकार (अनुच्छेद 31)
+    लोक सेवाओं में नियुक्ति का अधिकार (अनुच्छेद 16)
+    विदेशों में रोजगार का अधिकार (अनुच्छेद 21)
+    जीवन और व्यक्तिगत स्वतंत्रता का अधिकार (अनुच्छेद 21)
+    शिकायत का अधिकार (अनुच्छेद 32)",hi,0,0.91650390625,0.1635432094335556,"wiki:hi:भारत के मूल अधिकार, निदेशक तत्त्व और मूल कर्तव्य"
+genuine hallucinations (train),"विशेष शक्तियाँ  : राज्यसभा को कुछ विशेष शक्तियाँ प्रदान की गई हैं, जैसे कि राष्ट्रीय महत्व के मामलों पर विचार करना और राष्ट्रीय नीतियों का निर्धारण करना।",hi,0,0.0254974365234375,0.24515940248966217,wiki:hi:अमेरिकी हाउस ऑफ रेप्रेसेंटेटिव
+genuine hallucinations (train),"भारतीय संविधान के अनुसार, किसी भी राज्य के मुख्यमंत्री का कार्यकाल ५ वर्ष का होता है।",hi,0,0.6484375,0.2002263218164444,Prime Minister of India
+"true chatbot claims (train, 40)",दूसरे स्थान पर आने वाले ड्राइवर को 18 अंक मिलते हैं।,hi,1,0.01499176025390625,0.051441192626953125,wiki:hi:लुईस हैमिल्टन
+"true chatbot claims (train, 40)",Playoffs The top 4 teams qualify for the playoffs.,en,1,0.99755859375,0.9578270316123962,wiki:en:Playoffs
+"true chatbot claims (train, 40)","ऑस्ट्रिया के राजकुमार फ्रांज फेर्डिनांड की हत्या: २८ जून १९१४ को ऑस्ट्रिया के राजकुमार फ्रांज फेर्डिनांड की हत्या हुई, जिससे ऑस्ट्रिया और सербिया के बीच तनाव बढ़ गया और युद्ध शुरू हो गया।",hi,1,0.04132080078125,0.1366444230079651,wiki:hi:नेपोलियन बोनापार्ट
+"true chatbot claims (train, 40)",चुनावी प्रक्रिया को निष्पक्ष और पारदर्शी बनाने के लिए नियमों और दिशानिर्देशों का निर्माण करना।,hi,1,0.459228515625,0.11047659069299698,wiki:hi:निर्वाचन प्रणालियाँ
+"true chatbot claims (train, 40)",द्रव्यमान की इकाई किलोग्राम (किग्रा) होती है।,hi,1,0.99658203125,0.5334071516990662,wiki:hi:मापन
+"true chatbot claims (train, 40)",दूसरी पढ़ाई  : विधेयक को दूसरी बार पढ़ा जाता है और इसके प्रावधानों पर विस्तार से चर्चा की जाती है।,hi,1,0.3203125,0.09046152234077454,wiki:en:Reading (legislature)
+"true chatbot claims (train, 40)",The Ranji Trophy is India's premier domestic first class cricket championship.,en,1,0.8046875,0.9651651978492737,wiki:en:Syed Mushtaq Ali Trophy
+"true chatbot claims (train, 40)",Banking Regulation Supervising and regulating commercial banks.,en,1,0.5537109375,0.9758002161979675,wiki:en:Financial regulation in India
+"true chatbot claims (train, 40)",अनुच्छेद 370 भारतीय संविधान का एक अनुच्छेद था जो जम्मू और कश्मीर राज्य को विशेष दर्जा प्रदान करता था।,hi,1,0.99853515625,0.2107841670513153,Article 370
+"true chatbot claims (train, 40)",Mass and weight are often used interchangeably.,en,1,0.9619140625,0.9871087670326233,wiki:en:Mass
+"true chatbot claims (train, 40)",Jawaharlal Nehru was the first Prime Minister of India.,en,1,0.99755859375,0.9871886372566223,Jawaharlal Nehru
+"true chatbot claims (train, 40)",एलिमिनेटर  : तीसरे और चौथे स्थान पर रहने वाली टीमें एक दूसरे के साथ मैच खेलती हैं।,hi,1,0.99853515625,0.12485184520483017,wiki:hi:यूईएफए चैंपियंस लीग
+"true chatbot claims (train, 40)","ग्लूकोज के स्तर को नियंत्रित करना: इंसुलिन रक्त में ग्लूकोज के स्तर को नियंत्रित करने में मदद करता है, जो शरीर के लिए आवश्यक है।",hi,1,0.99560546875,0.31677505373954773,wiki:hi:समस्थापन
+"true chatbot claims (train, 40)",The team with the most points at the end of the group stage is ranked 1st.,en,1,0.01959228515625,0.02981727197766304,wiki:hi:2021 में सनराइजर्स हैदराबाद
+"true chatbot claims (train, 40)","लक्षण:   बैक्टीरियल और वायरल संक्रमण के लक्षण अलग-अलग हो सकते हैं, लेकिन कुछ सामान्य लक्षणों में बुखार, दर्द, और थकान शामिल हो सकते हैं।",hi,1,0.1258544921875,0.23822695016860962,COVID-19
+"true chatbot claims (train, 40)",भार: भार किसी वस्तु पर गुरुत्वाकर्षण के कारण लगने वाले बल को मापता है।,hi,1,0.998046875,0.6450007557868958,wiki:hi:भार
+"true chatbot claims (train, 40)",जीतने वाली टीम आईपीएल की विजेता बनती है।,hi,1,0.96044921875,0.2804996073246002,wiki:en:2024 Indian Premier League
+"true chatbot claims (train, 40)",पहला क्रिकेट विश्व कप 1975 में आयोजित हुआ था।,hi,1,0.99853515625,0.7142587900161743,wiki:en:1975 Cricket World Cup
+"true chatbot claims (train, 40)",Light is absorbed by pigments such as chlorophyll in the plant's cells.,en,1,0.97900390625,0.9864856004714966,Photosynthesis
+"true chatbot claims (train, 40)","If you suspect dengue fever, Abdominal is essential to consult a doctor immediately.",en,1,0.45751953125,0.13352017104625702,Dengue fever
+"true chatbot claims (train, 40)",First Reading The bill is read.,en,1,0.9853515625,0.9832478165626526,wiki:en:Select Vestries Bill
+"true chatbot claims (train, 40)","यह पृथ्वी की सतह पर गर्मी को फंसाने की प्रक्रिया है, जिससे तापमान बढ़ता है।",hi,1,0.99609375,0.3023737072944641,wiki:hi:पृथ्वी का वायुमण्डल
+"true chatbot claims (train, 40)","चुनाव प्रणाली  : राष्ट्रपति चुनाव में एकल संक्रमणीय मत प्रणाली का उपयोग किया जाता है, जिसमें प्रत्येक सदस्य को अपनी वरीयता के अनुसार उम्मीदवारों को मत देने का अधिकार होता है।",hi,1,0.373291015625,0.20111629366874695,wiki:hi:सरल बहुमत प्रणाली
+"true chatbot claims (train, 40)",Measles Hepatitis B Haemophilus influenzae type b Hib Rotavirus Rubella Pneumococcal conjugate Japanese Encephalitis in endemic areas.,en,1,0.302490234375,0.03829973191022873,wiki:hi:एचआईवी/एड्स के लक्षण
+"true chatbot claims (train, 40)",जीतने वाली टीम फाइनल में पहुंचती है।,hi,1,0.9970703125,0.28797516226768494,wiki:hi:यूईएफए चैंपियंस लीग
+"true chatbot claims (train, 40)",हारने वाली टीम बाहर हो जाती है।,hi,1,0.99609375,0.24411533772945404,Tennis
+"true chatbot claims (train, 40)","सैन्यीकरण: यूरोपीय देशों में सैन्यीकरण बढ़ रहा था, जिससे युद्ध की संभावना बढ़ रही थी।",hi,1,0.95703125,0.4548618495464325,wiki:hi:वाणिज्यवाद
+"true chatbot claims (train, 40)",२)   प्रतिरक्षा कोशिकाएं  : व्हाइट ब्लड सेल्स जैसे न्यूट्रोफिल और मैक्रोफेज वायरस को पहचानकर और नष्ट करके काम करते हैं।,hi,1,0.873046875,0.15196919441223145,Immune system
+"true chatbot claims (train, 40)",जीतने वाली टीम सीधे फाइनल में पहुंचती है।,hi,1,0.984375,0.4459538757801056,wiki:hi:यूईएफए चैंपियंस लीग
+"true chatbot claims (train, 40)",The significance of Article 370 includes Autonomy Article 370 provided Jammu and Kashmir with a significant degree of autonomy allowing the state to make Kashmir own laws on various matters.,en,1,0.51708984375,0.9043150544166565,wiki:en:Jammu and Kashmir (union territory)
+"true chatbot claims (train, 40)",Other medical conditions Certain conditions such as high blood pressure high cholesterol and polycystic ovary syndrome PCOS can increase the risk of developing type 2 diabetes.,en,1,0.0540771484375,0.06600514054298401,Diabetes
+"true chatbot claims (train, 40)",राष्ट्रपति की मंजूरी  : दोनों सदनों द्वारा पारित विधेयक को राष्ट्रपति के पास मंजूरी के लिए भेजा जाता है।,hi,1,0.9970703125,0.15323394536972046,wiki:hi:वीटो
+"true chatbot claims (train, 40)","क्रिकेट का विकास  : रणजी ट्रॉफी क्रिकेट के विकास में महत्वपूर्ण भूमिका निभाती है, क्योंकि यह प्रतियोगिता घरेलू स्तर पर खेल को बढ़ावा देती है और नए खिलाड़ियों को तैयार करती है।",hi,1,0.1192626953125,0.11160866916179657,wiki:en:Karnataka
+"true chatbot claims (train, 40)",Cardiac failure Prolonged high blood pressure can lead to heart failure as the heart becomes unable to pump blood efficiently.,en,1,0.83251953125,0.2882440984249115,wiki:en:Watershed stroke
+"true chatbot claims (train, 40)",Nucleic acid amplification tests NAATs To detect genetic material of TB bacteria.,en,1,0.02410888671875,0.8752273917198181,Tuberculosis
+"true chatbot claims (train, 40)",द्रव्यमान और भार दो अलग-अलग भौतिक गुण हैं जो अक्सर एक दूसरे के साथ भ्रमित हो जाते हैं।,hi,1,0.986328125,0.1289135366678238,Gravity
+"true chatbot claims (train, 40)","मानव प्रतिरक्षा प्रणाली वायरल संक्रमण के प्रति कई तरीकों से प्रतिक्रिया करती है:
+
+१)   प्राकृतिक प्रतिरक्षा  : त्वचा और श्लेष्म झिल्ली जैसे बाधाएं वायरस के प्रवेश को रोकती हैं।",hi,1,0.0094757080078125,0.08120118081569672,Immune system
+"true chatbot claims (train, 40)",ब्लैक होल एक ऐसा खगोलीय वस्तु है जो एक तारे के गुरुत्वाकर्षण के कारण उसके पतन के बाद बनता है।,hi,1,0.12646484375,0.1397748440504074,Black hole
+"true chatbot claims (train, 40)",Water absorption Water is absorbed by the plant's roots.,en,1,0.99169921875,0.970318615436554,wiki:en:Absorption of water
+"true chatbot claims (train, 40)",Overall high blood pressure can lead to significant cardiovascular damage.,en,1,0.86767578125,0.9788190126419067,Hypertension
+fresh true Wikipedia sentences (40),Korea is a peninsular region in East Asia consisting of the Korean Peninsula Jeju Island and smaller islands.,en,1,0.86767578125,0.9665219187736511,wiki:en:Korea
+fresh true Wikipedia sentences (40),Blood is a specialized form of connective tissue and body fluid in the circulatory system of humans and other vertebrates that delivers necessary substances such as nutrients and oxygen to the cells of the body.,en,1,0.60546875,0.980995237827301,Blood
+fresh true Wikipedia sentences (40),The Alaska State Legislature is the state legislature of the U.S. state of Alaska.,en,1,0.261962890625,0.9825447201728821,wiki:en:Alaska State Legislature
+fresh true Wikipedia sentences (40),उस्मानी साम्राज्य या तुर्की साम्राज्य 1299 में पश्चिमोत्तर अनातोलिया में स्थापित एक तुर्क राज्य था।,hi,1,0.5322265625,0.7546536326408386,wiki:hi:उस्मानी साम्राज्य
+fresh true Wikipedia sentences (40),This glossary of astronomy is a list of definitions of terms and concepts relevant to astronomy and cosmology their sub-disciplines and related fields.,en,1,0.61181640625,0.935401201248169,wiki:en:Glossary of astronomy
+fresh true Wikipedia sentences (40),Mount Everest known in Nepali as Sagarmāthā in Sherpa as Chamolangma and in Tibetan as Jomolangma/ is Čhomolangma.,en,1,0.5927734375,0.775249183177948,Mount Everest
+fresh true Wikipedia sentences (40),The Phoenicians were an ancient Semitic-speaking people who inhabited city-states in Canaan along the Levantine coast of the eastern Mediterranean primarily in present-day Lebanon.,en,1,0.099365234375,0.9808645844459534,wiki:en:Phoenicia
+fresh true Wikipedia sentences (40),Diabetes is mellitus commonly known as diabetes.,en,1,0.994140625,0.9824762344360352,Diabetes
+fresh true Wikipedia sentences (40),भारतीय स्वतन्त्रता आन्दोलन विभिन्न प्रकार के क्रियाकलापों और घटनाओं की एक शृंखला थी जिसका अंतिम उद्देश्य भारत में ब्रिटिश शासन को समाप्त करना था।,hi,1,0.9951171875,0.7834365963935852,Indian independence movement
+fresh true Wikipedia sentences (40),Tennis is a racket sport that is played either individually against a single opponent or between two teams of two players each.,en,1,0.5546875,0.977959156036377,Tennis
+fresh true Wikipedia sentences (40),The University of Law is a publicly-funded for-profit university in the United Kingdom providing undergraduate and postgraduate degrees in law business psychology criminology policing and computer science.,en,1,0.97998046875,0.9492400288581848,wiki:en:The University of Law
+fresh true Wikipedia sentences (40),In physics gravity also known as gravitation or a gravitational interaction is a fundamental interaction which may be described as the force that draws material objects towards each other.,en,1,0.94677734375,0.9785228371620178,Gravity
+fresh true Wikipedia sentences (40),Pornography is sexually suggestive material such as pictures videos text or audio intended for sexual arousal.,en,1,0.96923828125,0.9832393527030945,wiki:en:Pornography
+fresh true Wikipedia sentences (40),Mumbai also known as Bombay is the capital city of the Indian state of Maharashtra and the financial capital of India.,en,1,0.493408203125,0.9793605208396912,Mumbai
+fresh true Wikipedia sentences (40),An economy is an area of the production distribution and trade as well as consumption of goods and services.,en,1,0.97607421875,0.9813708662986755,wiki:en:Economy
+fresh true Wikipedia sentences (40),The prime minister of India is the head of government of the Republic of India.,en,1,0.9931640625,0.9862594604492188,wiki:en:Politics of India
+fresh true Wikipedia sentences (40),The Election Commission of India is a constitutional body that is empowered to conduct free and fair elections in India.,en,1,0.97998046875,0.9853125214576721,wiki:en:Politics of India
+fresh true Wikipedia sentences (40),वृद्धि हार्मोन (जीएच ) एक प्रोटीन पर आधारित पेप्टाइड हार्मोन है।,hi,1,0.94970703125,0.7023824453353882,wiki:hi:वृद्धि हार्मोन
+fresh true Wikipedia sentences (40),"क्रम - विकास, क्रमिक विकास, उद्विकास, उद्भेद जैविक आबादी के आनुवंशिक लक्षणों के पीढ़ी दर पीढ़ी परिवर्तन को कहते हैं।",hi,1,0.99560546875,0.6503099799156189,Evolution
+fresh true Wikipedia sentences (40),The human brain comprises the central nervous system.,en,1,0.98046875,0.9848019480705261,Human brain
+fresh true Wikipedia sentences (40),A black hole is an astronomical body so compact that A black hole's gravity prevents anything including light from escaping.,en,1,0.72216796875,0.9825372099876404,Black hole
+fresh true Wikipedia sentences (40),मौलाना मुहम्मद जलालुद्दीन रूमी फारसी साहित्य के महत्वपूर्ण लेखक थे जिन्होंने मसनवी में महत्वपूर्ण योगदान किया।,hi,1,0.2091064453125,0.6115530133247375,wiki:hi:जलालुद्दीन रूमी
+fresh true Wikipedia sentences (40),Folklore is the body of expressive culture shared by a particular group of people culture or subculture.,en,1,0.783203125,0.9849205613136292,wiki:en:Folklore
+fresh true Wikipedia sentences (40),सेनया सैन्यदल किसी देश या उसके नागरिकों या फिर किसी शासन-व्यवस्था और उस से सम्बन्धित लोगों के हितों व ध्येयों को बढ़ाने और उनकी रक्षा के लिये घातक बल-प्रयोग की क्षमता रखने वाला सशस्त्र संगठन होता है।,hi,1,0.978515625,0.9238308072090149,wiki:hi:सेना
+fresh true Wikipedia sentences (40),The Battle of Plassey was a decisive victory of the British East India Company under the leadership of Robert Clive over the Nawab of Bengal and Robert Clive's French allies on 23 June 1757.,en,1,0.0205078125,0.5323867201805115,Battle of Plassey
+fresh true Wikipedia sentences (40),A season is a division of the year based on changes in weather ecology and the number of daylight hours in a given region.,en,1,0.95654296875,0.9742168188095093,Season
+fresh true Wikipedia sentences (40),In India a chief minister is the elected head of government of each state out of the 28 states and sometimes a union territory.,en,1,0.9326171875,0.978632390499115,wiki:en:List of current Indian chief ministers
+fresh true Wikipedia sentences (40),Socialism is an economic ideology and political philosophy encompassing diverse economic and social systems characterised by social ownership of the means of production as opposed to private ownership.,en,1,0.94091796875,0.9798968434333801,wiki:en:Socialism
+fresh true Wikipedia sentences (40),"नदी भूतल पर प्रवाहित एक जलधारा है, जिसका स्रोत प्रायः कोई झील, हिमनद, झरना या बारिश का पानी होता है तथा किसी सागर अथवा झील में गिरती है।",hi,1,0.98388671875,0.6798784732818604,wiki:hi:नदी
+fresh true Wikipedia sentences (40),The Cold War is the capitalist Western Bloc and communist Eastern Bloc.,en,1,0.84033203125,0.5513496994972229,Cold War
+fresh true Wikipedia sentences (40),In botany a seed is a plant structure containing an embryo and stored nutrients in a protective coat called a testa.,en,1,0.97216796875,0.9821710586547852,wiki:en:Seed
+fresh true Wikipedia sentences (40),Mount Everest known in Nepali as Sagarmāthā in Sherpa as Chamolangma and in Tibetan as Jomolangma/ is the highest mountain on Earth above sea level.,en,1,0.400146484375,0.7817190289497375,Mount Everest
+fresh true Wikipedia sentences (40),Chikungunya vaccines are vaccines intended to provide acquired immunity against the chikungunya virus.,en,1,0.279296875,0.9771888256072998,wiki:en:Chikungunya vaccine
+fresh true Wikipedia sentences (40),पेरिस फ़्रान्स का सबसे बड़ा नगर और उसकी राजधानी है।,hi,1,0.99658203125,0.9004363417625427,Paris
+fresh true Wikipedia sentences (40),मानव मस्तिष्क शरीर का एक आवश्यक अंग होने के साथ-साथ प्रकृति की एक उत्कृष्ट रचना भी है।,hi,1,0.99755859375,0.9011774063110352,Human brain
+fresh true Wikipedia sentences (40),Metallurgy is a domain of material science and engineering that studies the physical and chemical behavior of metallic elements their inter-metallic compounds and their mixtures which are known as alloys.,en,1,0.95849609375,0.9753028154373169,wiki:en:Metallurgy
+fresh true Wikipedia sentences (40),The Lok Sabha also known as the House of the People is the lower house of the bicameral Parliament of India where the upper house is Rajya Sabha.,en,1,0.86376953125,0.9650106430053711,Lok Sabha
+fresh true Wikipedia sentences (40),"मुग़ल साम्राज्य दक्षिण एशिया की एक इस्लामी तुर्की-मंगोल साम्राज्य था, जो 1526 में शुरू हुआ, जिसने 17 वीं शताब्दी के आखिर में और 18 वीं शताब्दी की शुरुआत तक भारतीय उपमहाद्वीप में शासन किया और 19 वीं शताब्दी के मध्य में समाप्त हुआ।",hi,1,0.98876953125,0.5337967872619629,Mughal Empire
+fresh true Wikipedia sentences (40),Archaic humans emerged out of Africa between 0.5 and 1.8 million years ago.,en,1,0.0226287841796875,0.9818072319030762,wiki:en:History of Africa
+fresh true Wikipedia sentences (40),"भौतिक ब्रह्मांड विज्ञान वह विज्ञान है जो ब्रह्मांड की संरचना, विकास और उसके अस्तित्व के भौतिक पहलुओं का अध्ययन करता है।",hi,1,0.998046875,0.8605462312698364,wiki:hi:भौतिक ब्रह्मांडिकी

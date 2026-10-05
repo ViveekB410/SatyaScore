@@ -125,6 +125,29 @@ at a cost in false alarms that we measured.
 **Not recommended (tested or ruled out):** other NLI models, threshold tuning, fine-tuning on our 303
 claims, an LLM as the main judge.
 
-**Next step:** a design probe on the existing failure cases, comparing current NLI with MiniCheck on the
-same passages (common-sense set, genuine hallucinations, true chatbot claims, fresh Wikipedia
-sentences): about 15 minutes, 1.7 GB model download. Then, if promising, the pre-registered test.
+**Update:** the design probe was run (section 5): MiniCheck did not fix false support of common-sense
+falsehoods, so the change is not pursued.
+
+---
+
+## 5. Design probe: MiniCheck-DeBERTa-v3-L vs the current NLI model (2026-10-06)
+
+Same retrieved passages for both; "supports" = the best passage scores >= 0.5. A design probe to
+understand the problem, not a decision test. English only below (MiniCheck is English-only; its
+Hindi results are meaningless without translation).
+
+| Group (English) | n | NLI supports | MiniCheck supports |
+|---|---|---|---|
+| true chatbot claims (train sample, seed 19) | 16 | 11 | 11 |
+| fresh true Wikipedia sentences (seed 19) | 29 | 22 | **29** |
+| genuine train hallucinations (should not be supported) | 7 | 3 | 2 |
+| false common-sense statements (should not be supported) | 9 | 7 | **7** |
+
+MiniCheck still confidently supported "Humans have three lungs" (0.97, Lung article), "Spiders are
+insects" (0.97), "The Moon produces its own light" (0.99) and "Humans can breathe naturally underwater"
+(0.69).
+
+**Conclusion of the probe:** a grounding checker recognises genuine support better in English but does
+**not** fix false support of common-sense falsehoods, the failure that matters most; Hindi would need a
+translation model as well. **Not pursued.** The remaining errors need world knowledge, which only large
+LLMs supply, at a measured cost in false alarms (section 2).

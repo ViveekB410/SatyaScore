@@ -39,7 +39,7 @@ RUN useradd -m -u 1000 user && mkdir -p /app/instance && chown -R user /app
 USER user
 
 # Models are in the image, so no Hub access at runtime. HTTPS on *.hf.space -> Secure cookie.
-ENV HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 SATYASCORE_COOKIE_SECURE=true
+ENV HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 SATYASCORE_COOKIE_SECURE=true SATYASCORE_API_KEYS=""
 EXPOSE 7860
 CMD ["uvicorn", "member3_backend.serve:create_app", "--factory", "--host", "0.0.0.0", "--port", "7860", \
      "--proxy-headers", "--forwarded-allow-ips", "*"]

@@ -121,3 +121,10 @@ def test_cors_origins_are_configurable_for_a_hosted_frontend():
     assert parse_cors_origins("http://localhost:5173, https://demo.lovable.app") == [
         "http://localhost:5173", "https://demo.lovable.app"]
     assert _CORS_ORIGINS  # the middleware is built from this list
+
+
+def test_api_keys_are_configurable_and_can_be_switched_off():
+    from member3_backend.api import parse_api_keys
+    assert parse_api_keys(None) == {"dev-key-satyascore-2026"}  # local default unchanged
+    assert parse_api_keys("") == set()                           # public deployment: no keys
+    assert parse_api_keys(" a , b,,") == {"a", "b"}

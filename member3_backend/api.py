@@ -21,6 +21,7 @@ noticeably slower than subsequent ones. This is expected.
 
 from __future__ import annotations
 
+import os
 import time
 import re
 import requests
@@ -54,7 +55,15 @@ from member3_backend.pipeline import DetectionPipeline
 #   - anonymous web users: no key, no cookie; allowed, with a lower per-IP limit.
 # Rate-limit state is in-memory (one process). A multi-worker deployment needs a
 # shared store (e.g. Redis) instead.
-VALID_API_KEYS = {"dev-key-satyascore-2026"}
+# SATYASCORE_API_KEYS: comma-separated keys; unset -> the development key. A public
+# deployment sets it to "" (no keys), since the development key is written in the repository.
+def parse_api_keys(value: str | None) -> set[str]:
+    if value is None:
+        return {"dev-key-satyascore-2026"}
+    return {k.strip() for k in value.split(",") if k.strip()}
+
+
+VALID_API_KEYS = parse_api_keys(os.environ.get("SATYASCORE_API_KEYS"))
 RATE_LIMIT_PER_MINUTE = 100          # per API key or per signed-in user
 ANON_RATE_LIMIT_PER_MINUTE = 20      # per IP, anonymous
 _request_log: dict[str, list[float]] = defaultdict(list)

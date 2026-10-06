@@ -29,6 +29,14 @@ npm run dev
 (e.g. `http://192.168.x.x:5173`). The phone reaches the backend through the web server's `/api`
 forwarding; the backend itself stays on localhost. Details: `PROJECT_GUIDE.md` §3.2a.
 
+**Public link** (anyone, anywhere, while the laptop runs it) — one command instead of the two above;
+it builds the web app, serves website + API on http://localhost:7860 and prints a free
+`https://<random>.trycloudflare.com` address (needs `winget install --id Cloudflare.cloudflared -e` once):
+```powershell
+.venv\Scripts\python.exe deploy\start_public.py
+```
+Details: `PROJECT_GUIDE.md` §3.2b; permanent hosting: `deploy/DEPLOY.md`.
+
 Open **http://localhost:5173** — the status pill should read *Online · 102,069 passages* (or *9,351* if the
 expanded corpus has not been built on this machine; see First-time setup).
 
@@ -41,7 +49,7 @@ seconds; on CPU about 25 s per short passage.
 ### First-time setup
 ```powershell
 python -m venv .venv
-.venv\Scripts\python.exe -m pip install -r requirements.txt
+.venv\Scripts\python.exe -m pip install -r requirements.txt -c requirements-lock.txt   # the tested versions
 .venv\Scripts\python.exe -m spacy download en_core_web_sm
 # optional GPU: CUDA build of PyTorch (match your installed torch version)
 .venv\Scripts\python.exe -m pip install "torch==<version>" --index-url https://download.pytorch.org/whl/cu130
@@ -99,7 +107,10 @@ The code is valid for 30 minutes, works once, and is stored only as a hash; the 
 | `GET /history`, `GET` / `DELETE /history/{id}` | the signed-in user's saved checks |
 
 Callers: the web app (session cookie or anonymous, 20 checks/min per IP), or scripts with the
-`X-API-Key` header (dev key `dev-key-satyascore-2026`; never sent by the web app).
+`X-API-Key` header (dev key `dev-key-satyascore-2026`; never sent by the web app). Keys come from
+`SATYASCORE_API_KEYS` (comma-separated; unset = the dev key); the public link and the container
+set it empty, so the dev key does not work there. When served by `member3_backend/serve.py`
+(public link, container) the API is under `/api` (e.g. `/api/detect`).
 
 ## Results in one paragraph
 
@@ -120,7 +131,8 @@ member3_backend/   API, accounts (auth.py), pipeline, claim extractor, FAISS ret
 web/               web app (current)            frontend/  earlier dashboard (fallback)
 round3/            pre-registration, questions, claims, annotator sheets, signals
 results/           every measured result (*.md, *.csv)
-tests/             249 tests
+deploy/            public link (start_public.py), Hugging Face Space container (space/, push_to_hf.py, DEPLOY.md)
+tests/             259 tests
 ```
 
 ## Reproducing the results
@@ -154,5 +166,8 @@ Run `.xlsx`-reading scripts with `.venv\Scripts\python.exe` (needs `openpyxl`).
 ## Known gaps
 
 No email verification (password reset uses an administrator-issued code, not email); rate limits are in-memory (single process); the
-`Dockerfile` packages the API only and has not been re-tested since accounts and the KG changes;
-Marathi is out of scope. Full list: `RESULTS_SUMMARY.md` §12.
+root `Dockerfile` packages the API only and is out of date — the current container is
+`deploy/space/Dockerfile.template` (website + API, tested versions), whose Docker build has not
+been run yet (Hugging Face now needs a paid plan for Docker Spaces; Docker is not installed on the
+development laptop); the public link depends on the laptop being on; Marathi is out of scope.
+Full list: `RESULTS_SUMMARY.md` §12.

@@ -1,5 +1,11 @@
 # Deploying Satya-Score to Hugging Face Spaces
 
+> **Status (2026-10-07):** Hugging Face now requires a **PRO subscription** for Docker Spaces on
+> its free CPU hardware (the Hub answers `402 Payment Required` when the Space is created). The
+> private bundle (`<user>/satyascore-bundle`) uploads fine; the Space itself needs PRO. Without
+> PRO, use the **public link** from the laptop (`deploy/start_public.py`, PROJECT_GUIDE §3.2b),
+> or a server such as Azure for Students (free $100 credit) running the same container.
+
 The app (website + API) runs in one Docker container on a free Hugging Face Space:
 2 CPU cores, 16 GB RAM, public address `https://<user>-satyascore.hf.space`.
 The source code stays private: the Space contains only a Dockerfile, a README, a small

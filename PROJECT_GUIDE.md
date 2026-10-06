@@ -79,6 +79,33 @@ The web app prints two addresses:
 - **Sign-in:** works on the phone, but it is a separate sign-in from the laptop's.
 - **Both at once:** the laptop can keep using http://localhost:5173 at the same time.
 
+### 3.2b Public link (anyone, anywhere)
+One command runs the whole app on this laptop and gives it a public **https** address through a
+free Cloudflare tunnel (no Cloudflare account needed):
+
+```powershell
+winget install --id Cloudflare.cloudflared -e                  # once; then open a new terminal
+.venv\Scripts\python.exe deploy\start_public.py                 # builds the web app, prints the link
+.venv\Scripts\python.exe deploy\start_public.py --no-build      # next times, if the web app is unchanged
+```
+
+It prints `Public link: https://<random-words>.trycloudflare.com`; the link works after
+`Application startup complete` (about a minute). Use **this** command instead of the two in §3.2
+(not together: it serves the website and the backend itself). On the laptop, open
+http://localhost:7860.
+
+- **The link changes every start** and works only while that terminal stays open and the laptop
+  is awake and online. Stop with **Ctrl + C**.
+- **Same speed and data as the demo:** it uses the laptop's GPU and the same accounts and History.
+- **Security:** the app listens only on the laptop; the tunnel is the one way in. The development
+  API key is switched off, so outsiders can only use the website (guests: 20 checks/min; signed-in
+  users: 100). Sign-in from other websites is refused.
+- **Before showing it:** start it a few minutes early and run one check, so the first (slower)
+  live lookups are not in front of the audience.
+
+A permanent address needs a server (see `deploy/DEPLOY.md`: a Hugging Face Space is prepared but
+Docker Spaces now need a paid PRO plan; Azure for Students is the free alternative).
+
 ### 3.3 Demo script (about 10 minutes)
 The results below were checked on the live system.
 
@@ -119,6 +146,9 @@ http://localhost:8000/docs.
 | Page goes blank after an edit to the code | restart the web app (`npm run dev`) and reload with Ctrl + Shift + R |
 | No fact-checks shown | the backend was started from a terminal opened before the key was saved: open a new terminal and restart it |
 | No internet | stored passages still work; Wikidata and fact-checks do not. Use saved checks in **History** |
+| Public link does not open | the `start_public.py` terminal must stay open; wait for `Application startup complete`; after a restart the link is new |
+| `cloudflared is not installed` | `winget install --id Cloudflare.cloudflared -e`, then open a **new** terminal |
+| Port 7860 already in use | another copy is running: close it (Ctrl + C in its terminal) |
 
 ---
 
@@ -149,7 +179,7 @@ http://localhost:8000/docs.
 Code map: `member1_model/` (embeddings, NLI, scoring, calibration, LLM verifier) ·
 `member2_data/` (Wikidata connector, entity linker) · `member3_backend/` (API, accounts, pipeline,
 claim extractor, retriever, Wikipedia expander, evidence rules) · `web/` (the web app) ·
-`results/` (every measured result) · `tests/` (249 automated tests).
+`results/` (every measured result) · `tests/` (259 automated tests) · `deploy/` (public link and container deployment).
 
 ---
 
@@ -355,7 +385,8 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 | Data | SQLite (`instance/satyascore.db`, never committed): users, sessions, each user's saved checks |
 | Rate limits | 100 checks/min per signed-in user or API key; 20/min per network when anonymous |
 | Speed | NVIDIA GPU (RTX 4050): a 6-claim answer in **~5 s the first time, under 1 s when repeated**; lookups run in parallel, each web service is paced separately, searches are remembered (`results/latency_realtime.md`) |
-| Quality | **249 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
+| Production serving | `member3_backend/serve.py` serves the built website at `/` and the API at `/api` from one address (first-party cookie, no cross-site setup); used by the public link (`deploy/start_public.py`) and the container (`deploy/space/`). Exact library versions: `requirements-lock.txt` |
+| Quality | **259 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API, production serving |
 
 ---
 

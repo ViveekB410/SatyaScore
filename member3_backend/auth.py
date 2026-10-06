@@ -513,6 +513,16 @@ SECURITY_HEADERS = {
 }
 
 
+def route_path(request: Request) -> str:
+    """The path as this app's routes see it. When the API is mounted under a prefix
+    (member3_backend/serve.py serves it at /api), request.url.path still includes the
+    prefix, so path checks must strip root_path first."""
+    path, root = request.scope["path"], request.scope.get("root_path", "")
+    if root and path.startswith(root):
+        return path[len(root):] or "/"
+    return path
+
+
 def csrf_violation(request: Request) -> str | None:
     """A state-changing browser request must come from an allowed Origin when it
     carries the session cookie, and sign-in/sign-up must never be posted from a
@@ -521,7 +531,7 @@ def csrf_violation(request: Request) -> str | None:
         return None
     origin = request.headers.get("origin")
     has_cookie = SESSION_COOKIE in request.cookies
-    is_auth = request.url.path.startswith("/auth/")
+    is_auth = route_path(request).startswith("/auth/")
     if (has_cookie or is_auth) and origin is not None and origin not in _state["origins"]:
         return "Request origin not allowed."
     if has_cookie and origin is None:
@@ -541,7 +551,7 @@ def install(app: FastAPI, allowed_origins: list[str]) -> None:
         response = JSONResponse({"detail": reason}, status_code=403) if reason else await call_next(request)
         for k, v in SECURITY_HEADERS.items():
             response.headers.setdefault(k, v)
-        if request.url.path.startswith(("/auth/", "/history")):
+        if route_path(request).startswith(("/auth/", "/history")):
             response.headers["Cache-Control"] = "no-store"
         return response
 

@@ -65,6 +65,7 @@ function Account() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => navigate('/history')}>Your history</DropdownMenuItem>
+        <DropdownMenuItem onSelect={() => navigate('/account')}>Change password</DropdownMenuItem>
         <DropdownMenuItem
           onSelect={async () => {
             await signOut()

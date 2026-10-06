@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { getMe, signIn, signOut, signUp } from './api'
+import { changePassword, getMe, resetPassword, signIn, signOut, signUp } from './api'
 import type { User } from './types'
 
 interface AuthValue {
@@ -8,6 +8,8 @@ interface AuthValue {
   signIn: (email: string, password: string) => Promise<User>
   signUp: (name: string, email: string, password: string) => Promise<User>
   signOut: () => Promise<void>
+  changePassword: (currentPassword: string, newPassword: string) => Promise<User>
+  resetPassword: (email: string, code: string, newPassword: string) => Promise<User>
 }
 
 const AuthContext = createContext<AuthValue | null>(null)
@@ -47,9 +49,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  // both sign the user in with a fresh session (the server revokes every other session)
+  const doChange = useCallback(async (currentPassword: string, newPassword: string) => {
+    const u = await changePassword(currentPassword, newPassword)
+    setUser(u)
+    return u
+  }, [])
+
+  const doReset = useCallback(async (email: string, code: string, newPassword: string) => {
+    const u = await resetPassword(email, code, newPassword)
+    setUser(u)
+    return u
+  }, [])
+
   const value = useMemo(
-    () => ({ user, loading, signIn: doSignIn, signUp: doSignUp, signOut: doSignOut }),
-    [user, loading, doSignIn, doSignUp, doSignOut],
+    () => ({ user, loading, signIn: doSignIn, signUp: doSignUp, signOut: doSignOut,
+             changePassword: doChange, resetPassword: doReset }),
+    [user, loading, doSignIn, doSignUp, doSignOut, doChange, doReset],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

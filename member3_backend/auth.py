@@ -86,7 +86,13 @@ CREATE TABLE IF NOT EXISTS analyses (
     flagged_count INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS analyses_user_time ON analyses(user_id, created_at DESC);
+CREATE TABLE IF NOT EXISTS password_resets (
+    code_hash TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at REAL NOT NULL
+);
 """
+RESET_CODE_MINUTES = 30
 
 _init_lock = threading.Lock()
 _initialised: set[str] = set()
@@ -349,6 +355,99 @@ def logout(request: Request, response: Response) -> Response:
     return out
 
 
+def _password_problem(password: str, email: str) -> str | None:
+    """The same rules as at sign-up."""
+    if len(password) < MIN_PASSWORD:
+        return f"Use a password of at least {MIN_PASSWORD} characters."
+    if password.strip().lower() == email:
+        return "The password must not be your email address."
+    return None
+
+
+def _set_password(con: sqlite3.Connection, user_id: str, password: str) -> None:
+    """New hash; every existing session and reset code of the user is revoked."""
+    con.execute("UPDATE users SET password_hash = ? WHERE id = ?", (hash_password(password), user_id))
+    con.execute("DELETE FROM sessions WHERE user_id = ?", (user_id,))
+    con.execute("DELETE FROM password_resets WHERE user_id = ?", (user_id,))
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(..., max_length=MAX_PASSWORD)
+    new_password: str = Field(..., max_length=MAX_PASSWORD)
+
+
+@router.post("/auth/change-password")
+def change_password(body: ChangePasswordRequest, request: Request, response: Response,
+                    user: dict = Depends(require_user)) -> dict:
+    """Signed-in: the current password is required. Other devices are signed out; this one
+    gets a fresh session."""
+    ip = client_ip(request)
+    key = f"{ip}|{user['email']}"
+    for window, k in ((_login_fail_account, key), (_login_fail_ip, ip)):
+        if (wait := window.retry_after(k)) is not None:
+            raise _too_many(wait, "failed password attempts")
+    with _db() as con:
+        row = con.execute("SELECT password_hash FROM users WHERE id = ?", (user["id"],)).fetchone()
+        if not row or not verify_password(body.current_password, row["password_hash"]):
+            _login_fail_account.hit(key)
+            _login_fail_ip.hit(ip)
+            raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="The current password is incorrect.")
+        if problem := _password_problem(body.new_password, user["email"]):
+            raise HTTPException(422, detail=problem)
+        _set_password(con, user["id"], body.new_password)
+    _set_cookie(response, create_session(user["id"]))
+    return {"user": user}
+
+
+def create_reset_code(email: str) -> str | None:
+    """A one-time password-reset code for an account (valid RESET_CODE_MINUTES), for the
+    administrator to give to the user (no email server is configured). Only its hash is
+    stored. None if no such account."""
+    code = "-".join(secrets.token_hex(3).upper() for _ in range(3))  # e.g. 3F9A1C-0B7D22-9E4410
+    with _db() as con:
+        row = con.execute("SELECT id FROM users WHERE email = ?", (email.strip().lower(),)).fetchone()
+        if not row:
+            return None
+        con.execute("DELETE FROM password_resets WHERE user_id = ? OR expires_at < ?", (row["id"], time.time()))
+        con.execute("INSERT INTO password_resets (code_hash, user_id, expires_at) VALUES (?, ?, ?)",
+                    (_token_hash(code), row["id"], time.time() + RESET_CODE_MINUTES * 60))
+    return code
+
+
+class ResetPasswordRequest(BaseModel):
+    email: str = Field(..., max_length=254)
+    code: str = Field(..., max_length=64)
+    new_password: str = Field(..., max_length=MAX_PASSWORD)
+
+
+@router.post("/auth/reset-password")
+def reset_password(body: ResetPasswordRequest, request: Request, response: Response) -> dict:
+    """Set a new password with a one-time reset code. Wrong email or code give the same
+    answer (no account enumeration) and count as failed attempts (throttled)."""
+    ip = client_ip(request)
+    email = body.email.strip().lower()
+    key = f"{ip}|{email}"
+    for window, k in ((_login_fail_account, key), (_login_fail_ip, ip)):
+        if (wait := window.retry_after(k)) is not None:
+            raise _too_many(wait, "failed reset attempts")
+    code = body.code.strip().upper()
+    with _db() as con:
+        row = con.execute(
+            "SELECT u.id, u.email, u.name, u.created_at FROM password_resets r JOIN users u ON u.id = r.user_id "
+            "WHERE r.code_hash = ? AND u.email = ? AND r.expires_at >= ?",
+            (_token_hash(code), email, time.time())).fetchone()
+        if not row:
+            _login_fail_account.hit(key)
+            _login_fail_ip.hit(ip)
+            raise HTTPException(400, detail="This reset code is not valid or has expired.")
+        if problem := _password_problem(body.new_password, email):
+            raise HTTPException(422, detail=problem)
+        _set_password(con, row["id"], body.new_password)
+    _login_fail_account.reset(key)
+    _set_cookie(response, create_session(row["id"]))
+    return {"user": _public(row)}
+
+
 @router.get("/auth/me")
 def me(request: Request) -> dict:
     # 200 with null rather than 401: "not signed in" is a normal state here.
@@ -445,3 +544,15 @@ def install(app: FastAPI, allowed_origins: list[str]) -> None:
         if request.url.path.startswith(("/auth/", "/history")):
             response.headers["Cache-Control"] = "no-store"
         return response
+
+if __name__ == "__main__":  # administrator tools
+    import sys
+    if len(sys.argv) == 3 and sys.argv[1] == "reset-code":
+        issued = create_reset_code(sys.argv[2])
+        if issued is None:
+            sys.exit("No account with that email.")
+        print(f"One-time reset code for {sys.argv[2].strip().lower()} (valid {RESET_CODE_MINUTES} minutes):")
+        print(issued)
+        print("Give it to the user; they enter it at Sign in -> Forgot password?")
+    else:
+        sys.exit("Usage: python -m member3_backend.auth reset-code <email>")

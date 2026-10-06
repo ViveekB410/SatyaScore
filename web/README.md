@@ -39,7 +39,9 @@ move it). **Behind HTTPS** (a real deployment) set `SATYASCORE_COOKIE_SECURE=tru
 frontend on a different site also set `SATYASCORE_COOKIE_SAMESITE=none` and add its origin to
 `SATYASCORE_CORS_ORIGINS`.
 
-Not included (known limits): email verification, password reset, and throttling that
+Passwords can be changed when signed in, and reset with a one-time code issued by the administrator
+(`python -m member3_backend.auth reset-code <email>`; see the main README).
+Not included (known limits): email verification, emailed reset links, and throttling that
 survives a restart or spans several server processes.
 
 ## Verdicts

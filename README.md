@@ -77,6 +77,15 @@ are saved to the user's own history on the server. Passwords are scrypt-hashed, 
 HttpOnly cookies, cross-site requests and repeated failed sign-ins are refused — details in
 **`web/README.md`**. User data lives in `instance/satyascore.db` (git-ignored).
 
+**Passwords:** signed-in users change theirs under *(name) → Change password* (current password
+required; other devices are signed out). A forgotten password is reset with a one-time code that the
+administrator issues; no email server is used:
+```powershell
+.venv\Scripts\python.exe -m member3_backend.auth reset-code user@example.com
+```
+The code is valid for 30 minutes, works once, and is stored only as a hash; the user enters it at
+*Sign in → Forgot password?*.
+
 `frontend/` is the earlier React dashboard, kept as a fallback (same port; run one at a time).
 
 ## API
@@ -111,7 +120,7 @@ member3_backend/   API, accounts (auth.py), pipeline, claim extractor, FAISS ret
 web/               web app (current)            frontend/  earlier dashboard (fallback)
 round3/            pre-registration, questions, claims, annotator sheets, signals
 results/           every measured result (*.md, *.csv)
-tests/             245 tests
+tests/             249 tests
 ```
 
 ## Reproducing the results
@@ -144,6 +153,6 @@ Run `.xlsx`-reading scripts with `.venv\Scripts\python.exe` (needs `openpyxl`).
 
 ## Known gaps
 
-No email verification or password reset; rate limits are in-memory (single process); the
+No email verification (password reset uses an administrator-issued code, not email); rate limits are in-memory (single process); the
 `Dockerfile` packages the API only and has not been re-tested since accounts and the KG changes;
 Marathi is out of scope. Full list: `RESULTS_SUMMARY.md` §12.

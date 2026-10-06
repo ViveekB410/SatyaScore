@@ -136,3 +136,69 @@ def test_password_hash_round_trip():
     assert auth.verify_password("a long enough password", stored)
     assert not auth.verify_password("a long enough passworD", stored)
     assert not auth.verify_password("x", "garbage")
+
+# --- changing and resetting the password -----------------------------------------------
+
+NEW = "a brand new passphrase"
+
+
+def login(client, password, email="asha@example.com"):
+    return client.post("/auth/login", json={"email": email, "password": password}, headers=GOOD)
+
+
+def test_change_password_needs_the_current_one_and_signs_out_other_devices(client):
+    register(client)
+    other = client.cookies.get(auth.SESSION_COOKIE)  # a second device holding the old session
+    bad = client.post("/auth/change-password", json={"current_password": "wrong password!", "new_password": NEW},
+                      headers=GOOD)
+    assert bad.status_code == 401
+    short = client.post("/auth/change-password", json={"current_password": PASSWORD, "new_password": "short"},
+                        headers=GOOD)
+    assert short.status_code == 422
+    ok = client.post("/auth/change-password", json={"current_password": PASSWORD, "new_password": NEW}, headers=GOOD)
+    assert ok.status_code == 200 and client.get("/auth/me").json()["user"]["email"] == "asha@example.com"
+    client.cookies.set(auth.SESSION_COOKIE, other)
+    assert client.get("/auth/me").json()["user"] is None  # the old session no longer works
+    assert login(client, PASSWORD).status_code == 401 and login(client, NEW).status_code == 200
+
+
+def test_change_password_requires_sign_in_and_a_same_site_request(client):
+    assert client.post("/auth/change-password", json={"current_password": PASSWORD, "new_password": NEW},
+                       headers=GOOD).status_code == 401
+    register(client)
+    cross = client.post("/auth/change-password", json={"current_password": PASSWORD, "new_password": NEW},
+                        headers={"Origin": "https://evil.example"})
+    assert cross.status_code == 403
+
+
+def test_reset_code_is_one_time_expires_and_is_stored_only_as_a_hash(client, tmp_path):
+    register(client)
+    client.post("/auth/logout", headers=GOOD)
+    assert auth.create_reset_code("nobody@example.com") is None
+    code = auth.create_reset_code("ASHA@example.com")
+    stored = sqlite3.connect(tmp_path / "test.db").execute("SELECT code_hash FROM password_resets").fetchone()[0]
+    assert code not in stored
+    body = {"email": "asha@example.com", "code": code.lower(), "new_password": NEW}  # case-insensitive code
+    assert client.post("/auth/reset-password", json=body, headers=GOOD).status_code == 200
+    assert client.get("/auth/me").json()["user"]["email"] == "asha@example.com"
+    assert client.post("/auth/reset-password", json=body, headers=GOOD).status_code == 400  # used once only
+    assert login(client, NEW).status_code == 200
+    late = auth.create_reset_code("asha@example.com")
+    con = sqlite3.connect(tmp_path / "test.db")
+    con.execute("UPDATE password_resets SET expires_at = ?", (time.time() - 1,))
+    con.commit()
+    expired = client.post("/auth/reset-password", json={**body, "code": late}, headers=GOOD)
+    assert expired.status_code == 400
+
+
+def test_wrong_reset_codes_reveal_nothing_and_are_throttled(client):
+    register(client)
+    a = client.post("/auth/reset-password", json={"email": "asha@example.com", "code": "AAAAAA-BBBBBB-CCCCCC",
+                                                 "new_password": NEW}, headers=GOOD)
+    b = client.post("/auth/reset-password", json={"email": "nobody@example.com", "code": "AAAAAA-BBBBBB-CCCCCC",
+                                                 "new_password": NEW}, headers=GOOD)
+    assert a.status_code == b.status_code == 400 and a.json() == b.json()
+    codes = [client.post("/auth/reset-password", json={"email": "asha@example.com", "code": "WRONG",
+                                                       "new_password": NEW}, headers=GOOD).status_code
+             for _ in range(5)]
+    assert codes[-1] == 429

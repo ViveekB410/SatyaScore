@@ -133,6 +133,11 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        <p className="-mt-2 text-right text-[13px]">
+          <Link to="/reset-password" className="text-navy underline decoration-rule underline-offset-4 hover:decoration-navy">
+            Forgot password?
+          </Link>
+        </p>
         <Button type="submit" className="w-full" disabled={busy || !email || !password}>
           {busy ? 'Signing in…' : 'Sign in'}
         </Button>

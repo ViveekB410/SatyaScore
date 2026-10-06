@@ -159,6 +159,16 @@ export async function signUp(name: string, email: string, password: string): Pro
   return (await json<{ user: User }>('/auth/register', postJson({ name, email, password }))).user
 }
 
+export async function changePassword(currentPassword: string, newPassword: string): Promise<User> {
+  return (await json<{ user: User }>('/auth/change-password',
+    postJson({ current_password: currentPassword, new_password: newPassword }))).user
+}
+
+export async function resetPassword(email: string, code: string, newPassword: string): Promise<User> {
+  return (await json<{ user: User }>('/auth/reset-password',
+    postJson({ email, code, new_password: newPassword }))).user
+}
+
 export async function signOut(): Promise<void> {
   const res = await request('/auth/logout', { method: 'POST' })
   if (!res.ok && res.status !== 401) throw await errorFrom(res)

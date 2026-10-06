@@ -149,7 +149,7 @@ http://localhost:8000/docs.
 Code map: `member1_model/` (embeddings, NLI, scoring, calibration, LLM verifier) ·
 `member2_data/` (Wikidata connector, entity linker) · `member3_backend/` (API, accounts, pipeline,
 claim extractor, retriever, Wikipedia expander, evidence rules) · `web/` (the web app) ·
-`results/` (every measured result) · `tests/` (245 automated tests).
+`results/` (every measured result) · `tests/` (249 automated tests).
 
 ---
 
@@ -350,12 +350,12 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 | Part | Details |
 |---|---|
 | Framework | **FastAPI** (Python); automatic API docs at `/docs` |
-| Endpoints | `GET /health`; `POST /detect` (text → claims, verdicts, scores, sources); `POST /extract-text` (.txt/.pdf upload); `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/me`; `/history` (list, open, delete) |
-| Accounts & security | passwords hashed with **scrypt** + random salt (never stored in plain text); sessions in **HttpOnly, SameSite cookies** (JavaScript cannot read them; only a hash is stored; expire in 7 days); **CSRF** protection (requests from other websites refused); **5 failed sign-ins → 15-minute lock**; same message for "wrong password" and "no such email" (no account guessing); security headers |
+| Endpoints | `GET /health`; `POST /detect` (text → claims, verdicts, scores, sources); `POST /extract-text` (.txt/.pdf upload); `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/me`, `/auth/change-password`, `/auth/reset-password`; `/history` (list, open, delete) |
+| Accounts & security | passwords hashed with **scrypt** + random salt (never stored in plain text); sessions in **HttpOnly, SameSite cookies** (JavaScript cannot read them; only a hash is stored; expire in 7 days); **CSRF** protection (requests from other websites refused); **5 failed sign-ins → 15-minute lock**; password change (current password required, other devices signed out) and reset with a one-time administrator code (30 min, single use, stored hashed); same message for "wrong password" and "no such email" (no account guessing); security headers |
 | Data | SQLite (`instance/satyascore.db`, never committed): users, sessions, each user's saved checks |
 | Rate limits | 100 checks/min per signed-in user or API key; 20/min per network when anonymous |
 | Speed | NVIDIA GPU (RTX 4050): a 6-claim answer in **~5 s the first time, under 1 s when repeated**; lookups run in parallel, each web service is paced separately, searches are remembered (`results/latency_realtime.md`) |
-| Quality | **245 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
+| Quality | **249 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API |
 
 ---
 

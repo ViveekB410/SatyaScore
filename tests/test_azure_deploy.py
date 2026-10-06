@@ -40,6 +40,7 @@ def test_build_context_layout(tmp_path):
     ctx = tmp_path / "ctx"
     azd.stage_context(dist, ctx)
     assert (ctx / "Dockerfile").is_file() and (ctx / "requirements-lock.txt").is_file()
+    assert b"\r\n" not in (ctx / "Dockerfile").read_bytes()  # LF only, whatever the checkout uses
     assert all((ctx / f).is_file() for f in azd.DATA_FILES)
     assert (ctx / "app" / "member3_backend" / "serve.py").is_file()
     assert (ctx / "app" / "web" / "dist" / "index.html").is_file()

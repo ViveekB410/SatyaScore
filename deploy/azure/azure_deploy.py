@@ -140,7 +140,9 @@ def stage_context(dist: Path, dest: Path) -> None:
     shutil.copytree(dist, app / "web" / "dist")
     for name in DATA_FILES + ["requirements.txt", "requirements-lock.txt"]:
         shutil.copy2(ROOT / name, dest / name)
-    shutil.copy2(HERE / "Dockerfile", dest / "Dockerfile")
+    # LF line endings: a Windows checkout may turn them into CRLF, which breaks the backslash
+    # line continuations when the Dockerfile is read on Linux.
+    (dest / "Dockerfile").write_text((HERE / "Dockerfile").read_text(encoding="utf8"), encoding="utf8", newline="\n")
 
 
 def cmd_build(_):

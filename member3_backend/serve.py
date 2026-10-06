@@ -27,8 +27,14 @@ DIST = Path(os.environ.get("SATYASCORE_WEB_DIST", ROOT / "web" / "dist"))
 
 
 def allowed_origin_from_space(environ: dict) -> str | None:
-    """https://<SPACE_HOST> on Hugging Face Spaces, else None."""
+    """The app's own public https origin when the platform tells us: Hugging Face Spaces
+    (SPACE_HOST) or Azure Container Apps (CONTAINER_APP_NAME + CONTAINER_APP_ENV_DNS_SUFFIX,
+    giving https://<app>.<environment-suffix>). None elsewhere."""
     host = environ.get("SPACE_HOST", "").strip()
+    if not host:
+        name = environ.get("CONTAINER_APP_NAME", "").strip()
+        suffix = environ.get("CONTAINER_APP_ENV_DNS_SUFFIX", "").strip()
+        host = f"{name}.{suffix}" if name and suffix else ""
     return f"https://{host}" if host else None
 
 

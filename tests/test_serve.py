@@ -70,3 +70,10 @@ def test_allowed_origin_from_space_host():
     f = serve.allowed_origin_from_space
     assert f({"SPACE_HOST": "vivek-satyascore.hf.space"}) == "https://vivek-satyascore.hf.space"
     assert f({}) is None and f({"SPACE_HOST": "  "}) is None
+
+
+def test_allowed_origin_on_azure_container_apps():
+    f = serve.allowed_origin_from_space
+    env = {"CONTAINER_APP_NAME": "satyascore", "CONTAINER_APP_ENV_DNS_SUFFIX": "happy-sea-1a2b.centralindia.azurecontainerapps.io"}
+    assert f(env) == "https://satyascore.happy-sea-1a2b.centralindia.azurecontainerapps.io"
+    assert f({"CONTAINER_APP_NAME": "satyascore"}) is None  # both parts needed

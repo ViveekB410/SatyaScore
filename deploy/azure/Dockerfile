@@ -1,0 +1,41 @@
+# Satya-Score container for Azure Container Apps, built on the laptop by deploy/azure/azure_deploy.py
+# (Azure does not run cloud image builds on student subscriptions). The build context is a staging
+# folder made by that script: committed code (git archive HEAD), the built web app (web/dist), the
+# corpus and the requirements files. The image is pushed to a private Azure Container Registry.
+FROM python:3.13-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    HF_HOME=/app/.cache/huggingface TOKENIZERS_PARALLELISM=false
+
+WORKDIR /app
+
+# CPU build of torch (Container Apps has no GPU here; ~180 MB instead of several GB).
+RUN pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu
+
+# Libraries at the versions tested on the development laptop.
+COPY requirements.txt requirements-lock.txt ./
+RUN pip install -r requirements.txt -c requirements-lock.txt && \
+    python -m spacy download en_core_web_sm
+
+# Models used at request time, baked into the image (XLM-R embedder, mDeBERTa NLI).
+RUN python -c "from sentence_transformers import SentenceTransformer; \
+SentenceTransformer('sentence-transformers/paraphrase-xlm-r-multilingual-v1'); \
+from transformers import AutoTokenizer, AutoModelForSequenceClassification; \
+AutoTokenizer.from_pretrained('MoritzLaurer/mDeBERTa-v3-base-mnli-xnli'); \
+AutoModelForSequenceClassification.from_pretrained('MoritzLaurer/mDeBERTa-v3-base-mnli-xnli')"
+
+# Corpus (102,069 passages): changes rarely, so its own layer (later pushes skip it).
+COPY corpus_passages_expanded.json corpus_vectors_expanded.npy ./
+
+# Application code and the built web app: the small layer that changes with each update.
+COPY app/ ./
+
+RUN useradd -m -u 1000 user && mkdir -p /app/instance && chown -R user /app
+USER user
+
+# Models are in the image: no Hub access at runtime. HTTPS on *.azurecontainerapps.io -> Secure
+# cookie. No X-API-Key access from outside (the development key is written in the repository).
+ENV HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 SATYASCORE_COOKIE_SECURE=true SATYASCORE_API_KEYS=""
+EXPOSE 7860
+CMD ["uvicorn", "member3_backend.serve:create_app", "--factory", "--host", "0.0.0.0", "--port", "7860", \
+     "--proxy-headers", "--forwarded-allow-ips", "*"]

@@ -11,7 +11,7 @@ evidence cited.
 SatyaScore checks a claim in one of two ways:
 
 1. **A structured source decides** (Wikidata, World Bank / WHO, professional fact-checks). Measured
-   error: close to zero (13/13 annotated KG decisions right; 137/137 false statistics caught with 0
+   error: close to zero (12/12 annotated KG decisions right, round 3, English; 137/137 false statistics caught with 0
    true claims contradicted; 0 wrong fact-check decisions).
 2. **Otherwise, Wikipedia passages are retrieved and an NLI model (mDeBERTa-v3-base-mnli-xnli) judges
    each passage** as supporting, contradicting or neither.

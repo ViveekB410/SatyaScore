@@ -179,7 +179,7 @@ http://localhost:8000/docs.
 Code map: `member1_model/` (embeddings, NLI, scoring, calibration, LLM verifier) ·
 `member2_data/` (Wikidata connector, entity linker) · `member3_backend/` (API, accounts, pipeline,
 claim extractor, retriever, Wikipedia expander, evidence rules) · `web/` (the web app) ·
-`results/` (every measured result) · `tests/` (259 automated tests) · `deploy/` (public link and container deployment).
+`results/` (every measured result) · `tests/` (265 automated tests) · `deploy/` (public link and container deployment).
 
 ---
 
@@ -386,7 +386,7 @@ Text: *"Cricket is a bat-and-ball sport played between two teams usually with 11
 | Rate limits | 100 checks/min per signed-in user or API key; 20/min per network when anonymous |
 | Speed | NVIDIA GPU (RTX 4050): a 6-claim answer in **~5 s the first time, under 1 s when repeated**; lookups run in parallel, each web service is paced separately, searches are remembered (`results/latency_realtime.md`) |
 | Production serving | `member3_backend/serve.py` serves the built website at `/` and the API at `/api` from one address (first-party cookie, no cross-site setup); used by the public link (`deploy/start_public.py`) and the container (`deploy/space/`). Exact library versions: `requirements-lock.txt` |
-| Quality | **259 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API, production serving |
+| Quality | **265 automated tests** (`pytest`) covering extraction, scoring, evidence rules, KG, security, API, production serving |
 
 ---
 

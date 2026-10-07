@@ -132,7 +132,7 @@ web/               web app (current)            frontend/  earlier dashboard (fa
 round3/            pre-registration, questions, claims, annotator sheets, signals
 results/           every measured result (*.md, *.csv)
 deploy/            public link (start_public.py), Hugging Face Space container (space/, push_to_hf.py, DEPLOY.md)
-tests/             259 tests
+tests/             265 tests
 ```
 
 ## Reproducing the results

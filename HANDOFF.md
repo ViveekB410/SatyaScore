@@ -42,7 +42,7 @@ and is not the main limiter at article level. This is the **honest negative resu
 §15 pre-registered**.
 
 ## Known limitations (state these in the paper)
-- Dataset 456 claims (not 3,000), single primary annotator, Verified-heavy, all answers from
+- Dataset 456 claims (not 3,000), four annotators (the authors) sharing the claims, one per claim, Verified-heavy, all answers from
   one LLM. Grouped test split has only 8 EN / 2 HI hallucinated claims — too few to interpret
   Hallucinated-F1.
 - IAA round 1: binary "hallucination vs not" **κ = 0.53** (headline; 0.61 on the well-formed

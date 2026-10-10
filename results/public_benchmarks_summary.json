@@ -1,0 +1,184 @@
+{
+ "items_total": 604,
+ "items_answered": 604,
+ "fever": {
+  "live": {
+   "supports_verified": {
+    "k": 107,
+    "n": 150,
+    "p": 0.7133,
+    "lo": 0.6363,
+    "hi": 0.7797
+   },
+   "supports_false_alarm": {
+    "k": 17,
+    "n": 150,
+    "p": 0.1133,
+    "lo": 0.072,
+    "hi": 0.174
+   },
+   "supports_uncertain": {
+    "k": 26,
+    "n": 150,
+    "p": 0.1733,
+    "lo": 0.1211,
+    "hi": 0.2419
+   },
+   "refutes_caught": {
+    "k": 64,
+    "n": 150,
+    "p": 0.4267,
+    "lo": 0.3503,
+    "hi": 0.5067
+   },
+   "refutes_missed": {
+    "k": 24,
+    "n": 150,
+    "p": 0.16,
+    "lo": 0.1099,
+    "hi": 0.227
+   },
+   "refutes_uncertain": {
+    "k": 62,
+    "n": 150,
+    "p": 0.4133,
+    "lo": 0.3377,
+    "hi": 0.4933
+   },
+   "accuracy_decided": {
+    "k": 171,
+    "n": 212,
+    "p": 0.8066,
+    "lo": 0.7482,
+    "hi": 0.8541
+   },
+   "decided": {
+    "k": 212,
+    "n": 300,
+    "p": 0.7067,
+    "lo": 0.6528,
+    "hi": 0.7553
+   }
+  },
+  "nli_only": {
+   "supports_verified": {
+    "k": 107,
+    "n": 150,
+    "p": 0.7133,
+    "lo": 0.6363,
+    "hi": 0.7797
+   },
+   "supports_false_alarm": {
+    "k": 17,
+    "n": 150,
+    "p": 0.1133,
+    "lo": 0.072,
+    "hi": 0.174
+   },
+   "supports_uncertain": {
+    "k": 26,
+    "n": 150,
+    "p": 0.1733,
+    "lo": 0.1211,
+    "hi": 0.2419
+   },
+   "refutes_caught": {
+    "k": 64,
+    "n": 150,
+    "p": 0.4267,
+    "lo": 0.3503,
+    "hi": 0.5067
+   },
+   "refutes_missed": {
+    "k": 23,
+    "n": 150,
+    "p": 0.1533,
+    "lo": 0.1044,
+    "hi": 0.2196
+   },
+   "refutes_uncertain": {
+    "k": 63,
+    "n": 150,
+    "p": 0.42,
+    "lo": 0.344,
+    "hi": 0.5
+   },
+   "accuracy_decided": {
+    "k": 171,
+    "n": 211,
+    "p": 0.8104,
+    "lo": 0.7522,
+    "hi": 0.8576
+   },
+   "decided": {
+    "k": 211,
+    "n": 300,
+    "p": 0.7033,
+    "lo": 0.6493,
+    "hi": 0.7522
+   }
+  }
+ },
+ "mushroom_hi": {
+  "live": {
+   "iou": 0.0105,
+   "cor": 0.0526
+  },
+  "mark_all": {
+   "iou": 0.2711,
+   "cor": 0.0
+  },
+  "mark_none": {
+   "iou": 0.0,
+   "cor": 0.0
+  },
+  "answers": 150,
+  "claims": 207,
+  "answers_without_claims": 0,
+  "answers_flagged": {
+   "k": 10,
+   "n": 150,
+   "p": 0.0667,
+   "lo": 0.0366,
+   "hi": 0.1184
+  },
+  "flagged_claims_on_gold": {
+   "k": 10,
+   "n": 14,
+   "p": 0.7143,
+   "lo": 0.4535,
+   "hi": 0.8828
+  }
+ },
+ "mushroom_en": {
+  "live": {
+   "iou": 0.1022,
+   "cor": 0.1116
+  },
+  "mark_all": {
+   "iou": 0.3489,
+   "cor": 0.0
+  },
+  "mark_none": {
+   "iou": 0.0325,
+   "cor": 0.0
+  },
+  "answers": 154,
+  "claims": 390,
+  "answers_without_claims": 8,
+  "answers_flagged": {
+   "k": 46,
+   "n": 154,
+   "p": 0.2987,
+   "lo": 0.232,
+   "hi": 0.3752
+  },
+  "flagged_claims_on_gold": {
+   "k": 56,
+   "n": 68,
+   "p": 0.8235,
+   "lo": 0.7164,
+   "hi": 0.8961
+  }
+ }
+}

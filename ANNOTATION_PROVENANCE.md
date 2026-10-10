@@ -4,7 +4,7 @@ Source of record: `final annotator file(Sheet1) (1).csv` (clean UTF-8 export of 
 Derived gold: `gold_final.csv` (456 claims).
 
 ## 0. Review protocol
-- Review was **full, not sampled**: the annotator reviewed every one of the AI-suggested verdicts in the sheet.
+- Review was **full, not sampled**: every AI-suggested verdict in the sheet was reviewed. The four authors divided the claims among themselves (one reviewer per claim); their parts were merged into the single sheet above, and no label was changed after merging.
 - The annotator wrote a verdict only when they **disagreed** with the AI. A blank annotator field (or 'ok') therefore means **"reviewed and agreed"**, not "not reviewed".
 - Limitation: review happened with the AI verdict visible, which biases toward agreement (anchoring). The blind round-2 re-labelling (`results/label_audit.md`) measures this directly.
 
@@ -39,4 +39,4 @@ hi        Hallucinated      9
 - Hindi gold rows with intact Devanagari: 190/190
 
 ## Verdict: PROVEN
-Every gold label is reproducible from the human annotator file by a fixed, documented rule; no label is invented. The honest caveat: 96 labels are human overrides/confirmations and 360 are reviewed-and-agreed with the AI suggestion, reviewed with the AI verdict visible (anchoring) by a single annotator. Two blind inter-annotator rounds check this: round 1 (`iaa/`) and round 2 (`results/label_audit.md`).
+Every gold label is reproducible from the human annotator file by a fixed, documented rule; no label is invented. The honest caveat: 96 labels are human overrides/confirmations and 360 are reviewed-and-agreed with the AI suggestion, reviewed with the AI verdict visible (anchoring). The review was done by a team of four annotators (the project authors), who divided the 456 claims among themselves; each claim was reviewed by one of them, and the merged sheet is the source of record above. Two blind inter-annotator rounds check this: round 1 (`iaa/`) and round 2 (`results/label_audit.md`).

@@ -29,3 +29,7 @@ results/_factcheck_cache/
 results/_medline_cache/
 results/_stats_cache/
 results/_wiki_search_cache/
+
+# public benchmark data (third-party; see benchmarks/README.md) and run logs
+benchmarks/data/
+results/_*.log

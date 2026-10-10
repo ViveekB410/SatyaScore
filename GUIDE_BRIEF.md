@@ -66,7 +66,7 @@ aren't supported.
 
 ## 4. Limitations (stated up front — this is a strength)
 
-- Single primary annotator for the full set; round-2 blind re-annotation validates it but is
+- Four annotators (the authors) shared the full set, one per claim; round-2 blind re-annotation validates it but is
   pilot-sized (n = 50).
 - Class imbalance, especially Hindi hallucinated claims (n = 9).
 - Detector accuracy is data-bound; scaling annotation is the main lever.
@@ -84,7 +84,7 @@ and show with the ablation and diagnostics. The *system* works; the *scores* nee
 re-annotation reproduces gold 98%. The 0.3 is a base-rate artifact of a near-single-class
 sample; we report it with its CI rather than a misleading headline.
 
-**"Only one annotator?"** — Yes for the full set; the round-2 blind study is the check on that,
+**"Only one annotator per claim?"** — Yes: the four authors shared the full set, each claim labelled once; the round-2 blind study is the check on that,
 and it came back strongly (98% reproduction). Next step is a larger, verdict-balanced round.
 
 **"What would you do next?"** — Scale annotation (especially Hindi hallucinated claims) and a

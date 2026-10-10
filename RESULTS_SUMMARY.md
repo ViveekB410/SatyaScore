@@ -173,7 +173,7 @@ Each change below was tested with its decision rule written and committed before
 - The KG checks one relation per claim; other facts in the same claim are not checked when it decides. It covers birth/death places and dates, capitals, locations, founders and founding dates, authorship, current office-holders, height/length/population/area and currency; country statistics come from the World Bank and WHO (section 11).
 - General statements about the world are judged by NLI over Wikipedia and can be wrongly Verified (all 9 false common-sense statements in results/evidence_rule_eval.md); fixes and an LLM judge were tested and not adopted (section 11).
 - Hindi has too few Hallucinated claims (9 in the gold set) to evaluate any Hindi change.
-- Label reliability: single primary annotator, anchored review (section 2); round-1 3-class agreement is low because the annotators used different label schemes; binary kappa is the reliable figure.
+- Label reliability: one annotator per claim (four authors sharing the set), anchored review (section 2); round-1 3-class agreement is low because the annotators used different label schemes; binary kappa is the reliable figure.
 - Dataset small (456) vs the PRD's 3,000; Verified-heavy.
 - NLI is a pretrained mDeBERTa stand-in, not the PRD's DeBERTa-v3 + IndicXNLI fine-tune (stronger pretrained candidates were tested and did not help; section 10).
 - KG signal non-functional on this claim type; Marathi out of scope; baseline suite partial.

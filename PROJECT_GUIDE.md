@@ -128,10 +128,10 @@ http://localhost:8000/docs.
    a topic the index lacks, the matching Wikipedia article is fetched and added on the spot. The text
    users paste is never added as evidence.
 3. *Numbers* (all in `results/`):
-   - fresh true sentences wrongly flagged: 33% → 3%;
-   - the knowledge graph was right on 12/12 claims it answered;
+   - fresh true sentences wrongly flagged: 33% → 8% on the same 99 sentences (4 of 128, about 3%, on a second sample);
+   - the knowledge graph was right on 11 of 13 claims it answered in the pre-registered round-3 run, and on 12/12 after the place-linking fix (exploratory);
    - fact-checks: 0 wrong decisions, rumours caught 3 → 10 of 25;
-   - every rule was fixed before its test was run.
+   - most rules were fixed before their test was run; the two exploratory analyses and the four decisions that went against a rule (evidence rule, top-10 passages, LLM judge, NLI model) are recorded.
 4. *Limits (say them openly):* hallucinations are caught reliably only where Wikidata or a
    fact-checker covers them. Otherwise the answer is usually **Uncertain**, a deliberate choice not
    to call true text false. Hindi has less evidence. The LLM verifier is built but not yet evaluated.
@@ -296,8 +296,9 @@ of 99 (`results/aggregation_eval.md`).
   birthplace), or **unknown** (no signal — never counted as false).
 
 **KG decides when it answers:** when Wikidata gives a definite answer, it decides the claim.
-**Why:** it is structured, curated data — in the round-3 study it was right on every claim it
-answered (12/12), while NLI was wrong on 9 claims where they disagreed (`results/round3_kg_decides.md`).
+**Why:** it is structured, curated data — in the round-3 study it was right on 11 of 13 claims
+it answered in the pre-registered run and on 12/12 after the place-linking fix, while NLI was wrong on 9 claims
+where they disagreed (`results/round3_kg_decides.md`; this rule was chosen in that exploratory analysis).
 
 ### Step 7b — Professional fact-checks (`member2_data/factcheck.py`, `member3_backend/factcheck_rules.py`)
 **What:** each claim the KG did not decide is searched in the **Google Fact Check Tools API**, which
@@ -318,9 +319,10 @@ chatbot claims no fact-check applied (they are not rumours), so those results ar
 Needs a free Google API key in the backend's environment (`GOOGLE_FACTCHECK_KEY`).
 
 ### Step 8 — Scoring (CMHSA, `member1_model/cmhsa.py`)
-The PRD formula: **HalluScore = α·SemSim + β·NLI + γ·KG**, weights learned per language
-(`weights_en.json`, `weights_hi.json`). Training set α (semantic similarity) to **0**: similarity
-measures *topic*, not *truth* (below chance in Hindi). When the KG answers, it overrides the fusion.
+The PRD formula: **HalluScore = α·SemSim + β·NLI + γ·KG**, weights per language
+(`weights_en.json`, `weights_hi.json`). α (semantic similarity) is fixed at **0** by design, not learned:
+similarity measures *topic*, not *truth* (below chance in Hindi); β and γ are learned (about 0.5 each).
+When the KG answers, it overrides the fusion, so in practice the score is the KG (or statistics) answer, else a matching fact-check, else the NLI score.
 
 **Verdict tiers (PRD FR-04):** score **< 0.35 → Hallucinated**, **0.35–0.65 → Uncertain**,
 **> 0.65 → Verified**.

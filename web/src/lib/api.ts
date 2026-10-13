@@ -15,7 +15,8 @@ import type {
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
-const DETECT_TIMEOUT_MS = 90_000 // CPU inference can take up to ~60 s
+// CPU inference can take up to ~60 s; the Version 2 cross-check with a local LLM takes ~5-10 s per claim
+const DETECT_TIMEOUT_MS = 300_000
 const DEFAULT_TIMEOUT_MS = 20_000
 const UPLOAD_TIMEOUT_MS = 60_000
 export const MAX_CHARS = 20_000 // api.py DetectRequest.text max_length

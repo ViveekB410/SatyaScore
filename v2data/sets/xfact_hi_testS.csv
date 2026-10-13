@@ -1,0 +1,13 @@
+item_id,set,split,language,text,label,meta
+xfact-hi-test-014,xfact_hi,test,hi,उत्तर कोरिया में मिले पहले कोरोना के मरीज को किम जोंग ने गोली मारने का आदेश दिया.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-017,xfact_hi,test,hi,लोगों को घर के अंदर रखने के लिए रूस में व्लादिमीर पुतिन ने सड़कों पर शेर छोड़ दिए.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-033,xfact_hi,test,hi,मनोज तिवारी ने कबूला इस्लाम,Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-036,xfact_hi,test,hi,"पुराने शहर, हैदराबाद के एक अस्पताल के बाहर बेड पर इंतजार करते मरीज.",Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-042,xfact_hi,test,hi,एक तस्वीर जिसमें गांधी जी को एक महिला के बेहद नज़दीक देखा जा सकता है.,Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-061,xfact_hi,test,hi,"कोलकाता के NRS मेडिकल कॉलेज के जिन दो जूनियर डॉक्टरों की पिटाई हुई थी, उनमें से डॉ परिवाह मुखर्जी की मौत हो गई है.",Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-073,xfact_hi,test,hi,ऑस्ट्रेलिया में प्रताड़ना का शिकार हुए एक नौ साल के बच्चे Quaden Bayles ने खुदकुशी कर ली.,Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-089,xfact_hi,test,hi,महेश भट्ट मलेशिया जाकर विवादास्पद इस्लामी प्रचारक और भगोड़े जाकिर नाइक से मिले.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-090,xfact_hi,test,hi,सैनिकों के ताबूत की तस्वीरें तो दिखाती हैं कि हाल ही में ईरान के हमले में अमेरिकी सैनिक मारे गए.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-120,xfact_hi,test,hi,"कांग्रेस नेता नसीमुद्दीन सिद्दीकी ने कहा, “हम मुसलमान पहले हैं, हिंदुस्तानी बाद में”",Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-142,xfact_hi,test,hi,तमिलनाडु के पंचवर्णस्वामी मंदिर में है 2000 साल पुराने एक साइकल सवार की मूर्ति,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-150,xfact_hi,test,hi,लॉकडाउन के दौरान दिल्ली कैंट के पास धौला कुआं में शेरों का झुंड देखा गया.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"

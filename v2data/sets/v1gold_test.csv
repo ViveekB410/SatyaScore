@@ -1,0 +1,100 @@
+item_id,set,split,language,text,label,meta
+healthcare_en_01_llama-3.3-70b-versatile_0,v1gold,test,en,System is Recognition : The immune system recognizes viral particles or infected cells through pattern recognition receptors ( PRRs ).,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_1,v1gold,test,en,The human immune system responds to a viral infection through a multi step process.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_2,v1gold,test,en,"Are activated to produce cytokines and chemokines, which recruit other immune cells to the site of infection.",Verified,
+healthcare_en_01_llama-3.3-70b-versatile_4,v1gold,test,en,Production of interferons Infected cells produce interferons which inhibit viral replication and activate nearby immune cells.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_5,v1gold,test,en,Activation of adaptive immunity Adaptive immune cells such as T cells and B cells are activated to recognize and respond to viral antigens.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_6,v1gold,test,en,Cells is CD8 + T cells.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_7,v1gold,test,en,Cells kill infected cells.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_8,v1gold,test,en,T cell response Cytotoxic T cells recognize while helper T cells CD4 + T cells coordinate the immune response.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_9,v1gold,test,en,B cell response B cells produce antibodies to neutralize viral particles and prevent further infection.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_10,v1gold,test,en,Clearance of the virus The immune system works to eliminate the virus from the body through a combination of cell mediated and humoral immunity.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_11,v1gold,test,en,Response also provides long - term immunity against future infections.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_12,v1gold,test,en,This response helps to control and eventually clear the viral infection.,Verified,
+healthcare_en_02_llama-3.3-70b-versatile_0,v1gold,test,en,The recommended dosage frequency for a standard paracetamol tablet 500 mg is every 4 6 hours not exceeding 4 grams 8 tablets in 24 hours.,Verified,
+healthcare_en_08_llama-3.3-70b-versatile_0,v1gold,test,en,Insulin is a hormone produced by the pancreas that plays a crucial role in regulating blood sugar levels in the human body.,Verified,
+healthcare_en_08_llama-3.3-70b-versatile_1,v1gold,test,en,Insulin main functions are Glucose uptake Insulin facilitates the uptake of glucose by cells particularly by the liver muscles and adipose tissue for energy production growth and storage.,Verified,
+healthcare_en_08_llama-3.3-70b-versatile_3,v1gold,test,en,Cell growth and repair Insulin helps promote cell growth and repair by stimulating the uptake of amino acids and other nutrients.,Verified,
+healthcare_en_08_llama-3.3-70b-versatile_4,v1gold,test,en,Overall insulin helps maintain normal blood sugar levels and ensures that cells receive the energy Blood need to function properly.,Verified,
+history_en_08_llama-3.3-70b-versatile_0,v1gold,test,en,The Non Cooperation Movement was a civil disobedience movement launched by Mahatma Gandhi in 1920 in India against British rule.,Verified,
+history_en_08_llama-3.3-70b-versatile_1,v1gold,test,en,British involved boycotting British goods institutions and services and promoting Indian self sufficiency.,Verified,
+history_en_08_llama-3.3-70b-versatile_2,v1gold,test,en,Movement achieve Indian independence.,Verified,
+history_en_08_llama-3.3-70b-versatile_3,v1gold,test,en,The movement aimed to non violently resist British authority.,Verified,
+science_en_00_llama-3.3-70b-versatile_0,v1gold,test,en,The chemical formula for water is H2O.,Verified,
+science_en_07_llama-3.3-70b-versatile_0,v1gold,test,en,The theory of plate tectonics states that the Earth's lithosphere outer layer is divided into large rigid plates that move relative to each other.,Hallucinated,
+science_en_07_llama-3.3-70b-versatile_2,v1gold,test,en,The movement of the plates is driven by convection currents in the Earth's mantle.,Verified,
+science_en_09_llama-3.3-70b-versatile_0,v1gold,test,en,The primary function of DNA Deoxyribonucleic acid in living organisms is to Store genetic information DNA carries the genetic instructions for the development growth and function of an organism.,Hallucinated,
+science_en_09_llama-3.3-70b-versatile_2,v1gold,test,en,Provide instructions for protein synthesis DNA contains the instructions for the production of proteins which are essential for various cellular functions.,Hallucinated,
+science_en_09_llama-3.3-70b-versatile_3,v1gold,test,en,Regulate cellular activities DNA helps regulate gene expression cell division and other cellular processes.,Hallucinated,
+science_en_09_llama-3.3-70b-versatile_4,v1gold,test,en,In summary DNA serves as a blueprint or instructions for the development growth and function of living organisms.,Verified,
+sports_en_01_llama-3.3-70b-versatile_0,v1gold,test,en,The first Cricket World Cup was held in 1975 in England.,Verified,
+sports_en_02_llama-3.3-70b-versatile_0,v1gold,test,en,In cricket a run out occurs when a batsman is dismissed by a fielder hitting the stumps while the batsman is outside their crease.,Verified,
+sports_en_02_llama-3.3-70b-versatile_1,v1gold,test,en,The rules for a run out are.,Hallucinated,
+sports_en_02_llama-3.3-70b-versatile_2,v1gold,test,en,The batsman must be outside their crease.,Hallucinated,
+sports_en_02_llama-3.3-70b-versatile_4,v1gold,test,en,The fielder must hit the stumps either directly or by throwing the ball before the batsman can make their ground.,Verified,
+sports_en_02_llama-3.3-70b-versatile_5,v1gold,test,en,The batsman is given out if the stumps are hit and the bails are knocked off even if the batsman has not touched the ball.,Hallucinated,
+sports_en_02_llama-3.3-70b-versatile_6,v1gold,test,en,If the fielder throws the ball to the wicketkeeper or another fielder who then hits the stumps it is still considered a run out.,Verified,
+sports_en_02_llama-3.3-70b-versatile_7,v1gold,test,en,The batsman can be run out at either end of the pitch whether they are the striker or the non striker.,Verified,
+sports_en_02_llama-3.3-70b-versatile_9,v1gold,test,en,The batsman must leave the field.,Verified,
+sports_en_02_llama-3.3-70b-versatile_10,v1gold,test,en,If these conditions are met the umpire will raise their arm.,Hallucinated,
+sports_en_04_llama-3.3-70b-versatile_0,v1gold,test,en,In football the offside rule states that a player is offside if they are closer to the opponent's goal line than both the ball and the second to last opponent when the ball is played forward.,Verified,
+sports_en_04_llama-3.3-70b-versatile_1,v1gold,test,en,Player must become involved in the play.,Verified,
+sports_en_04_llama-3.3-70b-versatile_2,v1gold,test,en,To be considered offside the player must also be in the opponent's half of the field.,Verified,
+healthcare_hi_02_llama-3.3-70b-versatile_0,v1gold,test,hi,"एक सामान्य पैरासिटामोल टैबलेट की अनुशंसित खुराक आवृत्ति आमतौर पर 4-6 घंटे होती है, लेकिन यह व्यक्ति की उम्र, वजन और स्वास्थ्य स्थिति पर निर्भर करती है।",Verified,
+healthcare_hi_02_llama-3.3-70b-versatile_1,v1gold,test,hi,यह महत्वपूर्ण है कि आप अपने डॉक्टर या फार्मासिस्ट से परामर्श लें और उनकी सलाह का पालन करें।,Verified,
+healthcare_hi_03_llama-3.3-70b-versatile_0,v1gold,test,hi,"टाइप 2 मधुमेह का कारण शरीर में इंसुलिन की कमी या इंसुलिन प्रतिरोध है, जिसके परिणामस्वरूप रक्त शर्करा का स्तर बढ़ जाता है।",Verified,
+healthcare_hi_03_llama-3.3-70b-versatile_1,v1gold,test,hi,"इसके कई कारण हो सकते हैं, जिनमें शामिल हैं:
+
+१) अनुवांशिक कारक
+२) मोटापा
+३) शारीरिक निष्क्रियता
+४) अस्वस्थ आहार
+५) उम्र
+६) अन्य स्वास्थ्य समस्याएं, जैसे कि उच्च रक्तचाप और उच्च कोलेस्ट्रॉल।",Verified,
+history_hi_05_llama-3.3-70b-versatile_0,v1gold,test,hi,"दांडी मार्च, जिसे नमक सत्याग्रह भी कहा जाता है, एक महत्वपूर्ण घटना थी जो 12 मार्च 1930 से 6 अप्रैल 1930 तक हुई थी।",Verified,
+history_hi_05_llama-3.3-70b-versatile_1,v1gold,test,hi,इस मार्च का नेतृत्व महात्मा गांधी ने किया था और इसका उद्देश्य ब्रिटिश सरकार द्वारा लगाए गए नमक कर के खिलाफ विरोध करना था।,Verified,
+history_hi_05_llama-3.3-70b-versatile_2,v1gold,test,hi,"दांडी मार्च का महत्व इस प्रकार है:
+      नमक कर के खिलाफ विरोध  : दांडी मार्च नमक कर के खिलाफ विरोध करने के लिए आयोजित किया गया था, जो भारतीयों पर एक अन्यायपूर्ण कर था।",Verified,
+history_hi_05_llama-3.3-70b-versatile_3,v1gold,test,hi,स्वदेशी और आत्मनिर्भरता  : इस मार्च ने स्वदेशी और आत्मनिर्भरता की भावना को बढ़ावा दिया और लोगों को अपने देश के उत्पादों का समर्थन करने के लिए प्रेरित किया।,Verified,
+history_hi_05_llama-3.3-70b-versatile_4,v1gold,test,hi,अहिंसक विरोध  : दांडी मार्च ने अहिंसक विरोध की शक्ति को प्रदर्शित किया और दुनिया को दिखाया कि बिना हिंसा के भी बड़े परिवर्तन लाए जा सकते हैं।,Verified,
+history_hi_05_llama-3.3-70b-versatile_5,v1gold,test,hi,भारतीय स्वतंत्रता संग्राम  : दांडी मार्च भारतीय स्वतंत्रता संग्राम के लिए एक महत्वपूर्ण मील का पत्थर था और इसने भारतीयों को स्वतंत्रता के लिए लड़ने के लिए प्रेरित किया।,Verified,
+history_hi_05_llama-3.3-70b-versatile_6,v1gold,test,hi,महात्मा गांधी की नेतृत्व  : दांडी मार्च ने महात्मा गांधी की नेतृत्व क्षमता को प्रदर्शित किया और उन्हें विश्व स्तर पर एक प्रमुख नेता के रूप में स्थापित किया।,Verified,
+history_hi_05_llama-3.3-70b-versatile_7,v1gold,test,hi,"इस प्रकार, दांडी मार्च एक महत्वपूर्ण घटना थी जिसने भारतीय स्वतंत्रता संग्राम को गति प्रदान की और दुनिया को अहिंसक विरोध की शक्ति को दिखाया।",Verified,
+history_hi_09_llama-3.3-70b-versatile_0,v1gold,test,hi,संयुक्त राष्ट्र की स्थापना 24 अक्टूबर 1945 को हुई थी।,Verified,
+science_hi_00_llama-3.3-70b-versatile_0,v1gold,test,hi,पानी का रासायनिक सूत्र H2O है।,Verified,
+science_hi_01_llama-3.3-70b-versatile_0,v1gold,test,hi,प्रकाश संश्लेषण एक जटिल प्रक्रिया है जिसमें पौधे और कुछ अन्य जीव सूर्य की ऊर्जा का उपयोग करके कार्बन डाइऑक्साइड और पानी से ग्लूकोज और ऑक्सीजन बनाते हैं।,Verified,
+science_hi_01_llama-3.3-70b-versatile_1,v1gold,test,hi,यह प्रक्रिया वायुमंडल में ऑक्सीजन की मात्रा को बढ़ाने और पृथ्वी पर जीवन को बनाए रखने में महत्वपूर्ण भूमिका निभाती है।,Verified,
+science_hi_01_llama-3.3-70b-versatile_2,v1gold,test,hi,प्रकाश संश्लेषण की प्रक्रिया में दो मुख्य चरण होते हैं: प्रकाश-निर्भर चरण और प्रकाश-स्वतंत्र चरण।,Verified,
+science_hi_01_llama-3.3-70b-versatile_3,v1gold,test,hi,"प्रकाश-निर्भर चरण:
+इस चरण में, पौधे के पत्तों में मौजूद क्लोरोफिल नामक वर्णक सूर्य की ऊर्जा को अवशोषित करता है और इसे रासायनिक ऊर्जा में परिवर्तित करता है।",Verified,
+science_hi_01_llama-3.3-70b-versatile_4,v1gold,test,hi,"यह ऊर्जा तब एटीपी (एडेनोसिन ट्राइफॉस्फेट) और एनएडीपी (निकोटिनamide एडेनिन डाइन्यूक्लियोटाइड फॉस्फेट) नामक अणुओं में संग्रहीत की जाती है, जो ऊर्जा के भंडार के रूप में कार्य करते हैं।",Verified,
+science_hi_01_llama-3.3-70b-versatile_5,v1gold,test,hi,"प्रकाश-स्वतंत्र चरण:
+इस चरण में, पौधे कार्बन डाइऑक्साइड और पानी का उपयोग करके ग्लूकोज और ऑक्सीजन बनाते हैं।",Hallucinated,
+science_hi_01_llama-3.3-70b-versatile_6,v1gold,test,hi,"यह प्रक्रिया कैलविन चक्र नामक एक जटिल रासायनिक प्रतिक्रिया द्वारा होती है, जिसमें विभिन्न एंजाइम और सह-एंजाइम शामिल होते हैं।",Hallucinated,
+science_hi_01_llama-3.3-70b-versatile_7,v1gold,test,hi,"प्रकाश संश्लेषण की समीकरण है:
+६ सीओ२ + ६ एच२ओ + प्रकाश ऊर्जा → सी६एच₁₂ओ६ (ग्लूकोज) + ६ ओ२
+
+इस प्रकार, प्रकाश संश्लेषण एक महत्वपूर्ण प्रक्रिया है जो पृथ्वी पर जीवन को बनाए रखने में मदद करती है।",Verified,
+science_hi_02_llama-3.3-70b-versatile_0,v1gold,test,hi,"पृथ्वी पर मौसम बदलने के कई कारण हैं, जिनमें से कुछ प्रमुख कारण हैं:
+
+सूरज की किरणों का पृथ्वी पर पड़ने का कोण
+पृथ्वी की घूर्णन गति और इसके अक्ष का झुकाव
+महासागरों और वायुमंडल में गर्मी का संचार
+वायुमंडलीय दबाव और तापमान में परिवर्तन
+जलवायु परिवर्तन और मानव गतिविधियों का प्रभाव
+
+इन कारणों से पृथ्वी पर मौसम में परिवर्तन होता है, जैसे कि तापमान में बदलाव, वर्षा की मात्रा में परिवर्तन, और हवा की दिशा में बदलाव।",Verified,
+science_hi_07_llama-3.3-70b-versatile_0,v1gold,test,hi,प्लेट टेक्टोनिक्स का सिद्धांत यह है कि पृथ्वी की सतह पर कई बड़ी प्लेटें होती हैं जो लगातार गति में होती हैं और उनकी गति से पृथ्वी की सतह पर परिवर्तन होता है।,Verified,
+science_hi_07_llama-3.3-70b-versatile_1,v1gold,test,hi,"ये प्लेटें एक दूसरे से टकराती हैं, अलग होती हैं और एक दूसरे के नीचे जाती हैं, जिससे भूकंप, ज्वालामुखी और पहाड़ बनते हैं।",Verified,
+science_hi_07_llama-3.3-70b-versatile_2,v1gold,test,hi,यह सिद्धांत पृथ्वी की सतह पर होने वाली कई भूगर्भिक गतिविधियों को समझाने में मदद करता है।,Verified,
+government_hi_07_llama-3.3-70b-versatile_0,v1gold,test,hi,"भारतीय रिजर्व बैंक (आरबीआई) भारत का केंद्रीय बैंक है, जो देश की मौद्रिक नीति और बैंकिंग प्रणाली को नियंत्रित करता है।",Verified,
+government_hi_07_llama-3.3-70b-versatile_1,v1gold,test,hi,"इसके कुछ मुख्य कार्य हैं:
+
+मौद्रिक नीति का निर्धारण: आरबीआई मौद्रिक नीति को निर्धारित करता है, जिसमें ब्याज दरों और मुद्रा आपूर्ति को नियंत्रित करना शामिल है।",Verified,
+government_hi_07_llama-3.3-70b-versatile_2,v1gold,test,hi,"बैंकिंग नियमन: आरबीआई बैंकों और अन्य वित्तीय संस्थानों को नियंत्रित और नियमित करता है, ताकि वे सुरक्षित और स्थिर तरीके से काम करें।",Verified,
+government_hi_07_llama-3.3-70b-versatile_3,v1gold,test,hi,"मुद्रा प्रबंधन: आरबीआई देश की मुद्रा को प्रबंधित करता है, जिसमें मुद्रा की आपूर्ति और मांग को संतुलित करना शामिल है।",Verified,
+government_hi_07_llama-3.3-70b-versatile_4,v1gold,test,hi,"विदेशी मुद्रा प्रबंधन: आरबीआई विदेशी मुद्रा को प्रबंधित करता है, जिसमें विदेशी मुद्रा की खरीद और बिक्री को नियंत्रित करना शामिल है।",Verified,
+government_hi_07_llama-3.3-70b-versatile_5,v1gold,test,hi,बैंकिंग लाइसेंस: आरबीआई बैंकों और अन्य वित्तीय संस्थानों को लाइसेंस प्रदान करता है और उनकी गतिविधियों को नियंत्रित करता है।,Verified,
+government_hi_07_llama-3.3-70b-versatile_6,v1gold,test,hi,"वित्तीय स्थिरता: आरबीआई वित्तीय स्थिरता को बनाए रखने के लिए काम करता है, जिसमें आर्थिक संकटों को रोकने और उनके प्रभाव को कम करने में मदद करना शामिल है।",Verified,
+sports_hi_02_llama-3.3-70b-versatile_2,v1gold,test,hi,"३) रन-आउट के लिए, फील्डर को गेंद को विकेट पर मारने से पहले गेंद को अपने हाथ में रखना होता है।",Verified,
+sports_hi_02_llama-3.3-70b-versatile_3,v1gold,test,hi,"४) यदि फील्डर ने गेंद को विकेट पर मार दिया है और बल्लेबाज क्रीज से बाहर है, तो अम्पायर रन-आउट का संकेत देता है और बल्लेबाज आउट हो जाता है।",Verified,

@@ -1,0 +1,50 @@
+v1/dev: 0 cached, 953 to run
+[api] loaded trained weights for en: alpha=0.000 beta=0.500 gamma=0.500
+[api] loaded trained weights for hi: alpha=0.000 beta=0.498 gamma=0.502
+[api] no weights_mr.json — using placeholder 0.5/0.3/0.2 for mr
+[api] loaded cached bilingual corpus: 102069 passages {'en': 89594, 'hi': 12475}
+[api] on-demand Wikipedia expansion ON
+[api] fact-checks ON; GOOGLE_FACTCHECK_KEY set
+Loading weights:   0%|          | 0/202 [00:00<?, ?it/s]Loading weights: 100%|██████████| 202/202 [00:00<00:00, 11204.78it/s]
+[api] NLI model warmed (cuda) in 4.4s
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 10754.07it/s]
+[api] embedder warmed (cuda) in 18.6s
+fact-checks: ON | LLM: OFF
+25/953  (4.8 s/item)
+50/953  (4.2 s/item)
+75/953  (3.4 s/item)
+100/953  (3.2 s/item)
+125/953  (3.1 s/item)
+150/953  (3.0 s/item)
+175/953  (3.0 s/item)
+200/953  (2.9 s/item)
+225/953  (2.9 s/item)
+250/953  (2.9 s/item)
+275/953  (2.9 s/item)
+300/953  (2.9 s/item)
+325/953  (2.9 s/item)
+350/953  (2.9 s/item)
+375/953  (2.9 s/item)
+400/953  (2.9 s/item)
+425/953  (2.9 s/item)
+450/953  (2.8 s/item)
+475/953  (2.7 s/item)
+500/953  (2.8 s/item)
+525/953  (2.8 s/item)
+550/953  (2.7 s/item)
+575/953  (2.7 s/item)
+600/953  (2.7 s/item)
+625/953  (2.7 s/item)
+650/953  (2.8 s/item)
+675/953  (2.7 s/item)
+700/953  (2.7 s/item)
+725/953  (2.7 s/item)
+750/953  (2.6 s/item)
+775/953  (2.6 s/item)
+800/953  (2.6 s/item)
+825/953  (2.6 s/item)
+850/953  (2.6 s/item)
+875/953  (2.6 s/item)
+900/953  (2.6 s/item)
+925/953  (2.6 s/item)
+950/953  (2.6 s/item)

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { buildSegments } from '@/lib/segments'
+import { buildSegments, splitErrors } from '@/lib/segments'
 import type { Claim, Language } from '@/lib/types'
 import { VERDICT } from '@/lib/verdicts'
 import { cn } from '@/lib/utils'
@@ -52,13 +52,28 @@ export default function MarkedText({
               v.mark,
             )}
           >
-            {s.text}
+            {s.errors.length === 0
+              ? s.text
+              : splitErrors(s.text, s.errors).map((p, k) =>
+                  p.wrong ? (
+                    <mark
+                      key={k}
+                      title="The part that is wrong"
+                      className="rounded-sm bg-transparent font-semibold text-inherit decoration-wavy decoration-2"
+                    >
+                      {p.text}
+                    </mark>
+                  ) : (
+                    <span key={k}>{p.text}</span>
+                  ),
+                )}
             {open && (
               <span
                 role="tooltip"
                 className="pointer-events-none absolute bottom-full left-0 z-20 mb-1.5 whitespace-nowrap rounded bg-navy px-2 py-1 font-sans text-[12px] font-medium not-italic leading-normal text-paper shadow-overlay"
               >
                 Claim {n} · {v.label}
+                {s.errors.length > 0 && ' · wrong part in bold'}
               </span>
             )}
           </span>

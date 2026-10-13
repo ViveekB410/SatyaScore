@@ -116,3 +116,153 @@ def test_llm_failure_keeps_the_nli_result_with_a_note():
     llm.verify.side_effect = lv.LLMQuotaExhausted("daily limit")
     s = _pipeline_with(llm, kg_conf=None).run("Paris is the capital of France.", "en").scores[0]
     assert s.verdict.value == "Hallucinated" and "unavailable" in s.note
+
+
+def test_wrong_span_is_kept_only_when_it_occurs_in_the_claim():
+    claim = "Mahatma Gandhi was born in Delhi."
+    j = lv.parse_reply('{"verdict": "Hallucinated", "p_true": 0.05, "wrong_span": "Delhi", "reason": "Porbandar"}', claim)
+    assert j.wrong_span == "Delhi"
+    assert lv.parse_reply('{"verdict": "Hallucinated", "wrong_span": "Mumbai"}', claim).wrong_span == ""
+    assert lv.parse_reply('{"verdict": "Verified", "wrong_span": "Delhi"}', claim).wrong_span == ""
+
+
+def test_provider_selects_endpoint_and_key_variable(monkeypatch):
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    v = lv.LLMVerifier(provider="gemini", model="gemini-2.5-flash", min_interval_s=0)
+    assert "generativelanguage.googleapis.com" in v._url
+    with pytest.raises(lv.LLMVerifierError, match="GEMINI_API_KEY"):
+        v.verify("c", [])
+    assert "max_tokens" in v._body("c", []) and "max_completion_tokens" not in v._body("c", [])
+    with pytest.raises(ValueError):
+        lv.LLMVerifier(provider="nope")
+
+
+def test_evidence_sent_to_the_llm_is_trimmed():
+    msgs = lv.build_messages("c", ["x" * 5000] * 20, "open")
+    assert msgs[1]["content"].count("[") <= lv.MAX_PASSAGES and len(msgs[1]["content"]) < 5000
+
+
+# --- Version 2: cross-check verdict mode ----------------------------------------------
+
+def _crosscheck(llm, entail, contra):
+    p = _pipeline_with(llm, kg_conf=None)
+    p.verdict_mode = "crosscheck"
+    p.nli_scorer.score_batch.return_value = [MagicMock(entailment_prob=entail, contradiction_prob=contra)]
+    return p.run("Paris is the capital of France.", "en")
+
+
+def test_crosscheck_verified_needs_passages_and_llm():
+    llm = MagicMock(model="m")
+    llm.verify.return_value = lv.LLMJudgement("Verified", 0.95, "stated", "")
+    r = _crosscheck(llm, 0.9, 0.05)
+    assert r.scores[0].verdict.value == "Verified" and r.scores[0].note.startswith("cross-checked")
+    assert r.evidence[0]["llm_check"]["verdict"] == "Verified" and r.evidence[0]["error_spans"] == []
+    llm.verify.return_value = lv.LLMJudgement("Hallucinated", 0.1, "wrong city", "Paris", wrong_span="Paris")
+    r = _crosscheck(llm, 0.9, 0.05)
+    assert r.scores[0].verdict.value == "Uncertain"  # passages and LLM disagree
+
+
+def test_crosscheck_contradiction_or_llm_false_without_support_is_hallucinated():
+    llm = MagicMock(model="m")
+    llm.verify.return_value = lv.LLMJudgement("Uncertain", 0.5, "", "")
+    assert _crosscheck(llm, 0.1, 0.8).scores[0].verdict.value == "Hallucinated"  # on-topic contradiction
+    llm.verify.return_value = lv.LLMJudgement("Verified", 0.9, "", "")
+    assert _crosscheck(llm, 0.1, 0.8).scores[0].verdict.value == "Uncertain"  # symmetric: they disagree
+    llm.verify.return_value = lv.LLMJudgement("Hallucinated", 0.05, "", "", wrong_span="Paris")
+    r = _crosscheck(llm, 0.5, 0.3)
+    assert r.scores[0].verdict.value == "Hallucinated" and r.scores[0].hallu_score <= 0.34
+    assert r.evidence[0]["error_spans"] == [[0, 5]]
+
+
+def test_crosscheck_llm_failure_keeps_the_passage_verdict():
+    llm = MagicMock(model="m")
+    llm.verify.side_effect = lv.LLMQuotaExhausted("daily limit")
+    r = _crosscheck(llm, 0.1, 0.8)
+    assert r.scores[0].verdict.value == "Hallucinated" and r.evidence[0]["llm_check"] is None
+
+
+def test_provider_json_validation_failure_is_read_tolerantly_or_retried(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "x")
+    session = MagicMock()
+    bad = {"error": {"message": "Failed to validate JSON.", "code": "json_validate_failed",
+                     "failed_generation": 'Sure: {"verdict": "Hallucinated", "p_true": 0.1,}'}}
+    good = {"choices": [{"message": {"content": '{"verdict": "Verified", "p_true": 0.9}'}}], "usage": {}}
+    session.post.side_effect = [_resp(400, bad), _resp(200, good)]
+    j = lv.LLMVerifier(session=session, min_interval_s=0).verify("c", [])
+    assert j.verdict == "Verified"  # unparsable failed_generation -> retried without strict JSON mode
+    assert "response_format" not in session.post.call_args.kwargs["json"]
+    bad["error"]["failed_generation"] = '{"verdict": "Hallucinated", "p_true": 0.1} trailing text'
+    session.post.side_effect = [_resp(400, bad)]
+    assert lv.LLMVerifier(session=session, min_interval_s=0).verify("c", []).verdict == "Hallucinated"
+
+
+def test_second_reading_verifies_a_leaning_true_claim_only_if_the_sources_state_it():
+    llm = MagicMock(model="m")
+    llm.verify.return_value = lv.LLMJudgement("Verified", 0.95, "known fact", "")
+    p = _pipeline_with(llm, kg_conf=None)
+    p.verdict_mode = "crosscheck"
+    p.nli_scorer.score_batch.return_value = [MagicMock(entailment_prob=0.5, contradiction_prob=0.3)]
+    assert p.run("Paris is the capital of France.", "en").scores[0].verdict.value == "Uncertain"  # passages unclear
+    reader = MagicMock(model="m")
+    reader.verify.return_value = lv.LLMJudgement("Verified", 0.9, "passage 1 states it", "")
+    p.second_reader = reader
+    s = p.run("Paris is the capital of France.", "en").scores[0]
+    assert s.verdict.value == "Verified" and "second reading" in s.note
+    reader.verify.return_value = lv.LLMJudgement("Uncertain", 0.5, "", "")
+    assert p.run("Paris is the capital of France.", "en").scores[0].verdict.value == "Uncertain"
+    llm.verify.return_value = lv.LLMJudgement("Hallucinated", 0.1, "Lyon is the capital", "")  # LLM says false
+    reader.verify.reset_mock()
+    p.run("Paris is the capital of France.", "en")
+    reader.verify.assert_not_called()
+
+
+def test_v4a_guard_unflags_a_claim_the_sources_state():
+    llm = MagicMock(model="m")
+    llm.verify.return_value = lv.LLMJudgement("Hallucinated", 0.05, "wrong city", "")
+    p = _pipeline_with(llm, kg_conf=None)
+    p.verdict_mode, p.flag_needs_llm = "crosscheck", True
+    p.nli_scorer.score_batch.return_value = [MagicMock(entailment_prob=0.5, contradiction_prob=0.3)]
+    reader = MagicMock(model="m")
+    reader.verify.return_value = lv.LLMJudgement("Verified", 0.9, "passage 1 states it", "")
+    p.second_reader = reader
+    s = p.run("Paris is the capital of France.", "en").scores[0]
+    assert s.verdict.value == "Uncertain" and "not flagged" in s.note
+    reader.verify.return_value = lv.LLMJudgement("Uncertain", 0.5, "", "")
+    assert p.run("Paris is the capital of France.", "en").scores[0].verdict.value == "Hallucinated"
+
+
+def test_same_claim_and_passages_are_answered_from_the_cache(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "x")
+    session = MagicMock()
+    session.post.return_value = _resp(200, {"choices": [{"message": {"content": '{"verdict": "Verified"}'}}], "usage": {}})
+    v = lv.LLMVerifier(session=session, min_interval_s=0)
+    assert v.verify("c", ["p"]).verdict == v.verify("c", ["p"]).verdict == "Verified"
+    assert session.post.call_count == 1
+    v.verify("c", ["other passage"])
+    assert session.post.call_count == 2  # different evidence: asked again
+    session.post.return_value = _resp(200, {"choices": [{"message": {"content": "no json"}}], "usage": {}})
+    v.verify("d", [])
+    v.verify("d", [])
+    assert session.post.call_count == 4  # unparsable answers are not cached
+
+
+def test_parallel_crosscheck_gives_the_same_verdicts_in_claim_order():
+    import numpy as np
+    texts = ["Paris is the capital of France.", "Lyon is the capital of France.", "Nice is in France."]
+    answers = {texts[0]: "Verified", texts[1]: "Hallucinated", texts[2]: "Uncertain"}
+    llm = MagicMock(model="m")
+    llm.verify.side_effect = lambda claim, passages: lv.LLMJudgement(answers[claim], None, "", "")
+    runs = []
+    for workers in (1, 4):
+        p = _pipeline_with(llm, kg_conf=None)
+        p.verdict_mode, p.llm_workers = "crosscheck", workers
+        claims = []
+        for t in texts:
+            c = MagicMock()
+            c.text = t
+            claims.append(c)
+        p.claim_extractor.extract.return_value = claims
+        p.embedder.embed.return_value = MagicMock(vectors=np.ones((3, 8), np.float32), model_used=["xlm-r"] * 3)
+        p.nli_scorer.score_batch.return_value = [MagicMock(entailment_prob=0.9, contradiction_prob=0.05)]
+        runs.append([s.verdict.value for s in p.run(" ".join(texts), "en").scores])
+    assert runs[0] == runs[1] == ["Verified", "Hallucinated", "Uncertain"]  # one answer per claim, in order

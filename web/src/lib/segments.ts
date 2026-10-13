@@ -4,6 +4,8 @@ export interface Segment {
   text: string
   claim: Claim | null
   n: number | null // 1-based claim number, in response order
+  // The wrong words inside this claim's run, as [start, end] code-point offsets into `text`.
+  errors: [number, number][]
 }
 
 /** Split the submitted text into plain and highlighted runs from the claim
@@ -31,10 +33,30 @@ export function buildSegments(text: string, claims: Claim[], markSupported: bool
   let cursor = 0
   for (const s of spans) {
     if (s.start < cursor) continue // overlaps a span already applied
-    if (s.start > cursor) out.push({ text: slice(cursor, s.start), claim: null, n: null })
-    out.push({ text: slice(s.start, s.end), claim: s.claim, n: s.n })
+    if (s.start > cursor) out.push({ text: slice(cursor, s.start), claim: null, n: null, errors: [] })
+    // error spans narrower than the claim only (a whole-claim span adds nothing to the claim's own mark)
+    const errors = (s.claim.error_spans ?? [])
+      .map(([a, b]) => [Math.max(clamp(a), s.start) - s.start, Math.min(clamp(b), s.end) - s.start] as [number, number])
+      .filter(([a, b]) => b > a && b - a < s.end - s.start)
+      .sort((x, y) => x[0] - y[0])
+    out.push({ text: slice(s.start, s.end), claim: s.claim, n: s.n, errors })
     cursor = s.end
   }
-  if (cursor < len) out.push({ text: slice(cursor), claim: null, n: null })
+  if (cursor < len) out.push({ text: slice(cursor), claim: null, n: null, errors: [] })
+  return out
+}
+
+/** A claim run split into plain and wrong-word pieces (overlapping error spans are skipped). */
+export function splitErrors(text: string, errors: [number, number][]): { text: string; wrong: boolean }[] {
+  const chars = Array.from(text)
+  const out: { text: string; wrong: boolean }[] = []
+  let cursor = 0
+  for (const [a, b] of errors) {
+    if (a < cursor) continue
+    if (a > cursor) out.push({ text: chars.slice(cursor, a).join(''), wrong: false })
+    out.push({ text: chars.slice(a, b).join(''), wrong: true })
+    cursor = b
+  }
+  if (cursor < chars.length) out.push({ text: chars.slice(cursor).join(''), wrong: false })
   return out
 }

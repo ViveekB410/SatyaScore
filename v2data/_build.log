@@ -1,0 +1,13 @@
+== mushroom
+mushroom: dropped 23 ambiguous claims (1-2 overlapping characters)
+  mushroom_dev: 199 items | {('en', 'Hallucinated'): 75, ('en', 'Verified'): 45, ('hi', 'Hallucinated'): 76, ('hi', 'Verified'): 3}
+  mushroom_test: 581 items | {('en', 'Hallucinated'): 299, ('en', 'Verified'): 88, ('hi', 'Hallucinated'): 183, ('hi', 'Verified'): 11}
+== fever
+  fever_dev: 300 items | {('en', 'Hallucinated'): 150, ('en', 'Verified'): 150}
+  fever_test: 300 items | {('en', 'Hallucinated'): 150, ('en', 'Verified'): 150}
+== xfact
+  xfact_hi_dev: 112 items | {('hi', 'Hallucinated'): 112}
+  xfact_hi_test: 170 items | {('hi', 'Hallucinated'): 170}
+== v1gold
+  v1gold_dev: 303 items | {('en', 'Hallucinated'): 38, ('en', 'Verified'): 128, ('hi', 'Hallucinated'): 7, ('hi', 'Verified'): 130}
+  v1gold_test: 76 items | {('en', 'Hallucinated'): 8, ('en', 'Verified'): 33, ('hi', 'Hallucinated'): 2, ('hi', 'Verified'): 33}

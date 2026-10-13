@@ -1,0 +1,18 @@
+Run the LOCKED test split for 'v1'? Type yes: v1/testS3: 0 cached, 158 to run
+[api] loaded trained weights for en: alpha=0.000 beta=0.500 gamma=0.500
+[api] loaded trained weights for hi: alpha=0.000 beta=0.498 gamma=0.502
+[api] no weights_mr.json — using placeholder 0.5/0.3/0.2 for mr
+[api] loaded cached bilingual corpus: 102069 passages {'en': 89594, 'hi': 12475}
+[api] on-demand Wikipedia expansion ON
+[api] fact-checks ON; GOOGLE_FACTCHECK_KEY set
+Loading weights:   0%|          | 0/202 [00:00<?, ?it/s]Loading weights:  81%|████████  | 164/202 [00:00<00:00, 1615.13it/s]Loading weights: 100%|██████████| 202/202 [00:00<00:00, 1625.82it/s]
+[api] NLI model warmed (cuda) in 9.0s
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights:  76%|███████▋  | 152/199 [00:00<00:00, 1495.56it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 1564.35it/s]
+[api] embedder warmed (cuda) in 16.2s
+fact-checks: ON | LLM: OFF
+25/158  (4.2 s/item)
+50/158  (3.7 s/item)
+75/158  (3.6 s/item)
+100/158  (3.6 s/item)
+125/158  (3.6 s/item)
+150/158  (3.6 s/item)

@@ -1,0 +1,13 @@
+item_id,set,split,language,text,label,meta
+xfact-hi-test-013,xfact_hi,test,hi,गुजरात के सूरत में पकड़े गए नकली नोटों की तस्वीर.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-015,xfact_hi,test,hi,"रूस के राष्ट्रपति व्लादिमीर पुतिन की बेटी का एक वीडियो, जिसमें वह कोरोना वैक्सीन का पहला डोज लेते हुए दिख रही हैं.",Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-039,xfact_hi,test,hi,"ये भगवान राम, लक्ष्मण और सीता की असली मूर्तियां हैं जो बाबर के हमले के पहले अयोध्या से लाई गई हैं, जो फिलहाल कर्नाटक के हरिहर आश्रम में रखी हैं.",Hallucinated,"{""xfact_label"": ""partly true/misleading"", ""site"": ""aajtak.in""}"
+xfact-hi-test-046,xfact_hi,test,hi,बाढ़ का एक भयानक वीडियो जिसे असम का बताया जा रहा है. वीडियो में कुछ लोग एक पुल गिरने से नदी में बहते हुए दिख रहे हैं.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-051,xfact_hi,test,hi,"क्रिकेटर क्रिस गेल भारत आए हैं, बीजेपी के लिए कैम्पेनिंग करेंगे.",Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-079,xfact_hi,test,hi,योगी आदित्यनाथ के शासन में यूपी की खाप पंचायत ने दो दलित बहनों का रेप करने और निर्वस्त्र कर गांव में घुमाने का फरमान सुनाया.,Hallucinated,"{""xfact_label"": ""partly true/misleading"", ""site"": ""aajtak.in""}"
+xfact-hi-test-093,xfact_hi,test,hi,सरकार एक हजार रुपये के नये नोट जारी करने वाली है.,Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-101,xfact_hi,test,hi,मुस्लिम युवक को लात मारते हुए दिल्ली पुलिस की तस्वीर.,Hallucinated,"{""xfact_label"": ""partly true/misleading"", ""site"": ""aajtak.in""}"
+xfact-hi-test-115,xfact_hi,test,hi,स्वदेशी सामान के इस्तेमाल पर जोर देने वाले बाबा रामदेव ने खुद अपने घुटने का ऑपरेशन जर्मनी में करवाया है.,Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-137,xfact_hi,test,hi,ये अयोध्या में बन रहे भव्य राम मंदिर की पहली तस्वीरें हैं.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-140,xfact_hi,test,hi,हजारों लोगों की भीड़ के एक वीडियो को रूस के चेचन्या में फ्रांस के खिलाफ मुसलमानों का विरोध प्रदर्शन बताया जा रहा है.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-157,xfact_hi,test,hi,शाहीन बाग में पुरुष भी बुर्का पहनकर सीएए के खिलाफ विरोध-प्रदर्शन कर रहे हैं.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"

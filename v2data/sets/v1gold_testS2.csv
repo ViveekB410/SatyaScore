@@ -1,0 +1,43 @@
+item_id,set,split,language,text,label,meta
+government_hi_07_llama-3.3-70b-versatile_5,v1gold,test,hi,बैंकिंग लाइसेंस: आरबीआई बैंकों और अन्य वित्तीय संस्थानों को लाइसेंस प्रदान करता है और उनकी गतिविधियों को नियंत्रित करता है।,Verified,
+government_hi_07_llama-3.3-70b-versatile_6,v1gold,test,hi,"वित्तीय स्थिरता: आरबीआई वित्तीय स्थिरता को बनाए रखने के लिए काम करता है, जिसमें आर्थिक संकटों को रोकने और उनके प्रभाव को कम करने में मदद करना शामिल है।",Verified,
+healthcare_en_01_llama-3.3-70b-versatile_11,v1gold,test,en,Response also provides long - term immunity against future infections.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_2,v1gold,test,en,"Are activated to produce cytokines and chemokines, which recruit other immune cells to the site of infection.",Verified,
+healthcare_en_01_llama-3.3-70b-versatile_4,v1gold,test,en,Production of interferons Infected cells produce interferons which inhibit viral replication and activate nearby immune cells.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_6,v1gold,test,en,Cells is CD8 + T cells.,Verified,
+healthcare_hi_02_llama-3.3-70b-versatile_0,v1gold,test,hi,"एक सामान्य पैरासिटामोल टैबलेट की अनुशंसित खुराक आवृत्ति आमतौर पर 4-6 घंटे होती है, लेकिन यह व्यक्ति की उम्र, वजन और स्वास्थ्य स्थिति पर निर्भर करती है।",Verified,
+healthcare_hi_03_llama-3.3-70b-versatile_1,v1gold,test,hi,"इसके कई कारण हो सकते हैं, जिनमें शामिल हैं:
+
+१) अनुवांशिक कारक
+२) मोटापा
+३) शारीरिक निष्क्रियता
+४) अस्वस्थ आहार
+५) उम्र
+६) अन्य स्वास्थ्य समस्याएं, जैसे कि उच्च रक्तचाप और उच्च कोलेस्ट्रॉल।",Verified,
+history_en_08_llama-3.3-70b-versatile_0,v1gold,test,en,The Non Cooperation Movement was a civil disobedience movement launched by Mahatma Gandhi in 1920 in India against British rule.,Verified,
+history_en_08_llama-3.3-70b-versatile_2,v1gold,test,en,Movement achieve Indian independence.,Verified,
+history_en_08_llama-3.3-70b-versatile_3,v1gold,test,en,The movement aimed to non violently resist British authority.,Verified,
+history_hi_05_llama-3.3-70b-versatile_1,v1gold,test,hi,इस मार्च का नेतृत्व महात्मा गांधी ने किया था और इसका उद्देश्य ब्रिटिश सरकार द्वारा लगाए गए नमक कर के खिलाफ विरोध करना था।,Verified,
+history_hi_05_llama-3.3-70b-versatile_4,v1gold,test,hi,अहिंसक विरोध  : दांडी मार्च ने अहिंसक विरोध की शक्ति को प्रदर्शित किया और दुनिया को दिखाया कि बिना हिंसा के भी बड़े परिवर्तन लाए जा सकते हैं।,Verified,
+history_hi_05_llama-3.3-70b-versatile_5,v1gold,test,hi,भारतीय स्वतंत्रता संग्राम  : दांडी मार्च भारतीय स्वतंत्रता संग्राम के लिए एक महत्वपूर्ण मील का पत्थर था और इसने भारतीयों को स्वतंत्रता के लिए लड़ने के लिए प्रेरित किया।,Verified,
+history_hi_05_llama-3.3-70b-versatile_6,v1gold,test,hi,महात्मा गांधी की नेतृत्व  : दांडी मार्च ने महात्मा गांधी की नेतृत्व क्षमता को प्रदर्शित किया और उन्हें विश्व स्तर पर एक प्रमुख नेता के रूप में स्थापित किया।,Verified,
+science_hi_01_llama-3.3-70b-versatile_0,v1gold,test,hi,प्रकाश संश्लेषण एक जटिल प्रक्रिया है जिसमें पौधे और कुछ अन्य जीव सूर्य की ऊर्जा का उपयोग करके कार्बन डाइऑक्साइड और पानी से ग्लूकोज और ऑक्सीजन बनाते हैं।,Verified,
+science_hi_01_llama-3.3-70b-versatile_7,v1gold,test,hi,"प्रकाश संश्लेषण की समीकरण है:
+६ सीओ२ + ६ एच२ओ + प्रकाश ऊर्जा → सी६एच₁₂ओ६ (ग्लूकोज) + ६ ओ२
+
+इस प्रकार, प्रकाश संश्लेषण एक महत्वपूर्ण प्रक्रिया है जो पृथ्वी पर जीवन को बनाए रखने में मदद करती है।",Verified,
+science_hi_02_llama-3.3-70b-versatile_0,v1gold,test,hi,"पृथ्वी पर मौसम बदलने के कई कारण हैं, जिनमें से कुछ प्रमुख कारण हैं:
+
+सूरज की किरणों का पृथ्वी पर पड़ने का कोण
+पृथ्वी की घूर्णन गति और इसके अक्ष का झुकाव
+महासागरों और वायुमंडल में गर्मी का संचार
+वायुमंडलीय दबाव और तापमान में परिवर्तन
+जलवायु परिवर्तन और मानव गतिविधियों का प्रभाव
+
+इन कारणों से पृथ्वी पर मौसम में परिवर्तन होता है, जैसे कि तापमान में बदलाव, वर्षा की मात्रा में परिवर्तन, और हवा की दिशा में बदलाव।",Verified,
+sports_en_01_llama-3.3-70b-versatile_0,v1gold,test,en,The first Cricket World Cup was held in 1975 in England.,Verified,
+sports_en_02_llama-3.3-70b-versatile_0,v1gold,test,en,In cricket a run out occurs when a batsman is dismissed by a fielder hitting the stumps while the batsman is outside their crease.,Verified,
+sports_en_02_llama-3.3-70b-versatile_9,v1gold,test,en,The batsman must leave the field.,Verified,
+sports_en_04_llama-3.3-70b-versatile_0,v1gold,test,en,In football the offside rule states that a player is offside if they are closer to the opponent's goal line than both the ball and the second to last opponent when the ball is played forward.,Verified,
+sports_en_04_llama-3.3-70b-versatile_1,v1gold,test,en,Player must become involved in the play.,Verified,
+sports_hi_02_llama-3.3-70b-versatile_2,v1gold,test,hi,"३) रन-आउट के लिए, फील्डर को गेंद को विकेट पर मारने से पहले गेंद को अपने हाथ में रखना होता है।",Verified,

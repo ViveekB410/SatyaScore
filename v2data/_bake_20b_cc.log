@@ -1,0 +1,9 @@
+groq/openai/gpt-oss-20b: 0 cached, 206 to ask
+stopped (quota): groq asks to wait 324 s (rate/daily limit).  -- rerun later to resume
+tokens used: 8978
+groq/openai/gpt-oss-20b: 8 cached, 198 to ask
+stopped (quota): groq asks to wait 359 s (rate/daily limit).  -- rerun later to resume
+tokens used: 0
+groq/openai/gpt-oss-20b: 8 cached, 198 to ask
+stopped (quota): groq asks to wait 365 s (rate/daily limit).  -- rerun later to resume
+tokens used: 2136

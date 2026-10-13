@@ -1,0 +1,11 @@
+20/149
+40/149
+60/149
+80/149
+100/149
+120/149
+140/149
+Loading weights:   0%|          | 0/202 [00:00<?, ?it/s]Loading weights: 100%|██████████| 202/202 [00:00<00:00, 3241.07it/s]
+checks: {'paraphrased': 149, 'failed_nli': 0, 'failed_numbers': 3, 'same_text': 1, 'kept': 145}
+  hiwiki_para_dev: 146 items | {('hi', 'Hallucinated'): 73, ('hi', 'Verified'): 73}
+  hiwiki_para_test: 144 items | {('hi', 'Hallucinated'): 72, ('hi', 'Verified'): 72}

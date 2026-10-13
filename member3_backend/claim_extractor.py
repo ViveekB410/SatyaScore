@@ -102,8 +102,30 @@ _WS_BEFORE_CONTRACTION = re.compile(r"\s+('(?:s|t|re|ve|ll|d|m)\b)", re.IGNORECA
 # Matches markdown list/heading markers this extractor was never designed to
 # see: numbered list markers ("1. ", "12. "), bullet markers ("- ", "* ",
 # "• ") at the start of a line, and bold/italic asterisks anywhere.
-_NUMBERED_MARKER = re.compile(r"(?m)^\s*\d{1,2}\.\s")
+_NUMBERED_MARKER = re.compile(r"(?m)^\s*[0-9०-९]{1,2}[.)]\s")  # "1. ", "1) ", Devanagari "४) "
 _BULLET_MARKER = re.compile(r"(?m)^\s*[-*•]\s")
+
+# "**Label**: description" list lines (the usual chatbot layout). Parsed as prose they gave
+# claims such as "Recognition : The immune system recognizes ..." or, after a lead-in,
+# "Tuberculosis is ... the following methods symptom evaluation : Medical history ...".
+# They are handled before everything else: the description is the claim when it is a
+# sentence; "To <verb> ..." becomes "<Label> is used to <verb> ..."; a label with no
+# description is a sub-heading whose own items carry their labels.
+_LABEL_LINE = re.compile(
+    r"(?m)^[ \t]*(?:(?:[0-9०-९]{1,2}[.)]|[-*•])[ \t]+)?\*\*(?P<label>[^*\n:]{1,80}?)[ \t]*(?::\*\*|\*\*[ \t]*:)"
+    r"[ \t]*(?P<desc>[^\n]*)$")  # the colon after the bold label or inside it ("**Label:**")
+# the same without bold, but only on a list line and with a short, verb-less label
+_PLAIN_LABEL_LINE = re.compile(
+    r"(?m)^[ \t]*(?:[0-9०-९]{1,2}[.)]|[-*•])[ \t]+(?P<label>[^:\n*]{1,50}?)[ \t]*:[ \t]*(?P<desc>[^\n]*)$")
+_TO_PURPOSE = re.compile(r"^to\s+\w", re.I)
+# a Hindi description that is a full sentence ends in a finite verb form
+_HI_FINITE_END = re.compile(
+    r"(?:है|हैं|था|थे|थी|थीं|होता|होती|होते|होगा|होगी|गया|गई|गए|सकता|सकती|सकते|जाता|जाती|जाते|करता|करती|करते)\s*[।.!]?\s*$")
+# a Hindi claim that opens with a pronoun / demonstrative ("यह आयोग ...") needs the earlier
+# sentence to be understood; there is no Hindi parser here to resolve it, so it is flagged
+_HI_LEADING_PRONOUN = re.compile(r"^\W*(?:यह|वह|ये|वे|इस|उस|इसका|इसकी|इसके|उसका|उसकी|उसके|इन|उन)\s")
+# the English equivalent for label-line descriptions, which are not passed through the parser
+_EN_LEADING_PRONOUN = re.compile(r"^\W*(?:it|its|they|their|this|these|he|she|his|her)\b", re.I)
 
 
 def _blank_markdown_artifacts(text: str) -> str:
@@ -299,7 +321,8 @@ class ExtractedClaim:
     start_char: int  # offset into the ORIGINAL input text
     end_char: int
     extraction_method: Literal[
-        "decomposed_base", "decomposed_relcl", "decomposed_appos", "decomposed_conj", "sentence_level"
+        "decomposed_base", "decomposed_relcl", "decomposed_appos", "decomposed_conj", "sentence_level",
+        "list_item", "label_line", "table_row"
     ] = "sentence_level"
     had_unresolved_pronoun: bool = False
 
@@ -327,11 +350,149 @@ class ClaimExtractor:
         if word_count > MAX_WORDS:
             raise ValueError(f"Input has {word_count} words, exceeds FR-01's {MAX_WORDS}-word limit")
 
+        # Markdown tables, then "**Label**: description" lines, on the raw text (the bold
+        # markers and pipes mark them); each is blanked so normal extraction skips it
+        table_claims, text = self._extract_table_rows(text, language)
+        label_claims, text = self._extract_label_lines(text, language)
+        label_claims += table_claims
         text = _blank_bracketed(_blank_markdown_artifacts(text))
 
         if language == "en":
-            return self._extract_english(text)
-        return self._extract_indic_sentence_level(text, language)
+            claims = self._extract_english(text)
+        else:
+            claims = self._extract_indic_sentence_level(text, language)
+        claims = sorted(claims + label_claims, key=lambda c: c.start_char)
+        for k, c in enumerate(claims):
+            c.claim_id = f"claim_{k}"
+        return claims
+
+    # -- Markdown tables ------------------------------------------------------
+
+    _TABLE_ROW = re.compile(r"^[ \t]*\|.*\|[ \t]*$")
+    _TABLE_RULE = re.compile(r"^[\s|:\-]+$")
+
+    def _extract_table_rows(self, text: str, language: Language) -> tuple[list[ExtractedClaim], str]:
+        """One claim per data row of a Markdown table ("| a | b |" lines with a "|---|" rule
+        under the header). A two-column row is a "label: description" pair; a wider row
+        becomes "header: cell; header: cell". The table is blanked (LENGTH-PRESERVING)."""
+        lines, pos = [], 0
+        for raw in text.splitlines(keepends=True):
+            lines.append((pos, raw.rstrip("\r\n")))
+            pos += len(raw)
+        made: list[ExtractedClaim] = []
+        blank: list[tuple[int, int]] = []
+        clean = lambda cell: " ".join(_blank_bracketed(_blank_markdown_artifacts(cell)).split()).strip()
+        i = 0
+        while i < len(lines):
+            if not (self._TABLE_ROW.match(lines[i][1]) and i + 1 < len(lines)
+                    and self._TABLE_ROW.match(lines[i + 1][1]) and self._TABLE_RULE.match(lines[i + 1][1])):
+                i += 1
+                continue
+            header = [clean(c) for c in lines[i][1].strip().strip("|").split("|")]
+            blank += [(lines[i][0], lines[i][0] + len(lines[i][1])), (lines[i + 1][0], lines[i + 1][0] + len(lines[i + 1][1]))]
+            j = i + 2
+            while j < len(lines) and self._TABLE_ROW.match(lines[j][1]):
+                start, raw = lines[j]
+                blank.append((start, start + len(raw)))
+                cells = [clean(c) for c in raw.strip().strip("|").split("|")]
+                if len(cells) == 2 and cells[0] and cells[1]:
+                    claim = self._label_claim(cells[0].strip(" ."), _WS_BEFORE_PUNCT.sub(r"\1", cells[1]), language)
+                else:
+                    parts = [f"{h}: {c}" if h else c for h, c in zip(header, cells) if c]
+                    claim = "; ".join(parts) if len(parts) >= 2 else None
+                    if claim and claim[-1] not in ".!?।":
+                        claim += "." if language == "en" else "।"
+                if claim and len(claim.split()) >= 3 and not not_a_claim(claim, language):
+                    s = start + (len(raw) - len(raw.lstrip()))
+                    made.append(ExtractedClaim(claim_id="", text=claim, start_char=s, end_char=start + len(raw.rstrip()),
+                                               extraction_method="table_row"))
+                j += 1
+            i = j
+        chars = list(text)
+        for s, e in blank:
+            chars[s:e] = [" "] * (e - s)
+        return made, "".join(chars)
+
+    # -- "**Label**: description" list lines ---------------------------------
+
+    def _extract_label_lines(self, text: str, language: Language) -> tuple[list[ExtractedClaim], str]:
+        """Claims from "Label: description" list lines, each spanning its description;
+        returns them with the text in which those lines are blanked (LENGTH-PRESERVING,
+        offsets stay valid), so the normal extraction does not see them again."""
+        made: list[ExtractedClaim] = []
+        blank: list[tuple[int, int]] = []
+        seen: set[int] = set()
+        for pattern in (_LABEL_LINE, _PLAIN_LABEL_LINE):
+            for m in pattern.finditer(text):
+                if m.start() in seen:
+                    continue
+                label = " ".join(_blank_bracketed(m["label"]).split()).strip(" .")
+                if not label or (pattern is _PLAIN_LABEL_LINE and not self._is_bare_label(label, language)):
+                    continue
+                seen.add(m.start())
+                blank.append((m.start(), m.end()))
+                raw = m["desc"]
+                desc = " ".join(_blank_bracketed(_blank_markdown_artifacts(raw)).split()).strip()
+                desc = _WS_BEFORE_PUNCT.sub(r"\1", desc)  # "receptors (PRRs)." -> "receptors."
+                if not desc:
+                    continue  # a sub-heading ("**Sputum tests**:"): its items carry their own labels
+                claim = self._label_claim(label, desc, language)
+                if claim is None or not_a_claim(claim, language):
+                    continue
+                s = m.start("desc") + (len(raw) - len(raw.lstrip()))
+                e = m.start("desc") + len(raw.rstrip())
+                leading = _EN_LEADING_PRONOUN if language == "en" else _HI_LEADING_PRONOUN
+                made.append(ExtractedClaim(claim_id="", text=claim, start_char=s, end_char=e,
+                                           extraction_method="label_line",
+                                           had_unresolved_pronoun=bool(leading.match(desc))))
+        chars = list(text)
+        for s, e in blank:
+            chars[s:e] = [" "] * (e - s)
+        return made, "".join(chars)
+
+    @staticmethod
+    def _is_bare_label(label: str, language: Language) -> bool:
+        """A short, verb-less label ("Chest X-ray", "दूसरी पढ़ाई"), not a clause that happens
+        to end in a colon ("The rules are")."""
+        if len(label.split()) > 6:
+            return False
+        if language == "en":
+            with _NLP_LOCK:
+                doc = _get_english_pipeline()(label)
+            return not any(t.pos_ in ("VERB", "AUX") for t in doc)
+        return not _HI_FINITE_END.search(label)
+
+    @staticmethod
+    def _label_claim(label: str, desc: str, language: Language) -> str | None:
+        """The claim made by "label: desc": the description when it is a sentence on its
+        own, "<label> is used to ..." for a purpose, else "<label>: <desc>"."""
+        leading = _EN_LEADING_PRONOUN if language == "en" else _HI_LEADING_PRONOUN
+        if leading.match(desc):
+            # "**Osteomalacia:** It occurs in adults ..." -- the label is often what the pronoun
+            # means, so it is kept in front rather than dropped
+            claim = " ".join(f"{label}: {desc}".split())
+            if claim[-1] not in ".!?।":
+                claim += "." if language == "en" else "।"
+            return claim
+        if language == "en":
+            sentence = desc[0].upper() + desc[1:]
+            if sentence[-1] not in ".!?":
+                sentence += "."
+            if is_well_formed_claim(sentence, "en"):
+                return sentence
+            if _TO_PURPOSE.match(desc):
+                claim = f"{label} is used {desc[0].lower()}{desc[1:]}"
+            else:
+                claim = f"{label}: {desc[0].lower() + desc[1:] if desc[1:2].islower() else desc}"
+        else:
+            if _HI_FINITE_END.search(desc):
+                claim = desc
+            else:
+                claim = f"{label}: {desc}"
+        claim = " ".join(claim.split())
+        if claim[-1] not in ".!?।":
+            claim += "।" if language != "en" else "."
+        return claim if len(claim.split()) >= 3 else None
 
     # -- English: dependency-based decomposition + coreference --------------
 
@@ -369,13 +530,13 @@ class ClaimExtractor:
                     break
                 items.append(lines[j])
                 j += 1
-            intro = lead[:-1].strip()
+            intro = " ".join(lead[:-1].split())  # blanked asides leave runs of spaces
             used = []
             for item_start, item_raw in items if len(items) >= 2 else []:
                 marker = self._ITEM_MARKER.match(item_raw).end()
-                item = item_raw[marker:].strip().rstrip(".;,")
-                if not item or is_well_formed_claim(item + ".", "en"):
-                    continue  # empty, or a full sentence: normal extraction handles it
+                item = " ".join(item_raw[marker:].split()).rstrip(".;,")
+                if not item or ":" in item or is_well_formed_claim(item + ".", "en"):
+                    continue  # empty, a "label: text" line, or a full sentence: handled elsewhere
                 first = item.split()[0]
                 if first[:1].isupper() and first[1:].islower():
                     item = item[0].lower() + item[1:]  # "Severe pain" -> "... severe pain"; keeps "WHO"
@@ -817,6 +978,7 @@ class ClaimExtractor:
                     start_char=start,
                     end_char=end,
                     extraction_method="sentence_level",
+                    had_unresolved_pronoun=bool(_HI_LEADING_PRONOUN.match(sentence)),
                 )
             )
         return claims

@@ -290,3 +290,68 @@ def test_no_sentence_break_without_punctuation(extractor):
     assert claims == ["The Taj Mahal has been a UNESCO World Heritage Site since 1983."]
     assert [c.text for c in extractor.extract("Dr. Smith works at AIIMS. He is a surgeon.", "en")] == [
         "Dr. Smith works at AIIMS.", "Smith is a surgeon."]
+
+
+def test_bold_label_lines_give_clean_claims(extractor):
+    # chatbot layout "1. **Label**: description" gave "Recognition : The immune system ..." and,
+    # after a lead-in, "Tuberculosis is ... the following methods symptom evaluation : Medical ..."
+    text = ("Tuberculosis (TB) is typically diagnosed using a combination of the following methods:\n\n"
+            "1. **Chest X-ray**: To look for abnormalities in the lungs.\n"
+            "2. **Recognition**: The immune system recognizes infected cells (PRRs).\n"
+            "3. **Sputum tests**: \n   - **Smear microscopy**: To detect TB bacteria in sputum.\n")
+    claims = extractor.extract(text, "en")
+    texts = [c.text for c in claims]
+    assert "Chest X-ray is used to look for abnormalities in the lungs." in texts
+    assert "The immune system recognizes infected cells." in texts
+    assert "Smear microscopy is used to detect TB bacteria in sputum." in texts
+    assert not any(" : " in t or "  " in t or "Sputum tests" in t for t in texts)
+    xray = next(c for c in claims if c.text.startswith("Chest X-ray"))
+    assert text[xray.start_char:xray.end_char] == "To look for abnormalities in the lungs."  # spans the description
+
+
+def test_plain_label_line_needs_a_verbless_label(extractor):
+    texts = [c.text for c in extractor.extract("1. Membership: Lok Sabha has 543 elected members.", "en")]
+    assert texts == ["Lok Sabha has 543 elected members."]
+
+
+def test_hindi_label_line_and_devanagari_list_number(extractor):
+    text = ("संसद में विधेयक कई चरणों से गुजरता है:\n\n"
+            "१) **दूसरी पढ़ाई**: विधेयक को दूसरी बार पढ़ा जाता है।\n"
+            "४) अम्पायर रन-आउट का संकेत देता है।")
+    texts = [c.text for c in extractor.extract(text, "hi")]
+    assert "विधेयक को दूसरी बार पढ़ा जाता है।" in texts
+    assert not any(t.startswith(("१)", "४)")) or "**" in t for t in texts)
+
+
+def test_hindi_claim_starting_with_a_pronoun_is_flagged(extractor):
+    claims = extractor.extract("चुनाव आयोग एक संवैधानिक संस्था है। यह आयोग चुनाव कराता है।", "hi")
+    assert [c.had_unresolved_pronoun for c in claims] == [False, True]
+
+
+def test_markdown_table_rows_become_claims(extractor):
+    text = ("**Vice-President election**\n\n| Step | Detail |\n|------|--------|\n"
+            "| **Electoral college** | Members of both Houses of Parliament elect the Vice-President. |\n"
+            "| **Voting** | To rank the candidates by preference. |\n\nThe term is five years.")
+    claims = extractor.extract(text, "en")
+    texts = [c.text for c in claims]
+    assert "Members of both Houses of Parliament elect the Vice-President." in texts
+    assert "Voting is used to rank the candidates by preference." in texts
+    assert "The term is five years." in texts
+    assert not any("|" in t or "Step" in t for t in texts)
+    row = next(c for c in claims if c.text.startswith("Members"))
+    assert text[row.start_char:row.end_char].startswith("| **Electoral college**")
+
+
+def test_wide_table_row_keeps_its_headers(extractor):
+    text = "| Battle | Year | Sides |\n|---|---|---|\n| First Panipat | 1526 | Babur and Ibrahim Lodi |\n"
+    texts = [c.text for c in extractor.extract(text, "en")]
+    assert texts == ["Battle: First Panipat; Year: 1526; Sides: Babur and Ibrahim Lodi."]
+
+
+def test_colon_inside_bold_label_and_pronoun_keeps_the_label(extractor):
+    text = ("1. **Rickets:** Bones become soft in children.\n"
+            "2. **Osteomalacia:** It occurs in adults and weakens the bones.\n")
+    claims = extractor.extract(text, "en")
+    assert [c.text for c in claims] == ["Bones become soft in children.",
+                                        "Osteomalacia: It occurs in adults and weakens the bones."]
+    assert [c.had_unresolved_pronoun for c in claims] == [False, True]

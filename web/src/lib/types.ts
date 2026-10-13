@@ -23,6 +23,11 @@ export interface Claim {
   // and the fact Wikidata holds. Absent in checks saved before this was added.
   evidence_excerpt?: string | null
   kg_fact?: KGFact | null
+  // Version 2: where the error is in a Hallucinated claim, as [start, end] offsets into the submitted
+  // text (the value Wikidata contradicts, or the words the LLM named as wrong; else the whole claim).
+  error_spans?: [number, number][]
+  // The LLM's own judgement in cross-check mode.
+  llm_check?: { model: string; verdict: Verdict; p_true: number | null; reason: string; wrong_span: string } | null
 }
 
 export interface KGFact {

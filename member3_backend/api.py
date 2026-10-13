@@ -167,6 +167,26 @@ class ClaimResult(BaseModel):
     # (KG-decided claims).
     evidence_excerpt: str | None = None
     kg_fact: KGFact | None = None
+    # Version 2. Where the error is (Hallucinated claims): [start, end] offsets into the ORIGINAL input
+    # text, from the value Wikidata contradicts, the words the LLM named as wrong, or the whole claim.
+    error_spans: list[list[int]] = []
+    # The LLM's own judgement in cross-check mode: {"model", "verdict", "p_true", "reason", "wrong_span"}.
+    llm_check: dict | None = None
+
+
+def input_spans(text: str, claim, spans: list[list[int]]) -> list[list[int]]:
+    """Error spans (offsets into the claim's text) as offsets into the original input. The claim's text can
+    differ from its input slice (label lines, resolved pronouns), so each wrong word is searched for in the
+    slice; if it is not there, or the span is the whole claim, the claim's whole slice is marked."""
+    start, end = claim.start_char, claim.end_char
+    out = []
+    for a, b in spans:
+        word = claim.text[a:b]
+        k = text[start:end].casefold().find(word.casefold()) if (a, b) != (0, len(claim.text)) and word else -1
+        span = [start + k, start + k + len(word)] if k >= 0 else [start, end]
+        if span not in out:
+            out.append(span)
+    return out
 
 
 class DocumentResult(BaseModel):
@@ -438,14 +458,36 @@ def load_starter_corpus():
             # Optional LLM judge (SATYASCORE_LLM_VERIFIER = grounded | open). OFF by
             # default: adopted only if llm_verifier_eval.py meets its fixed rule. Needs
             # GROQ_API_KEY in the server's environment (never logged).
+            # Version 2: SATYASCORE_VERDICT_MODE=crosscheck asks the LLM ("open" mode) for every claim no
+            # source decided and combines it with the passages (member3_backend/crosscheck.py).
+            # SATYASCORE_LLM_PROVIDER (groq | gemini | openrouter | mistral) and SATYASCORE_LLM_MODEL choose it.
+            verdict_mode = _os.environ.get("SATYASCORE_VERDICT_MODE", "v1").lower()
             llm_mode = _os.environ.get("SATYASCORE_LLM_VERIFIER", "").lower()
+            if verdict_mode == "crosscheck":
+                llm_mode = "open"
             if llm_mode in ("grounded", "open"):
-                from member1_model.llm_verifier import LLMVerifier
+                from member1_model.llm_verifier import DEFAULT_MODEL, PROVIDERS, LLMVerifier
+                provider = _os.environ.get("SATYASCORE_LLM_PROVIDER", "groq").lower()
                 _pipeline.llm_verifier = LLMVerifier(
-                    mode=llm_mode, min_interval_s=float(_os.environ.get("SATYASCORE_LLM_MIN_INTERVAL", "2.2")))
-                has_key = bool(_os.environ.get("GROQ_API_KEY"))
-                print(f"[api] LLM judge ON ({llm_mode}); GROQ_API_KEY "
-                      f"{'set' if has_key else 'MISSING: claims will fall back to NLI'}", flush=True)
+                    model=_os.environ.get("SATYASCORE_LLM_MODEL", DEFAULT_MODEL), mode=llm_mode, provider=provider,
+                    min_interval_s=float(_os.environ.get("SATYASCORE_LLM_MIN_INTERVAL", "2.2")))
+                _pipeline.verdict_mode = "crosscheck" if verdict_mode == "crosscheck" else "v1"
+                _pipeline.crosscheck_symmetric = _os.environ.get("SATYASCORE_CROSSCHECK_SYMMETRIC", "true").lower() in ("1", "true", "yes")
+                # Claims sent to the LLM at the same time (speed only; verdicts are per claim). A cloud provider
+                # answers them in parallel; a local Ollama on a 6 GB laptop GPU was slower with 4 slots (46 s ->
+                # 202 s for a six-claim text), so it gets one at a time.
+                _pipeline.llm_workers = int(_os.environ.get("SATYASCORE_LLM_WORKERS", "1" if provider == "ollama" else "4"))
+                if verdict_mode == "crosscheck" and _os.environ.get("SATYASCORE_SECOND_READING", "true").lower() in ("1", "true", "yes"):
+                    reader = LLMVerifier(model=_pipeline.llm_verifier.model, mode="grounded", provider=provider,
+                                         min_interval_s=float(_os.environ.get("SATYASCORE_LLM_MIN_INTERVAL", "2.2")))
+                    reader.max_passages = 10
+                    _pipeline.second_reader = reader
+                    _pipeline.flag_needs_llm = _os.environ.get("SATYASCORE_FLAG_NEEDS_LLM", "false").lower() in ("1", "true", "yes")
+                key_var = PROVIDERS[provider][1]
+                key_state = ("no key needed (local)" if key_var is None else
+                             f"{key_var} {'set' if _os.environ.get(key_var) else 'MISSING: claims will fall back to NLI'}")
+                print(f"[api] LLM {'cross-check' if verdict_mode == 'crosscheck' else 'judge'} ON ({provider}, "
+                      f"{_pipeline.llm_verifier.model}, {llm_mode}); {key_state}", flush=True)
             # World Bank / WHO country statistics (member2_data/official_stats.py). ON by default:
             # attempt 2 met official_sources_eval.py's fixed rule (results/official_sources_eval_stats_seed6.md:
             # 40 fresh countries, true claims contradicted 0 of 137, false claims caught 137 of 137; attempt 1,
@@ -540,7 +582,7 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
         # The table is fitted on NLI-rule scores. A score set by the KG (1.0 / 0.0) or by
         # the LLM judge is on a different scale: looking it up would show e.g. a KG-caught
         # hallucination with "P(Verified) 0.73". No calibrated reading for those.
-        if score.note and (score.note == KG_NOTE or score.note.startswith(("judged by LLM", FC_NOTE_PREFIX))):
+        if score.note and (score.note == KG_NOTE or score.note.startswith(("judged by LLM", "cross-checked", FC_NOTE_PREFIX))):
             return {}
         c = lookup(score.hallu_score, table)
         return {"p_verified": c.p_verified, "p_verified_ci95": list(c.ci95), "calibration_n": c.n}
@@ -566,7 +608,7 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
         # the NLI's deciding passage is only "the" source when NLI made the verdict
         # (nor when the number guard overrode it: the passage lacks the claim's numbers)
         nli_decided = score.note != KG_NOTE and not (score.note or "").startswith(
-            ("judged by LLM", FC_NOTE_PREFIX, NUMBER_NOTE))
+            ("judged by LLM", "cross-checked", FC_NOTE_PREFIX, NUMBER_NOTE))
         deciding = ev.get("deciding") if nli_decided else None
         order = ([deciding[0]] if deciding else []) + list(ev.get("passage_ids", []))
         for pid in order:
@@ -593,6 +635,9 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
             sources=_sources(i, score),
             evidence_excerpt=_ev(i).get("excerpt"),
             kg_fact=_ev(i).get("kg_fact"),
+            error_spans=input_spans(request.text, claim, _ev(i).get("error_spans", []))
+            if _verdict(score) == "Hallucinated" else [],
+            llm_check=_ev(i).get("llm_check"),
         )
         for i, (claim, score) in enumerate(zip(result.claims, result.scores))
     ]

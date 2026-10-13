@@ -21,6 +21,7 @@ path then runs), else a TripleVerification (status "unknown" = applies but no an
 """
 from __future__ import annotations
 
+import os
 import re
 
 from member2_data.wikidata_connector import TripleVerification
@@ -276,4 +277,7 @@ def check(claim_text: str, language: str, linker, wd) -> TripleVerification | No
         return _unknown("P39", m["pre"])
     if (q := _quantity(t, language)) is not None:
         return _check_quantity(*q, language, linker, wd)
-    return None
+    if os.environ.get("SATYASCORE_KG_RELATIONS", "0") != "1":  # Version 2, on only after the dev check
+        return None
+    from member2_data import kg_relations  # nationality / origin, year of a work, director, cast, performer
+    return kg_relations.check(t, language, linker, wd)

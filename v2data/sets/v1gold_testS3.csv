@@ -1,0 +1,21 @@
+item_id,set,split,language,text,label,meta
+government_hi_07_llama-3.3-70b-versatile_1,v1gold,test,hi,"इसके कुछ मुख्य कार्य हैं:
+
+मौद्रिक नीति का निर्धारण: आरबीआई मौद्रिक नीति को निर्धारित करता है, जिसमें ब्याज दरों और मुद्रा आपूर्ति को नियंत्रित करना शामिल है।",Verified,
+government_hi_07_llama-3.3-70b-versatile_3,v1gold,test,hi,"मुद्रा प्रबंधन: आरबीआई देश की मुद्रा को प्रबंधित करता है, जिसमें मुद्रा की आपूर्ति और मांग को संतुलित करना शामिल है।",Verified,
+government_hi_07_llama-3.3-70b-versatile_4,v1gold,test,hi,"विदेशी मुद्रा प्रबंधन: आरबीआई विदेशी मुद्रा को प्रबंधित करता है, जिसमें विदेशी मुद्रा की खरीद और बिक्री को नियंत्रित करना शामिल है।",Verified,
+healthcare_en_01_llama-3.3-70b-versatile_1,v1gold,test,en,The human immune system responds to a viral infection through a multi step process.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_5,v1gold,test,en,Activation of adaptive immunity Adaptive immune cells such as T cells and B cells are activated to recognize and respond to viral antigens.,Verified,
+healthcare_en_01_llama-3.3-70b-versatile_8,v1gold,test,en,T cell response Cytotoxic T cells recognize while helper T cells CD4 + T cells coordinate the immune response.,Verified,
+healthcare_en_02_llama-3.3-70b-versatile_0,v1gold,test,en,The recommended dosage frequency for a standard paracetamol tablet 500 mg is every 4 6 hours not exceeding 4 grams 8 tablets in 24 hours.,Verified,
+healthcare_en_08_llama-3.3-70b-versatile_0,v1gold,test,en,Insulin is a hormone produced by the pancreas that plays a crucial role in regulating blood sugar levels in the human body.,Verified,
+healthcare_en_08_llama-3.3-70b-versatile_4,v1gold,test,en,Overall insulin helps maintain normal blood sugar levels and ensures that cells receive the energy Blood need to function properly.,Verified,
+healthcare_hi_03_llama-3.3-70b-versatile_0,v1gold,test,hi,"टाइप 2 मधुमेह का कारण शरीर में इंसुलिन की कमी या इंसुलिन प्रतिरोध है, जिसके परिणामस्वरूप रक्त शर्करा का स्तर बढ़ जाता है।",Verified,
+history_en_08_llama-3.3-70b-versatile_1,v1gold,test,en,British involved boycotting British goods institutions and services and promoting Indian self sufficiency.,Verified,
+history_hi_09_llama-3.3-70b-versatile_0,v1gold,test,hi,संयुक्त राष्ट्र की स्थापना 24 अक्टूबर 1945 को हुई थी।,Verified,
+science_en_07_llama-3.3-70b-versatile_2,v1gold,test,en,The movement of the plates is driven by convection currents in the Earth's mantle.,Verified,
+science_hi_01_llama-3.3-70b-versatile_1,v1gold,test,hi,यह प्रक्रिया वायुमंडल में ऑक्सीजन की मात्रा को बढ़ाने और पृथ्वी पर जीवन को बनाए रखने में महत्वपूर्ण भूमिका निभाती है।,Verified,
+science_hi_01_llama-3.3-70b-versatile_2,v1gold,test,hi,प्रकाश संश्लेषण की प्रक्रिया में दो मुख्य चरण होते हैं: प्रकाश-निर्भर चरण और प्रकाश-स्वतंत्र चरण।,Verified,
+science_hi_07_llama-3.3-70b-versatile_2,v1gold,test,hi,यह सिद्धांत पृथ्वी की सतह पर होने वाली कई भूगर्भिक गतिविधियों को समझाने में मदद करता है।,Verified,
+sports_en_04_llama-3.3-70b-versatile_2,v1gold,test,en,To be considered offside the player must also be in the opponent's half of the field.,Verified,
+sports_hi_02_llama-3.3-70b-versatile_3,v1gold,test,hi,"४) यदि फील्डर ने गेंद को विकेट पर मार दिया है और बल्लेबाज क्रीज से बाहर है, तो अम्पायर रन-आउट का संकेत देता है और बल्लेबाज आउट हो जाता है।",Verified,

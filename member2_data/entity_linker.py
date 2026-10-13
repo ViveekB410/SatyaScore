@@ -118,6 +118,9 @@ PLACE_SEARCH_LIMIT = 50  # the right "Naigaon" was hit 27 of 28
 _NOT_A_PLACE = ("given name", "family name", "surname", "genus", "species",
                 "disambiguation", "encyclopedic article", "scholarly article",
                 "film", "album", "song", "novel", "opera")
+# search_named (any item type): only pages that are never the thing a claim talks about.
+_NOT_AN_ITEM = ("given name", "family name", "surname", "disambiguation", "scholarly article",
+                "wikimedia", "wikinews")
 
 
 # Hindi relation templates. No Hindi NER model is wired in, so the patterns find
@@ -295,6 +298,37 @@ class EntityLinker:
             r["id"] for r in results
             if r.get("match", {}).get("text", "").strip().casefold() == name
             and not any(w in (r.get("description") or "").lower() for w in _NOT_A_PLACE))
+
+    def search_named(self, text: str, language: Language = "en",
+                     kinds: tuple[str, ...] = ()) -> tuple[tuple[str, ...], bool] | None:
+        """Items named exactly `text`, of any type (films, people, bands...), minus name/disambiguation
+        pages. With `kinds` (description words, e.g. ("film", "movie")), only items whose description
+        has one of them are kept, if any has: returns (ids, True); else all items and False.
+        None if the lookup failed."""
+        if parse_date(text) is not None:
+            return (), False
+        hits = self._remembered(("named", text, language), lambda: self._search_named(text, language))
+        if hits is None:
+            return None
+        if kinds:
+            typed = tuple(i for i, d in hits if any(re.search(rf"\b{re.escape(k)}\b", d) for k in kinds))
+            if typed:
+                return typed, True
+        return tuple(i for i, _ in hits), False
+
+    def _search_named(self, text: str, language: Language) -> tuple[tuple[str, str], ...] | None:
+        try:
+            response = polite_get(self._session, WIKIDATA_SEARCH_ENDPOINT, params={
+                    "action": "wbsearchentities", "search": text, "language": language,
+                    "format": "json", "limit": PLACE_SEARCH_LIMIT}, timeout=10)
+            results = response.json().get("search", [])
+        except (requests.RequestException, ValueError, KeyError):
+            return None
+        name = text.strip().casefold()
+        return tuple(
+            (r["id"], (r.get("description") or "").lower()) for r in results
+            if r.get("match", {}).get("text", "").strip().casefold() == name
+            and not any(w in (r.get("description") or "").lower() for w in _NOT_AN_ITEM))
 
     def link_hindi_claim(self, claim_text: str) -> list[LinkedTriple]:
         """Hindi path: the first template reading whose subject and object both

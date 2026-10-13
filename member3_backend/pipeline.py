@@ -52,6 +52,7 @@ from member2_data.dates import DATE_PID, parse_date
 from member2_data.entity_linker import EntityLinker, english_capital_claim
 from member2_data.wikidata_connector import WikidataConnector
 from member3_backend.claim_extractor import ClaimExtractor, ExtractedClaim
+from member3_backend.crosscheck import crosscheck_verdict, llm_verdict_used, second_reading_candidate
 from member3_backend.evidence_rules import RULES as AGGREGATION_RULES, SubjectIndex, deciding, passage_source
 from member3_backend.factcheck_rules import FC_FALSE_SCORE, FC_NOTE_PREFIX, FC_TRUE_SCORE
 from member3_backend.factcheck_rules import decide as decide_fact_check
@@ -163,6 +164,34 @@ def _same_article_texts(pc: dict, deciding_pid: str) -> list[str]:
     return [t for pid, t in zip(pc["passage_ids"], pc["passages"]) if passage_source(pid, {})[0] == title]
 
 
+CROSSCHECK_NOTE = "cross-checked"
+_TIER = {Verdict.VERIFIED: (0.66, 1.0), Verdict.UNCERTAIN: (0.35, 0.65), Verdict.HALLUCINATED: (0.0, 0.34)}
+
+
+def _crosscheck_score(verdict: Verdict, nli_prob: float | None, p_true: float | None) -> float:
+    """A score inside the verdict's band: the mean of the passage score and the LLM's P(true), clamped."""
+    vals = [v for v in (nli_prob, p_true) if v is not None]
+    lo, hi = _TIER[verdict]
+    return min(hi, max(lo, sum(vals) / len(vals) if vals else (lo + hi) / 2))
+
+
+def error_spans(claim: str, verdict: Verdict, note: str | None, kg_v, wrong_span: str = "") -> list[list[int]]:
+    """Where the error is, as [start, end] offsets into the claim, for a Hallucinated claim: the claimed
+    value Wikidata contradicts, else the words the LLM named as wrong, else the whole claim."""
+    if verdict != Verdict.HALLUCINATED:
+        return []
+    candidates = []
+    if note == KG_NOTE and kg_v is not None and getattr(kg_v, "status", None) == "contradicted":
+        candidates.append(str(kg_v.expected_value or ""))
+    candidates.append(wrong_span or "")
+    for w in candidates:
+        if w and not re.fullmatch(r"Q\d+", w):
+            k = claim.casefold().find(w.casefold())
+            if k >= 0:
+                return [[k, k + len(w)]]
+    return [[0, len(claim)]]
+
+
 def _decided_elsewhere(note: str | None) -> bool:
     """Was this claim's verdict set by the KG, the LLM judge or a fact-check (not by NLI)?"""
     return bool(note) and (note == KG_NOTE or note.startswith(("judged by LLM", FC_NOTE_PREFIX)))
@@ -225,6 +254,7 @@ class DetectionPipeline:
         subjects: SubjectIndex | None = None,
         fact_checker=None,
         number_guard: bool = False,
+        verdict_mode: str = "v1",
     ):
         self.embedder = embedder
         self.retriever = retriever
@@ -264,6 +294,20 @@ class DetectionPipeline:
         self.fact_checker = fact_checker
         # Number guard (member3_backend/number_guard.py); see number_guard_eval.py.
         self.number_guard = number_guard
+        # "v1": verdicts as before (an LLM, if set, replaces the NLI result). "crosscheck" (Version 2,
+        # member3_backend/crosscheck.py): sources decide first; otherwise the passages and the LLM must agree.
+        if verdict_mode not in ("v1", "crosscheck"):
+            raise ValueError("verdict_mode must be 'v1' or 'crosscheck'")
+        self.verdict_mode = verdict_mode
+        self.crosscheck_symmetric = True  # the default rule (member3_backend/crosscheck.py)
+        # Second reading (Version 2, last round): an LLM in "grounded" mode over all retrieved passages, asked only
+        # for claims the cross-check leaves Uncertain although one side leans true. None = off.
+        self.second_reader = None
+        # v4a: a passage contradiction alone never flags; and a claim about to be flagged is first read against all
+        # retrieved sources (second_reader): if they state it, it is Uncertain instead. Off unless adopted.
+        self.flag_needs_llm = False
+        # Claims cross-checked at the same time (speed only: each claim's verdict depends on that claim alone).
+        self.llm_workers = 1
         self.keep_article_texts = False  # evidence["article_texts"], for number_guard_eval_v2.py only
         # MedlinePlus as a second evidence source (member3_backend/medline_expander.py);
         # None unless the API switches it on (official_sources_eval.py decides).
@@ -419,7 +463,8 @@ class DetectionPipeline:
                     active_signals=[],
                     note="insufficient evidence: no sufficiently relevant passage found in the corpus",
                 ))
-        if self.llm_verifier is not None:
+        crosscheck = self.verdict_mode == "crosscheck" and self.llm_verifier is not None
+        if self.llm_verifier is not None and not crosscheck:
             t_llm = time.perf_counter()
             scores = [s if s.note == KG_NOTE else self._llm_judge(s, claim_texts[i], per_claim[i]["passages"])
                       for i, s in enumerate(scores)]
@@ -451,6 +496,18 @@ class DetectionPipeline:
                 scores[i] = ClaimScore(claim_id=s.claim_id, hallu_score=0.5, verdict=Verdict.UNCERTAIN,
                                        active_signals=s.active_signals,
                                        note=f"{NUMBER_NOTE} ({', '.join(missing)})")
+
+        # --- Cross-check (Version 2): for every claim no source decided, the LLM's own judgement and the
+        # passage score must agree for Verified; a contradiction or (no support + LLM false) is Hallucinated.
+        llm_checks: list[dict | None] = [None] * len(scores)
+        if crosscheck:
+            t_llm = time.perf_counter()
+            todo = [i for i, s in enumerate(scores) if not _decided_elsewhere(s.note)]
+            with ThreadPoolExecutor(max_workers=max(1, self.llm_workers)) as pool:
+                done = list(pool.map(lambda i: self._crosscheck_one(scores[i], claim_texts[i], per_claim[i]), todo))
+            for i, (score, check) in zip(todo, done):
+                scores[i], llm_checks[i] = score, check
+            timings["llm"] = (time.perf_counter() - t_llm) * 1000
 
         # --- Explanation only (no verdict changes): the evidence sentence of the
         # passage that decided each NLI-decided claim, and the fact Wikidata holds
@@ -484,14 +541,16 @@ class DetectionPipeline:
             processing_time_ms=timings["total"],
             timings_ms=timings,
             document=document,
-            evidence=[{"passage_ids": pc["passage_ids"], "deciding": pc["deciding"], "fact_check": fc,
-                       "excerpt": ex, "kg_fact": kf,
+            evidence=[{"passage_ids": pc["passage_ids"], "passages": pc["passages"], "deciding": pc["deciding"], "fact_check": fc,
+                       "excerpt": ex, "kg_fact": kf, "llm_check": lc,
+                       "error_spans": error_spans(ct, sc.verdict, sc.note, pc.get("kg_v"), (lc or {}).get("wrong_span", "")),
                        "deciding_text": (pc["passages"][pc["passage_ids"].index(pc["deciding"][0])]
                                          if pc["deciding"] and pc["deciding"][0] in pc["passage_ids"] else None),
                        # only for number_guard_eval_v2.py (not read by the API): not built per request
                        "article_texts": (_same_article_texts(pc, pc["deciding"][0])
                                          if self.keep_article_texts and pc["deciding"] else [])}
-                      for pc, fc, ex, kf in zip(per_claim, fact_checks, excerpts, kg_facts)],
+                      for pc, fc, ex, kf, lc, ct, sc in zip(per_claim, fact_checks, excerpts, kg_facts, llm_checks,
+                                                            claim_texts, scores)],
         )
 
     def _fact_check(self, score: ClaimScore, claim_text: str, language: Language, checks: list | None = None
@@ -517,6 +576,54 @@ class DetectionPipeline:
             active_signals=[*score.active_signals, "factcheck"],
             note=f"{FC_NOTE_PREFIX} {fc.publisher or 'a fact-checker'}: rated \"{fc.rating}\"",
         ), info
+
+    def _crosscheck_one(self, s: ClaimScore, claim_text: str, pc: dict) -> tuple[ClaimScore, dict | None]:
+        """Version 2 cross-check of one claim no source decided: (new score, llm_check or None)."""
+        try:
+            j = self.llm_verifier.verify(claim_text, pc["passages"])
+        except Exception:
+            j = None
+        if j is None or j.verdict is None:
+            return ClaimScore(claim_id=s.claim_id, hallu_score=s.hallu_score, verdict=s.verdict,
+                              active_signals=s.active_signals,
+                              note=s.note or "LLM cross-check unavailable (key, quota or network); "
+                                             "passage result used"), None
+        model = getattr(self.llm_verifier, "model", "LLM")
+        check = {"model": model, "verdict": j.verdict, "p_true": j.p_true, "reason": j.reason,
+                 "wrong_span": j.wrong_span}
+        nli = pc["nli_prob"]
+        number_missing = (s.note or "").startswith(NUMBER_NOTE)
+        used = llm_verdict_used(j.verdict, j.reason)
+        v = Verdict(crosscheck_verdict(s.verdict.value, False, nli, used, number_missing, self.crosscheck_symmetric,
+                                       self.flag_needs_llm))
+        tier = "no passage" if nli is None else ("passages support" if nli > 0.65 else
+                                                 "passages contradict" if nli < 0.35 else "passages unclear")
+        note = f"{CROSSCHECK_NOTE}: {tier}; LLM ({model}) says {j.verdict}"
+        if j.reason:
+            note += f": {j.reason}"
+        if (v == Verdict.UNCERTAIN and self.second_reader is not None
+                and second_reading_candidate(nli, used, number_missing)):
+            try:
+                g = self.second_reader.verify(claim_text, pc["passages"])
+            except Exception:
+                g = None
+            if g is not None and g.verdict == "Verified":
+                v = Verdict.VERIFIED
+                note += f"; second reading: the {len(pc['passages'])} retrieved sources state it"
+                if g.reason:
+                    note += f" ({g.reason})"
+                check["second_reading"] = {"verdict": g.verdict, "reason": g.reason}
+        if v == Verdict.HALLUCINATED and self.flag_needs_llm and self.second_reader is not None:
+            try:  # the false-alarm guard: do the retrieved sources state the claim after all?
+                g = self.second_reader.verify(claim_text, pc["passages"])
+            except Exception:
+                g = None
+            if g is not None and g.verdict == "Verified":
+                v = Verdict.UNCERTAIN
+                note += "; not flagged: a second reading finds the retrieved sources state it"
+                check["second_reading"] = {"verdict": g.verdict, "reason": g.reason}
+        return ClaimScore(claim_id=s.claim_id, hallu_score=_crosscheck_score(v, nli, j.p_true),
+                          verdict=v, active_signals=[*s.active_signals, "llm"], note=note), check
 
     def _llm_judge(self, score: ClaimScore, claim_text: str, passages: list[str]) -> ClaimScore:
         """The LLM's verdict for one claim (the KG did not decide it). Falls back to

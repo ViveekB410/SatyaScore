@@ -1,0 +1,5 @@
+== hiwiki
+hiwiki: 1235 indexed Hindi titles excluded
+hiwiki: 150 articles sampled
+  hiwiki_dev: 150 items | {('hi', 'Hallucinated'): 75, ('hi', 'Verified'): 75}
+  hiwiki_test: 148 items | {('hi', 'Hallucinated'): 74, ('hi', 'Verified'): 74}

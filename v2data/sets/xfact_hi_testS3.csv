@@ -1,0 +1,13 @@
+item_id,set,split,language,text,label,meta
+xfact-hi-test-012,xfact_hi,test,hi,"वीडियो में दिख रहे पुलिसकर्मी ने आदमी को इसलिए पीटा, क्योंकि वो स्वतंत्रता दिवस पर तिरंगे की जगह नीला झंडा फहरा रहा था.",Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-020,xfact_hi,test,hi,दिवाली पर मुंबई में हुई आतिशबाजी का वीडियो.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-037,xfact_hi,test,hi,"वायरल तस्वीर हिंदुस्तान की है, जहां पर कई परिवार लॉकडाउन के दौरान भूख से तंग आकर आत्महत्या कर रहे हैं.",Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-084,xfact_hi,test,hi,पाकिस्तानी क्रिकेटर्स भारत के खिलाफ खेलने से पहले देर रात तक पार्टी कर रहे थे,Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-094,xfact_hi,test,hi,WHO ने कहा है कि चीन में सामने आया ब्यूबोनिक प्लेग महामारी का रूप ले सकता है. अमेरिका के सेंटर फॉर डिजीज कंट्रोल (CDC) ने कहा है कि ब्यूबोनिक प्लेग खांसने पर हवा के जरिये फैल सकता है.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-112,xfact_hi,test,hi,तस्वीर में दिख रहे शख्स ने यूपी के शाहजहांपुर के पास एक लड़की को गैंग रेप से बचाया. उसने चार में से दो बदमाशों को मार डाला और तीन गोली लगने के बाद गंभीर हालत में अस्पताल में हैं.,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-114,xfact_hi,test,hi,केंद्र सरकार बिहार के जमालपुर में बने रेलवे प्रशिक्षण संस्थान को IRIMEE को लखनऊ स्थानांतरित करने जा रही है.,Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-124,xfact_hi,test,hi,झारखंड चुनाव में सीएम रघुबर दास को हराने के बाद जमशेदपुर के पूर्व विधायक सरयू राय नाचते हुए.,Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-131,xfact_hi,test,hi,पोस्ट में दिख रहे व्यक्ति कन्नड़ एक्टर चिरंजीवी सारजा हैं जिनका दिल का दौरा पड़ने से निधन हो गया है.,Hallucinated,"{""xfact_label"": ""partly true/misleading"", ""site"": ""aajtak.in""}"
+xfact-hi-test-141,xfact_hi,test,hi,जेएनयू छात्रसंघ की पूर्व उपाध्यक्ष शहला राशिद ने पाकिस्तान के झंडे वाली साड़ी पहनी.,Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-143,xfact_hi,test,hi,अबू धाबी में पहला हिंदू मंदिर बन कर तैयार हुआ,Hallucinated,"{""xfact_label"": ""mostly false"", ""site"": ""aajtak.in""}"
+xfact-hi-test-148,xfact_hi,test,hi,अल्पेश ठाकुर जनता को 'राहुल गांधी जिंदाबाद' के नारे लगाने को बोल रहे हैं लेकिन जनता 'मोदी-मोदी' के नारे लगा रही है.,Hallucinated,"{""xfact_label"": ""false"", ""site"": ""aajtak.in""}"

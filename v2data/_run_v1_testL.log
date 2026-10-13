@@ -1,0 +1,34 @@
+Run the LOCKED test split for 'v1'? Type yes: v1/testL: 0 cached, 572 to run
+[api] loaded trained weights for en: alpha=0.000 beta=0.500 gamma=0.500
+[api] loaded trained weights for hi: alpha=0.000 beta=0.498 gamma=0.502
+[api] no weights_mr.json — using placeholder 0.5/0.3/0.2 for mr
+[api] loaded cached bilingual corpus: 102069 passages {'en': 89594, 'hi': 12475}
+[api] on-demand Wikipedia expansion ON
+[api] fact-checks ON; GOOGLE_FACTCHECK_KEY set
+Loading weights:   0%|          | 0/202 [00:00<?, ?it/s]Loading weights: 100%|██████████| 202/202 [00:00<00:00, 5151.61it/s]
+[api] NLI model warmed (cuda) in 4.6s
+Loading weights:   0%|          | 0/199 [00:00<?, ?it/s]Loading weights: 100%|██████████| 199/199 [00:00<00:00, 2996.61it/s]
+[api] embedder warmed (cuda) in 10.9s
+fact-checks: ON | LLM: OFF
+25/572  (7.0 s/item)
+50/572  (7.0 s/item)
+75/572  (7.4 s/item)
+100/572  (6.2 s/item)
+125/572  (5.4 s/item)
+150/572  (5.1 s/item)
+175/572  (5.0 s/item)
+200/572  (4.8 s/item)
+225/572  (4.6 s/item)
+250/572  (4.3 s/item)
+275/572  (4.2 s/item)
+300/572  (4.1 s/item)
+325/572  (4.1 s/item)
+350/572  (4.1 s/item)
+375/572  (4.0 s/item)
+400/572  (4.0 s/item)
+425/572  (3.9 s/item)
+450/572  (3.8 s/item)
+475/572  (3.9 s/item)
+500/572  (3.9 s/item)
+525/572  (3.9 s/item)
+550/572  (3.9 s/item)

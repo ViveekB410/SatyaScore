@@ -1,0 +1,10 @@
+{"claim": "Don Bradman was a musician.", "verdict": "Hallucinated", "p_true": 0.0, "wrong_span": "was a musician", "reason": "Don Bradman was an Australian cricketer, not a musician."}
+{"claim": "Pink was incapable of covering the song Rhythm Nation.", "verdict": null, "p_true": null, "wrong_span": "", "reason": ""}
+{"claim": "Youtube is ranked as the fourth most popular site in the world.", "verdict": "Hallucinated", "p_true": 0.0, "wrong_span": "the fourth most popular site in the world", "reason": "Passage [1] states YouTube is the second-most-visited website in the world."}
+{"claim": "Duane Chapman's full name is not Duane Lee Dog Chapman I.", "verdict": null, "p_true": null, "wrong_span": "", "reason": ""}
+{"claim": "Fabian Nicieza only created characters for television.", "verdict": null, "p_true": null, "wrong_span": "", "reason": ""}
+{"claim": "David Packouz refused to ever be an arms dealer.", "verdict": "Hallucinated", "p_true": 0.1, "wrong_span": "refused to ever be an arms dealer", "reason": "Evidence Passage [4] explicitly identifies David Packouz as a former arms dealer."}
+{"claim": "Moonlight was not filmed in Miami Florida.", "verdict": "Hallucinated", "p_true": 0.0, "wrong_span": "Moonlight was not filmed in Miami Florida.", "reason": "Evidence passage [2] explicitly states that filming for Moonlight began in Miami, Florida."}
+{"claim": "Flaked is a film.", "verdict": null, "p_true": null, "wrong_span": "", "reason": ""}
+{"claim": "Janet Leigh was Canadian.", "verdict": "Hallucinated", "p_true": 0.0, "wrong_span": "Janet Leigh was Canadian.", "reason": "Janet Leigh was an American actress born in Stockton, California."}
+{"claim": "The first inauguration of Bill Clinton was on the West Front of the White House lawn.", "verdict": null, "p_true": null, "wrong_span": "", "reason": ""}

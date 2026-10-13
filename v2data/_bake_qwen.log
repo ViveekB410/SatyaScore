@@ -1,0 +1,10 @@
+groq/qwen/qwen3.8-27b: 144 cached, 62 to ask
+25/62  tokens so far 25086
+stopped (quota): groq asks to wait 531 s (rate/daily limit).  -- rerun later to resume
+tokens used: 33726
+groq/qwen/qwen3.8-27b: 177 cached, 29 to ask
+stopped (quota): groq asks to wait 343 s (rate/daily limit).  -- rerun later to resume
+tokens used: 2184
+groq/qwen/qwen3.8-27b: 179 cached, 27 to ask
+stopped (quota): groq asks to wait 437 s (rate/daily limit).  -- rerun later to resume
+tokens used: 917

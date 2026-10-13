@@ -45,7 +45,7 @@ from member3_backend import auth
 from member3_backend.claim_extractor import ClaimExtractor
 from member3_backend.evidence_rules import SubjectIndex, passage_site, passage_source
 from member3_backend.faiss_retriever import FAISSRetriever
-from member3_backend.pipeline import DetectionPipeline
+from member3_backend.pipeline import DECIDED_PREFIXES, DetectionPipeline, find_words
 
 # --- Access & rate limiting -------------------------------------------------
 # Three kinds of caller:
@@ -182,8 +182,8 @@ def input_spans(text: str, claim, spans: list[list[int]]) -> list[list[int]]:
     out = []
     for a, b in spans:
         word = claim.text[a:b]
-        k = text[start:end].casefold().find(word.casefold()) if (a, b) != (0, len(claim.text)) and word else -1
-        span = [start + k, start + k + len(word)] if k >= 0 else [start, end]
+        found = find_words(text[start:end], word) if (a, b) != (0, len(claim.text)) else None
+        span = [start + found[0], start + found[1]] if found else [start, end]
         if span not in out:
             out.append(span)
     return out
@@ -325,6 +325,21 @@ def parse_cors_origins(value: str | None) -> list[str]:
     return origins or ["http://localhost:5173"]
 
 
+def llm_models(providers: list[str], models: list[str], crosscheck: bool) -> list[str]:
+    """One model per LLM provider (SATYASCORE_LLM_PROVIDER / SATYASCORE_LLM_MODEL): the given list, which must name a
+    model for every provider in the same order, or else each provider's default: a model name that provider
+    serves (a Groq model id does not exist on Ollama, Gemini, Mistral or Cerebras). Groq gets gpt-oss-20b for the
+    cross-check, which was evaluated with it, and DEFAULT_MODEL for the older LLM judge."""
+    from member1_model.llm_verifier import DEFAULT_MODEL
+    if models and len(models) != len(providers):
+        raise ValueError(f"SATYASCORE_LLM_MODEL names {len(models)} model(s) for {len(providers)} provider(s) "
+                         f"({', '.join(providers)}); give one per provider, in the same order, or leave it unset")
+    defaults = {"groq": "openai/gpt-oss-20b" if crosscheck else DEFAULT_MODEL, "ollama": "gpt-oss:20b",
+                "openrouter": "openai/gpt-oss-20b", "cerebras": "gpt-oss-120b", "gemini": "gemini-2.5-flash",
+                "mistral": "mistral-small-latest"}
+    return models or [defaults.get(p, DEFAULT_MODEL) for p in providers]
+
+
 _CORS_ORIGINS = parse_cors_origins(_os_cors.environ.get("SATYASCORE_CORS_ORIGINS"))
 # Accounts, sessions, per-user history, CSRF guard and security headers. Installed
 # before CORS so CORS stays the outermost layer (error responses keep CORS headers).
@@ -460,34 +475,54 @@ def load_starter_corpus():
             # GROQ_API_KEY in the server's environment (never logged).
             # Version 2: SATYASCORE_VERDICT_MODE=crosscheck asks the LLM ("open" mode) for every claim no
             # source decided and combines it with the passages (member3_backend/crosscheck.py).
-            # SATYASCORE_LLM_PROVIDER (groq | gemini | openrouter | mistral) and SATYASCORE_LLM_MODEL choose it.
+            # SATYASCORE_LLM_PROVIDER (groq | gemini | openrouter | mistral | cerebras | ollama) and SATYASCORE_LLM_MODEL
+            # choose it. A comma-separated list ("groq,ollama", models "openai/gpt-oss-20b,gpt-oss:20b") is tried in
+            # order: when the first is rate-limited or out of quota, the next answers without waiting.
             verdict_mode = _os.environ.get("SATYASCORE_VERDICT_MODE", "v1").lower()
             llm_mode = _os.environ.get("SATYASCORE_LLM_VERIFIER", "").lower()
             if verdict_mode == "crosscheck":
                 llm_mode = "open"
             if llm_mode in ("grounded", "open"):
-                from member1_model.llm_verifier import DEFAULT_MODEL, PROVIDERS, LLMVerifier
-                provider = _os.environ.get("SATYASCORE_LLM_PROVIDER", "groq").lower()
-                _pipeline.llm_verifier = LLMVerifier(
-                    model=_os.environ.get("SATYASCORE_LLM_MODEL", DEFAULT_MODEL), mode=llm_mode, provider=provider,
-                    min_interval_s=float(_os.environ.get("SATYASCORE_LLM_MIN_INTERVAL", "2.2")))
+                from member1_model.llm_verifier import PROVIDERS, FallbackVerifier, LLMVerifier
+                on = lambda name, default: _os.environ.get(name, default).lower() in ("1", "true", "yes")  # noqa: E731
+                providers = [p.strip().lower() for p in _os.environ.get("SATYASCORE_LLM_PROVIDER", "groq").split(",") if p.strip()]
+                models = [m.strip() for m in _os.environ.get("SATYASCORE_LLM_MODEL", "").split(",") if m.strip()]
+                models = llm_models(providers, models, crosscheck=verdict_mode == "crosscheck")
+
+                def make(mode: str, like=None):
+                    """The verifier(s) for `mode`; `like`: the first reader, whose per-provider request pacing
+                    and paused-provider list the second reader shares (both call the same providers)."""
+                    partners = (like.verifiers if isinstance(like, FallbackVerifier) else [like]) if like else None
+                    vs = [LLMVerifier(model=models[k], mode=mode, provider=p,
+                                      # local: no request pacing; several cloud providers: a 429 moves on instead
+                                      min_interval_s=0.0 if p == "ollama" or len(providers) > 1 else
+                                      float(_os.environ.get("SATYASCORE_LLM_MIN_INTERVAL", "2.2")),
+                                      pacer=partners[k].pacer if partners else None)
+                          for k, p in enumerate(providers)]
+                    return vs[0] if len(vs) == 1 else FallbackVerifier(vs, share_with=like)
+
+                _pipeline.llm_verifier = make(llm_mode)
                 _pipeline.verdict_mode = "crosscheck" if verdict_mode == "crosscheck" else "v1"
-                _pipeline.crosscheck_symmetric = _os.environ.get("SATYASCORE_CROSSCHECK_SYMMETRIC", "true").lower() in ("1", "true", "yes")
+                _pipeline.crosscheck_symmetric = on("SATYASCORE_CROSSCHECK_SYMMETRIC", "true")
                 # Claims sent to the LLM at the same time (speed only; verdicts are per claim). A cloud provider
                 # answers them in parallel; a local Ollama on a 6 GB laptop GPU was slower with 4 slots (46 s ->
-                # 202 s for a six-claim text), so it gets one at a time.
-                _pipeline.llm_workers = int(_os.environ.get("SATYASCORE_LLM_WORKERS", "1" if provider == "ollama" else "4"))
-                if verdict_mode == "crosscheck" and _os.environ.get("SATYASCORE_SECOND_READING", "true").lower() in ("1", "true", "yes"):
-                    reader = LLMVerifier(model=_pipeline.llm_verifier.model, mode="grounded", provider=provider,
-                                         min_interval_s=float(_os.environ.get("SATYASCORE_LLM_MIN_INTERVAL", "2.2")))
+                # 202 s for a six-claim text), so Ollama alone gets one at a time.
+                _pipeline.llm_workers = int(_os.environ.get("SATYASCORE_LLM_WORKERS", "1" if providers == ["ollama"] else "4"))
+                # A passage contradiction alone never flags a claim (the LLM must say false); with the second
+                # reading on, a claim about to be flagged is also read against all retrieved passages first.
+                _pipeline.flag_needs_llm = verdict_mode == "crosscheck" and on("SATYASCORE_FLAG_NEEDS_LLM", "false")
+                if verdict_mode == "crosscheck" and on("SATYASCORE_SECOND_READING", "true"):
+                    reader = make("grounded", like=_pipeline.llm_verifier)
                     reader.max_passages = 10
                     _pipeline.second_reader = reader
-                    _pipeline.flag_needs_llm = _os.environ.get("SATYASCORE_FLAG_NEEDS_LLM", "false").lower() in ("1", "true", "yes")
-                key_var = PROVIDERS[provider][1]
-                key_state = ("no key needed (local)" if key_var is None else
-                             f"{key_var} {'set' if _os.environ.get(key_var) else 'MISSING: claims will fall back to NLI'}")
-                print(f"[api] LLM {'cross-check' if verdict_mode == 'crosscheck' else 'judge'} ON ({provider}, "
-                      f"{_pipeline.llm_verifier.model}, {llm_mode}); {key_state}", flush=True)
+                    # Optional: a second reading that finds the claim false flags it (off: not the evaluated rule).
+                    _pipeline.second_reading_flags = on("SATYASCORE_SECOND_READING_FLAGS", "false")
+                key_state = "; ".join(
+                    f"{p}: " + ("no key needed (local)" if PROVIDERS[p][1] is None else
+                                f"{PROVIDERS[p][1]} {'set' if _os.environ.get(PROVIDERS[p][1]) else 'MISSING'}")
+                    for p in providers)
+                print(f"[api] LLM {'cross-check' if verdict_mode == 'crosscheck' else 'judge'} ON ({', '.join(providers)}; "
+                      f"{llm_mode}; {_pipeline.llm_workers} at a time); {key_state}", flush=True)
             # World Bank / WHO country statistics (member2_data/official_stats.py). ON by default:
             # attempt 2 met official_sources_eval.py's fixed rule (results/official_sources_eval_stats_seed6.md:
             # 40 fresh countries, true claims contradicted 0 of 137, false claims caught 137 of 137; attempt 1,
@@ -582,7 +617,7 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
         # The table is fitted on NLI-rule scores. A score set by the KG (1.0 / 0.0) or by
         # the LLM judge is on a different scale: looking it up would show e.g. a KG-caught
         # hallucination with "P(Verified) 0.73". No calibrated reading for those.
-        if score.note and (score.note == KG_NOTE or score.note.startswith(("judged by LLM", "cross-checked", FC_NOTE_PREFIX))):
+        if score.note and (score.note == KG_NOTE or score.note.startswith(DECIDED_PREFIXES)):
             return {}
         c = lookup(score.hallu_score, table)
         return {"p_verified": c.p_verified, "p_verified_ci95": list(c.ci95), "calibration_n": c.n}
@@ -607,8 +642,7 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
                                   site=authority))
         # the NLI's deciding passage is only "the" source when NLI made the verdict
         # (nor when the number guard overrode it: the passage lacks the claim's numbers)
-        nli_decided = score.note != KG_NOTE and not (score.note or "").startswith(
-            ("judged by LLM", "cross-checked", FC_NOTE_PREFIX, NUMBER_NOTE))
+        nli_decided = score.note != KG_NOTE and not (score.note or "").startswith((*DECIDED_PREFIXES, NUMBER_NOTE))
         deciding = ev.get("deciding") if nli_decided else None
         order = ([deciding[0]] if deciding else []) + list(ev.get("passage_ids", []))
         for pid in order:
@@ -635,7 +669,9 @@ def detect(request: DetectRequest, user: dict | None = Depends(resolve_caller)) 
             sources=_sources(i, score),
             evidence_excerpt=_ev(i).get("excerpt"),
             kg_fact=_ev(i).get("kg_fact"),
-            error_spans=input_spans(request.text, claim, _ev(i).get("error_spans", []))
+            # a threshold override can make a claim Hallucinated that the pipeline did not flag (no spans): then
+            # the whole claim is marked, as for any Hallucinated claim whose wrong words are unknown
+            error_spans=input_spans(request.text, claim, _ev(i).get("error_spans") or [[0, len(claim.text)]])
             if _verdict(score) == "Hallucinated" else [],
             llm_check=_ev(i).get("llm_check"),
         )
@@ -702,4 +738,7 @@ async def extract_text(file: UploadFile = File(...), user: dict | None = Depends
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "index_size": len(_retriever)}
+    # mode: "v2" when the LLM cross-check is on, else "v1", so a server started without the Version 2 settings can
+    # be noticed (start_v2.ps1 starts it with them)
+    mode = "v2" if getattr(_pipeline, "verdict_mode", "v1") == "crosscheck" and _pipeline.llm_verifier is not None else "v1"
+    return {"status": "ok", "index_size": len(_retriever), "mode": mode}

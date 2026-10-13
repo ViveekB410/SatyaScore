@@ -75,6 +75,9 @@ function EvidenceLine({ claim }: { claim: Claim }) {
           ({sourceKind(deciding)})
           {others > 0 && `; ${others} ${deciding.role === 'fact-check' ? '' : 'more '}article${others > 1 ? 's' : ''} checked`}
         </>
+      ) : claim.llm_check?.passages ? (
+        // Version 2: the readers line above already says what the passages showed
+        `Evidence: ${sources.length} article${sources.length > 1 ? 's' : ''} checked`
       ) : (
         `Evidence: ${sources.length} article${sources.length > 1 ? 's' : ''} checked; none clearly states or contradicts this claim`
       )}
@@ -116,10 +119,54 @@ function Explanation({ claim, language }: { claim: Claim; language: Language }) 
   )
 }
 
+const PASSAGE_VERDICT: Record<string, { verdict: Verdict; label: string }> = {
+  'passages support': { verdict: 'Verified', label: 'support' },
+  'passages contradict': { verdict: 'Hallucinated', label: 'contradict' },
+  'passages unclear': { verdict: 'Uncertain', label: 'unclear' },
+  'no passage': { verdict: 'Uncertain', label: 'none found' },
+}
+
+function Reader({ name, verdict, label, title }: { name: string; verdict: Verdict; label?: string; title?: string }) {
+  return (
+    <span className="inline-flex items-center gap-1.5" title={title}>
+      <span className="text-muted">{name}</span>
+      <span className={cn('inline-flex h-5 items-center rounded border px-1.5 text-[12px] font-medium', VERDICT[verdict].chip)}>
+        {label ?? VERDICT[verdict].label}
+      </span>
+    </span>
+  )
+}
+
+/** Version 2 cross-check: what each reader said (passages, the LLM, the LLM's second reading of the passages). */
+function Readers({ claim }: { claim: Claim }) {
+  const lc = claim.llm_check
+  if (!lc) return null
+  const pv = lc.passages ? PASSAGE_VERDICT[lc.passages] : undefined
+  const filtered = lc.verdict_used && lc.verdict_used !== lc.verdict
+  const sr = lc.second_reading
+  return (
+    <div className="mt-2 space-y-1 text-[13px]">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+        {pv && (
+          <Reader name="Passages" verdict={pv.verdict}
+                  label={lc.passage_score != null ? `${pv.label} (${lc.passage_score.toFixed(2)})` : pv.label} />
+        )}
+        <Reader name="LLM" verdict={lc.verdict} title={lc.model}
+                label={filtered ? `${lc.verdict} → counted Uncertain` : undefined} />
+        {sr && <Reader name={sr.purpose === 'guard' ? 'Check before flagging' : 'Second reading'} verdict={sr.verdict} />}
+      </div>
+      {lc.reason && <p className="text-muted">LLM: {lc.reason}</p>}
+      {sr?.reason && <p className="text-muted">Second reading: {sr.reason}</p>}
+      {filtered && <p className="text-muted">The LLM only said the evidence is missing, which is not proof that the claim is false.</p>}
+    </div>
+  )
+}
+
 function ClaimCard({ claim, n, language }: { claim: Claim; n: number; language: Language }) {
-  // The KG / fact-check notes repeat what the explanation and evidence line already say.
+  // The KG / fact-check notes repeat what the explanation and evidence line already say; so does the
+  // cross-check note when the readers are shown.
   const deciding = (claim.sources ?? []).find((s) => s.role !== 'checked')
-  const showNote = claim.note && !claim.kg_fact && deciding?.role !== 'fact-check'
+  const showNote = claim.note && !claim.kg_fact && deciding?.role !== 'fact-check' && !claim.llm_check
   return (
     <li className="relative rounded border border-rule bg-card py-4 pl-7 pr-5">
       <span className={cn('absolute inset-y-0 left-0 w-1 rounded-l', VERDICT[claim.verdict].bar)} aria-hidden="true" />
@@ -131,6 +178,7 @@ function ClaimCard({ claim, n, language }: { claim: Claim; n: number; language: 
         {claim.text}
       </p>
       <Explanation claim={claim} language={language} />
+      <Readers claim={claim} />
       {showNote && <p className="mt-1.5 text-[14px] text-muted">{claim.note}</p>}
       <EvidenceLine claim={claim} />
     </li>

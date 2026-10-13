@@ -79,6 +79,14 @@ class LLMQuotaExhausted(RuntimeError):
     """The provider asked us to wait longer than MAX_WAIT_S (e.g. a daily limit)."""
 
 
+class LLMRateLimited(LLMQuotaExhausted):
+    """HTTP 429 from a provider told not to wait (FallbackVerifier: the next provider answers instead)."""
+
+    def __init__(self, message: str, retry_after: float):
+        super().__init__(message)
+        self.retry_after = retry_after
+
+
 @dataclass
 class LLMJudgement:
     verdict: str | None      # one of VERDICTS, or None if the reply could not be parsed
@@ -86,6 +94,7 @@ class LLMJudgement:
     reason: str
     raw: str
     wrong_span: str = ""     # the wrong words, if the model gave them AND they occur in the claim
+    model: str = ""          # the model that answered (set by LLMVerifier.verify)
 
 
 def build_messages(claim: str, passages: list[str], mode: Mode, max_passages: int = MAX_PASSAGES) -> list[dict]:
@@ -125,6 +134,38 @@ def parse_reply(text: str, claim: str | None = None) -> LLMJudgement:
                         wrong_span=span)
 
 
+class Pacer:
+    """Request pacing for one provider: requests start at least min_interval apart. Pass the same Pacer to every
+    LLMVerifier that calls that provider (the first and the second reading), so together they keep the pace."""
+
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.last = 0.0
+
+
+def _seconds(header: str | None, default: float) -> float:
+    """A Retry-After header in seconds; the default if it is missing or not a number (e.g. an HTTP date)."""
+    try:
+        return float(header) if header else default
+    except ValueError:
+        return default
+
+
+def _error_of(r) -> dict:
+    """The {"message", "code", ...} of an error response, whatever its shape: {"error": {...}}, {"error": "text"},
+    [{"error": {...}}] (Gemini's OpenAI layer) or no JSON at all."""
+    try:
+        body = r.json()
+    except ValueError:
+        body = None
+    if isinstance(body, list):
+        body = body[0] if body and isinstance(body[0], dict) else None
+    err = body.get("error") if isinstance(body, dict) else None
+    if isinstance(err, str):
+        return {"message": err}
+    return err if isinstance(err, dict) else {"message": (r.text or "")[:200]}
+
+
 class LLMVerifier:
     MAX_RETRIES = 4
     MAX_WAIT_S = 90  # a longer Retry-After means a daily/hourly quota: stop, don't sleep
@@ -132,7 +173,7 @@ class LLMVerifier:
 
     def __init__(self, model: str = DEFAULT_MODEL, mode: Mode = "grounded",
                  session: requests.Session | None = None, min_interval_s: float = 2.2,
-                 timeout_s: float = 90, provider: str = "groq"):
+                 timeout_s: float = 90, provider: str = "groq", pacer: Pacer | None = None):
         if mode not in _MODE_RULES:
             raise ValueError(f"mode must be one of {list(_MODE_RULES)}")
         if provider not in PROVIDERS:
@@ -141,11 +182,14 @@ class LLMVerifier:
         self._url, self._key_var = PROVIDERS[provider]
         self._session = session or requests.Session()
         self._min_interval, self._timeout = min_interval_s, timeout_s
-        self._last = 0.0
+        self.pacer = pacer or Pacer()
         self._lock = threading.Lock()  # verify() may be called from several threads (pipeline.llm_workers)
         self._cache: OrderedDict[tuple, LLMJudgement] = OrderedDict()
         self.tokens_used = 0
         self.max_passages = MAX_PASSAGES  # the second reading (Version 2) uses all 10 retrieved passages
+        # True (set by FallbackVerifier for every provider but the last): no waiting and no retries; a 429 raises
+        # LLMRateLimited and a network error or 5xx raises at once, so the next provider answers instead.
+        self.fail_fast = False
 
     def _key(self) -> str:
         if self._key_var is None:
@@ -161,17 +205,27 @@ class LLMVerifier:
                 "response_format": {"type": "json_object"}}
         if "gpt-oss" in self.model:  # Groq "openai/gpt-oss-20b", Ollama "gpt-oss:20b"
             body["reasoning_effort"] = "low"
-        if self.provider == "gemini":
-            body["max_tokens"] = body.pop("max_completion_tokens")  # Gemini's OpenAI layer uses max_tokens
+        if self.provider in ("gemini", "mistral"):  # their APIs take max_tokens (Mistral rejects unknown fields)
+            body["max_tokens"] = body.pop("max_completion_tokens")
         return body
 
-    def verify(self, claim: str, passages: list[str]) -> LLMJudgement:
-        key = (self.model, self.mode, claim, tuple(p[:MAX_PASSAGE_CHARS] for p in passages[:self.max_passages]))
+    def _cache_key(self, claim: str, passages: list[str]) -> tuple:
+        return (self.model, self.mode, claim, tuple(p[:MAX_PASSAGE_CHARS] for p in passages[:self.max_passages]))
+
+    def cached(self, claim: str, passages: list[str]) -> LLMJudgement | None:
+        key = self._cache_key(claim, passages)
         with self._lock:
             if key in self._cache:
                 self._cache.move_to_end(key)
                 return self._cache[key]
+        return None
+
+    def verify(self, claim: str, passages: list[str]) -> LLMJudgement:
+        key = self._cache_key(claim, passages)
+        if (hit := self.cached(claim, passages)) is not None:
+            return hit
         j = self._verify(claim, passages)
+        j.model = self.model
         if j.verdict is not None:
             with self._lock:
                 self._cache[key] = j
@@ -183,29 +237,30 @@ class LLMVerifier:
         headers = {"Authorization": f"Bearer {self._key()}", "Content-Type": "application/json"}
         body = self._body(claim, passages)
         for attempt in range(self.MAX_RETRIES + 1):
-            with self._lock:  # requests start at least min_interval apart, across threads
-                start = max(time.monotonic(), self._last + self._min_interval)
-                self._last = start
+            with self.pacer.lock:  # requests start at least min_interval apart, across threads and readers
+                start = max(time.monotonic(), self.pacer.last + self._min_interval)
+                self.pacer.last = start
             if start > time.monotonic():
                 time.sleep(start - time.monotonic())
             try:
                 r = self._session.post(self._url, headers=headers, json=body, timeout=self._timeout)
             except requests.RequestException:
-                if attempt == self.MAX_RETRIES:
+                if attempt == self.MAX_RETRIES or self.fail_fast:
                     raise
                 time.sleep(2 ** attempt)
                 continue
             if r.status_code == 200:
-                data = r.json()
-                with self._lock:
-                    self.tokens_used += int(data.get("usage", {}).get("total_tokens", 0))
-                return parse_reply(data["choices"][0]["message"].get("content") or "", claim)
-            if r.status_code in (400, 401, 403, 404):
                 try:
-                    err = r.json().get("error", {})
-                except ValueError:
-                    err = {"message": r.text[:200]}
-                detail = err.get("message", "")
+                    data = r.json()
+                    content = data["choices"][0]["message"].get("content") or ""
+                except (ValueError, KeyError, IndexError, TypeError, AttributeError):
+                    raise LLMVerifierError(f"{self.provider} sent a reply without a message") from None
+                with self._lock:
+                    self.tokens_used += int((data.get("usage") or {}).get("total_tokens", 0) or 0)
+                return parse_reply(content, claim)
+            if 400 <= r.status_code < 500 and r.status_code != 429:
+                err = _error_of(r)
+                detail = str(err.get("message", ""))
                 if r.status_code == 400 and (err.get("code") == "json_validate_failed" or "JSON" in detail):
                     # The model's reply was not strict JSON (provider-side check). Read what it wrote with the
                     # tolerant parser; if that fails, ask once more without the strict JSON mode.
@@ -217,10 +272,72 @@ class LLMVerifier:
                         continue
                 raise LLMVerifierError(f"{self.provider} HTTP {r.status_code}: {detail}")
             if r.status_code == 429 or r.status_code >= 500:
-                retry_after = float(r.headers.get("Retry-After", 2 ** attempt) or 1)
+                retry_after = _seconds(r.headers.get("Retry-After"), 2 ** attempt)
+                if self.fail_fast:
+                    if r.status_code == 429:
+                        raise LLMRateLimited(f"{self.provider} rate limit (retry after {retry_after:.0f} s)", retry_after)
+                    raise LLMVerifierError(f"{self.provider} HTTP {r.status_code}")
                 if retry_after > self.MAX_WAIT_S:
                     raise LLMQuotaExhausted(f"{self.provider} asks to wait {retry_after:.0f} s (rate/daily limit).")
                 time.sleep(retry_after)
                 continue
             raise LLMVerifierError(f"{self.provider} HTTP {r.status_code}")
         raise LLMVerifierError(f"{self.provider} did not answer after retries.")
+
+
+class FallbackVerifier:
+    """Several providers in order, e.g. Groq first and the local Ollama model second. A provider that is rate-limited,
+    out of quota or failing is skipped for a while and the next one answers, so a per-minute cloud limit costs no
+    waiting. Same interface as LLMVerifier (verify, model, mode, max_passages, tokens_used)."""
+    COOLDOWN_S = 60  # how long a failing provider is skipped (a 429 uses its Retry-After instead)
+    FAST_TIMEOUT_S = 30  # a provider with another behind it may not hang a claim for the usual 90 s
+
+    def __init__(self, verifiers: list[LLMVerifier], share_with: "FallbackVerifier | None" = None):
+        """share_with: another FallbackVerifier over the same providers (the second reading shares the first
+        reading's list of providers that are paused, so a provider found rate-limited is skipped by both)."""
+        if not verifiers:
+            raise ValueError("FallbackVerifier needs at least one verifier")
+        self.verifiers = verifiers
+        for v in verifiers[:-1]:  # the last provider still retries and waits: there is nothing after it
+            v.fail_fast = True
+            v._timeout = min(v._timeout, self.FAST_TIMEOUT_S)
+        if share_with is not None:
+            self._down, self._lock = share_with._down, share_with._lock
+        else:
+            self._down: dict[int, float] = {}
+            self._lock = threading.Lock()
+
+    model = property(lambda self: self.verifiers[0].model)
+    mode = property(lambda self: self.verifiers[0].mode)
+    tokens_used = property(lambda self: sum(v.tokens_used for v in self.verifiers))
+
+    @property
+    def max_passages(self) -> int:
+        return self.verifiers[0].max_passages
+
+    @max_passages.setter
+    def max_passages(self, n: int) -> None:
+        for v in self.verifiers:
+            v.max_passages = n
+
+    def verify(self, claim: str, passages: list[str]) -> LLMJudgement:
+        for v in self.verifiers:  # an answer any provider already gave is reused
+            if (hit := v.cached(claim, passages)) is not None:
+                return hit
+        error: Exception | None = None
+        last = len(self.verifiers) - 1
+        for i, v in enumerate(self.verifiers):
+            with self._lock:
+                if i < last and self._down.get(i, 0.0) > time.monotonic():
+                    continue
+            try:
+                return v.verify(claim, passages)
+            except LLMRateLimited as e:
+                error, pause = e, max(1.0, e.retry_after)
+            except Exception as e:  # quota, HTTP error, network, or a reply of an unexpected shape: move on
+                if i == last and not isinstance(e, (LLMQuotaExhausted, LLMVerifierError, requests.RequestException)):
+                    raise
+                error, pause = e, self.COOLDOWN_S
+            with self._lock:
+                self._down[i] = time.monotonic() + pause
+        raise error or LLMVerifierError("no LLM provider answered")

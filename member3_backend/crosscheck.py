@@ -11,7 +11,11 @@ Order of decision for one claim:
                    OR no passage supports it AND the LLM says it is false;
    - Uncertain     otherwise (including when the passages and the LLM disagree).
 3. If the LLM gave no usable answer (no key, quota, unparsable), the v1 verdict is kept.
-4. The v1 number guard still applies: a claim with a number missing from the evidence is never Verified.
+4. When the v1 number guard is on (SATYASCORE_NUMBER_GUARD; off by default, it was not adopted in v1) and it
+   found a claim's number missing from the deciding passage, the passages do not count as support. The guard
+   only looks at claims v1 had Verified from a supporting passage, so this is not a promise that a claim with a
+   number missing from the evidence is never Verified.
+5. With flag_needs_llm (the final version, v4a), a passage contradiction alone never flags a claim.
 
 Symmetric (the default since 2026-10-12, chosen by the project owner on the dev sample, before any test
 run): disagreement gives Uncertain in both directions. With symmetric=False a passage contradiction decides

@@ -26,8 +26,21 @@ export interface Claim {
   // Version 2: where the error is in a Hallucinated claim, as [start, end] offsets into the submitted
   // text (the value Wikidata contradicts, or the words the LLM named as wrong; else the whole claim).
   error_spans?: [number, number][]
-  // The LLM's own judgement in cross-check mode.
-  llm_check?: { model: string; verdict: Verdict; p_true: number | null; reason: string; wrong_span: string } | null
+  // The LLM's own judgement in cross-check mode, with every reader's verdict (older checks lack the later fields).
+  llm_check?: LLMCheck | null
+}
+
+export interface LLMCheck {
+  model: string
+  verdict: Verdict // first reading: the passages and the model's own knowledge
+  verdict_used?: Verdict // the same, after the no-evidence filter ("not mentioned" is not "false")
+  p_true: number | null
+  reason: string
+  wrong_span: string
+  passages?: 'passages support' | 'passages contradict' | 'passages unclear' | 'no passage'
+  passage_score?: number | null
+  // Second reading (the retrieved passages only); purpose: confirm a leaning-true claim, or guard before flagging.
+  second_reading?: { verdict: Verdict; reason: string; purpose?: 'confirm' | 'guard'; model?: string }
 }
 
 export interface KGFact {

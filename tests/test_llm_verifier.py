@@ -266,3 +266,67 @@ def test_parallel_crosscheck_gives_the_same_verdicts_in_claim_order():
         p.nli_scorer.score_batch.return_value = [MagicMock(entailment_prob=0.9, contradiction_prob=0.05)]
         runs.append([s.verdict.value for s in p.run(" ".join(texts), "en").scores])
     assert runs[0] == runs[1] == ["Verified", "Hallucinated", "Uncertain"]  # one answer per claim, in order
+
+
+def test_fallback_moves_on_at_a_rate_limit_without_waiting_and_skips_that_provider(monkeypatch):
+    monkeypatch.setenv("GROQ_API_KEY", "x")
+    good = {"choices": [{"message": {"content": '{"verdict": "Verified"}'}}], "usage": {}}
+    cloud, local = MagicMock(), MagicMock()
+    cloud.post.return_value = _resp(429, headers={"Retry-After": "30"})
+    local.post.return_value = _resp(200, good)
+    fb = lv.FallbackVerifier([lv.LLMVerifier(session=cloud, min_interval_s=0, model="a"),
+                              lv.LLMVerifier(session=local, min_interval_s=0, provider="ollama", model="b")])
+    j = fb.verify("c1", [])
+    assert j.verdict == "Verified" and j.model == "b" and cloud.post.call_count == 1  # one 429, no retries
+    fb.verify("c2", [])
+    assert cloud.post.call_count == 1 and local.post.call_count == 2  # cloud skipped while cooling down
+    assert fb.verify("c1", []) is j and local.post.call_count == 2  # cached answer reused
+    fb.max_passages = 10
+    assert all(v.max_passages == 10 for v in fb.verifiers)
+
+
+def test_second_reading_flags_only_when_switched_on_and_all_readers_are_recorded():
+    llm = MagicMock(model="m")
+    llm.verify.return_value = lv.LLMJudgement("Verified", 0.9, "known fact", "")
+    reader = MagicMock(model="m")
+    reader.verify.return_value = lv.LLMJudgement("Hallucinated", 0.1, "passage 2 gives 1889", "", wrong_span="Paris")
+    p = _pipeline_with(llm, kg_conf=None)
+    p.verdict_mode, p.second_reader = "crosscheck", reader
+    p.nli_scorer.score_batch.return_value = [MagicMock(entailment_prob=0.5, contradiction_prob=0.3)]
+    r = p.run("Paris is the capital of France.", "en")
+    assert r.scores[0].verdict.value == "Uncertain"  # default: the evaluated rule
+    lc = r.evidence[0]["llm_check"]
+    assert lc["passages"] == "passages unclear" and lc["second_reading"]["verdict"] == "Hallucinated"
+    assert lc["second_reading"]["purpose"] == "confirm" and lc["verdict_used"] == "Verified"
+    p.second_reading_flags = True
+    r = p.run("Paris is the capital of France.", "en")
+    assert r.scores[0].verdict.value == "Hallucinated" and "contradict it" in r.scores[0].note
+    assert r.evidence[0]["error_spans"] == [[0, 5]]
+
+
+def test_fallback_moves_on_at_once_on_a_network_error_or_server_error(monkeypatch):
+    import requests
+    monkeypatch.setenv("GROQ_API_KEY", "x")
+    good = {"choices": [{"message": {"content": '{"verdict": "Uncertain"}'}}], "usage": {}}
+    monkeypatch.setattr(lv.time, "sleep", lambda s: (_ for _ in ()).throw(AssertionError("must not wait")))
+    for failure in (requests.ConnectionError("down"), _resp(503)):
+        cloud, local = MagicMock(), MagicMock()
+        if isinstance(failure, Exception):
+            cloud.post.side_effect = failure
+        else:
+            cloud.post.return_value = failure
+        local.post.return_value = _resp(200, good)
+        fb = lv.FallbackVerifier([lv.LLMVerifier(session=cloud, min_interval_s=0, model="a"),
+                                  lv.LLMVerifier(session=local, min_interval_s=0, provider="ollama", model="b")])
+        assert fb.verify("c", []).model == "b" and cloud.post.call_count == 1  # no retries, no sleeping
+        assert fb.verifiers[0]._timeout <= lv.FallbackVerifier.FAST_TIMEOUT_S and fb.verifiers[1]._timeout == 90
+
+
+def test_llm_models_pairs_models_with_providers_and_rejects_a_mismatch():
+    from member3_backend.api import llm_models
+    assert llm_models(["groq", "ollama"], [], crosscheck=True) == ["openai/gpt-oss-20b", "gpt-oss:20b"]
+    assert llm_models(["ollama"], [], crosscheck=False) == ["gpt-oss:20b"]  # never a cloud name for Ollama
+    assert llm_models(["groq"], [], crosscheck=False) == [lv.DEFAULT_MODEL]
+    assert llm_models(["groq", "ollama"], ["x", "y"], crosscheck=True) == ["x", "y"]
+    with pytest.raises(ValueError, match="one per provider"):
+        llm_models(["groq", "ollama"], ["gpt-oss:20b"], crosscheck=True)

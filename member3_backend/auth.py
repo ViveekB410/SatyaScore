@@ -192,6 +192,9 @@ class SlidingWindow:
 _login_fail_account = SlidingWindow(5, 15 * 60)   # per IP + email
 _login_fail_ip = SlidingWindow(30, 15 * 60)       # per IP, across emails
 _register_ip = SlidingWindow(10, 60 * 60)
+_forgot_ip = SlidingWindow(10, 15 * 60)           # reset emails asked for, per IP
+_forgot_email = SlidingWindow(3, 15 * 60)         # reset emails per address (no mail flooding)
+_reset_fail_email = SlidingWindow(5, 30 * 60)     # wrong codes per email, any IP: then the code is cancelled
 
 
 def client_ip(request: Request) -> str:
@@ -399,11 +402,13 @@ def change_password(body: ChangePasswordRequest, request: Request, response: Res
     return {"user": user}
 
 
-def create_reset_code(email: str) -> str | None:
-    """A one-time password-reset code for an account (valid RESET_CODE_MINUTES), for the
-    administrator to give to the user (no email server is configured). Only its hash is
-    stored. None if no such account."""
-    code = "-".join(secrets.token_hex(3).upper() for _ in range(3))  # e.g. 3F9A1C-0B7D22-9E4410
+def create_reset_code(email: str, short: bool = False) -> str | None:
+    """A one-time password-reset code for an account (valid RESET_CODE_MINUTES). Only its hash is stored; a
+    new code replaces the old one. None if no such account. short=True: a 6-digit code for the reset email
+    (easy to type; at most RESET_CODE_TRIES wrong guesses before it is cancelled); otherwise a long code for
+    the administrator to hand over."""
+    code = (f"{secrets.randbelow(10**6):06d}" if short
+            else "-".join(secrets.token_hex(3).upper() for _ in range(3)))  # e.g. 3F9A1C-0B7D22-9E4410
     with _db() as con:
         row = con.execute("SELECT id FROM users WHERE email = ?", (email.strip().lower(),)).fetchone()
         if not row:
@@ -412,6 +417,41 @@ def create_reset_code(email: str) -> str | None:
         con.execute("INSERT INTO password_resets (code_hash, user_id, expires_at) VALUES (?, ?, ?)",
                     (_token_hash(code), row["id"], time.time() + RESET_CODE_MINUTES * 60))
     return code
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: str = Field(..., max_length=254)
+
+
+FORGOT_ANSWER = ("If an account exists for this email, a 6-digit reset code has been sent to it. "
+                 f"It is valid for {RESET_CODE_MINUTES} minutes.")
+
+
+def _send_reset_email(email: str, code: str) -> None:
+    from member3_backend import mailer
+    try:
+        mailer.send_reset_code(email, code, RESET_CODE_MINUTES)
+    except Exception as e:  # never shown to the user (it would reveal that the account exists)
+        print(f"[auth] could not send the reset email: {type(e).__name__}: {e}", flush=True)
+
+
+@router.post("/auth/forgot-password")
+def forgot_password(body: ForgotPasswordRequest, request: Request) -> dict:
+    """Email a 6-digit reset code. The answer is the same whether or not the account exists, and the email
+    is sent in the background, so neither the text nor the timing reveals which emails are registered."""
+    ip = client_ip(request)
+    email = body.email.strip().lower()
+    for window, k in ((_forgot_ip, ip), (_forgot_email, email)):
+        if (wait := window.retry_after(k)) is not None:
+            raise _too_many(wait, "reset requests")
+    if not _EMAIL.match(email):
+        raise HTTPException(422, detail="Enter a valid email address.")
+    _forgot_ip.hit(ip)
+    _forgot_email.hit(email)
+    if (code := create_reset_code(email, short=True)) is not None:
+        _reset_fail_email.reset(email)
+        threading.Thread(target=_send_reset_email, args=(email, code), daemon=True).start()
+    return {"message": FORGOT_ANSWER}
 
 
 class ResetPasswordRequest(BaseModel):
@@ -430,20 +470,28 @@ def reset_password(body: ResetPasswordRequest, request: Request, response: Respo
     for window, k in ((_login_fail_account, key), (_login_fail_ip, ip)):
         if (wait := window.retry_after(k)) is not None:
             raise _too_many(wait, "failed reset attempts")
-    code = body.code.strip().upper()
+    code = "".join(body.code.split()).upper()  # "123 456" and " 123456 " both work
     with _db() as con:
         row = con.execute(
             "SELECT u.id, u.email, u.name, u.created_at FROM password_resets r JOIN users u ON u.id = r.user_id "
             "WHERE r.code_hash = ? AND u.email = ? AND r.expires_at >= ?",
             (_token_hash(code), email, time.time())).fetchone()
-        if not row:
+        if row is None:
             _login_fail_account.hit(key)
             _login_fail_ip.hit(ip)
-            raise HTTPException(400, detail="This reset code is not valid or has expired.")
+            _reset_fail_email.hit(email)
+            cancelled = _reset_fail_email.retry_after(email) is not None
+            if cancelled:  # too many wrong codes for this email, from any network: cancel the code itself
+                con.execute("DELETE FROM password_resets WHERE user_id IN (SELECT id FROM users WHERE email = ?)", (email,))
+    if row is None:  # raised after the block above has committed the cancellation
+        raise HTTPException(400, detail="Too many wrong codes. Ask for a new reset code." if cancelled
+                            else "This reset code is not valid or has expired.")
+    with _db() as con:
         if problem := _password_problem(body.new_password, email):
             raise HTTPException(422, detail=problem)
         _set_password(con, row["id"], body.new_password)
     _login_fail_account.reset(key)
+    _reset_fail_email.reset(email)
     _set_cookie(response, create_session(row["id"]))
     return {"user": _public(row)}
 

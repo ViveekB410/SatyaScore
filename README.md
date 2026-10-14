@@ -86,13 +86,24 @@ HttpOnly cookies, cross-site requests and repeated failed sign-ins are refused �
 **`web/README.md`**. User data lives in `instance/satyascore.db` (git-ignored).
 
 **Passwords:** signed-in users change theirs under *(name) → Change password* (current password
-required; other devices are signed out). A forgotten password is reset with a one-time code that the
-administrator issues; no email server is used:
+required; other devices are signed out). A forgotten password is reset at *Sign in → Forgot password?*:
+the user enters their email, receives a **6-digit code** by email, and sets a new password with it. The
+answer on screen is the same whether or not the account exists; the code is valid for 30 minutes, works once,
+is stored only as a hash, and is cancelled after 5 wrong tries.
+
+To send the emails, set these in the server's environment yourself (never commit or share the password;
+for Gmail use an *App password*, which needs 2-step verification on that Google account):
+```powershell
+setx SATYASCORE_SMTP_HOST smtp.gmail.com
+setx SATYASCORE_SMTP_USER your.sender@gmail.com
+setx SATYASCORE_SMTP_PASSWORD "<the 16-letter app password>"
+```
+(`SATYASCORE_SMTP_PORT` defaults to 587; `SATYASCORE_SMTP_FROM` to the user.) Open a new terminal afterwards.
+Without these settings the code is printed in the API's console instead. The administrator can still issue
+a code directly:
 ```powershell
 .venv\Scripts\python.exe -m member3_backend.auth reset-code user@example.com
 ```
-The code is valid for 30 minutes, works once, and is stored only as a hash; the user enters it at
-*Sign in → Forgot password?*.
 
 `frontend/` is the earlier React dashboard, kept as a fallback (same port; run one at a time).
 
@@ -165,7 +176,7 @@ Run `.xlsx`-reading scripts with `.venv\Scripts\python.exe` (needs `openpyxl`).
 
 ## Known gaps
 
-No email verification (password reset uses an administrator-issued code, not email); rate limits are in-memory (single process); the
+No email verification at sign-up (password reset codes are emailed once SMTP is configured); rate limits are in-memory (single process); the
 root `Dockerfile` packages the API only and is out of date — the current container is
 `deploy/space/Dockerfile.template` (website + API, tested versions), whose Docker build has not
 been run yet (Hugging Face now needs a paid plan for Docker Spaces; Docker is not installed on the

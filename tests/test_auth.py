@@ -17,7 +17,8 @@ PASSWORD = "correct horse battery"
 @pytest.fixture
 def client(tmp_path):
     auth.set_db_path(tmp_path / "test.db")
-    for w in (auth._login_fail_account, auth._login_fail_ip, auth._register_ip):
+    for w in (auth._login_fail_account, auth._login_fail_ip, auth._register_ip,
+              auth._forgot_ip, auth._forgot_email, auth._reset_fail_email):
         w._hits.clear()
     app = FastAPI()
     auth.install(app, [ORIGIN])
@@ -202,3 +203,84 @@ def test_wrong_reset_codes_reveal_nothing_and_are_throttled(client):
                                                        "new_password": NEW}, headers=GOOD).status_code
              for _ in range(5)]
     assert codes[-1] == 429
+
+
+# --- reset by email (member3_backend/mailer.py) -----------------------------------------
+
+@pytest.fixture
+def outbox(monkeypatch):
+    """Reset emails sent, captured synchronously (no thread, no mail server)."""
+    sent = []
+
+    class Now:  # runs the background sender at once
+        def __init__(self, target, args=(), daemon=None):
+            self.target, self.args = target, args
+
+        def start(self):
+            self.target(*self.args)
+
+    from member3_backend import mailer
+    monkeypatch.setattr(auth.threading, "Thread", Now)
+    monkeypatch.setattr(mailer, "send_reset_code", lambda to, code, minutes: sent.append((to, code)))
+    return sent
+
+
+def test_forgot_password_answers_the_same_and_emails_a_six_digit_code_only_to_real_accounts(client, outbox):
+    register(client)
+    client.post("/auth/logout", headers=GOOD)
+    known = client.post("/auth/forgot-password", json={"email": "Asha@Example.com"}, headers=GOOD)
+    unknown = client.post("/auth/forgot-password", json={"email": "nobody@example.com"}, headers=GOOD)
+    assert known.status_code == unknown.status_code == 200 and known.json() == unknown.json()
+    assert len(outbox) == 1 and outbox[0][0] == "asha@example.com"
+    code = outbox[0][1]
+    assert len(code) == 6 and code.isdigit()
+    body = {"email": "asha@example.com", "code": f" {code[:3]} {code[3:]} ", "new_password": NEW}  # spaces are fine
+    assert client.post("/auth/reset-password", json=body, headers=GOOD).status_code == 200
+    assert login(client, NEW).status_code == 200
+
+
+def test_a_new_code_replaces_the_old_one_and_requests_are_limited(client, outbox):
+    register(client)
+    for _ in range(2):
+        client.post("/auth/forgot-password", json={"email": "asha@example.com"}, headers=GOOD)
+    first, second = outbox[0][1], outbox[1][1]
+    if first != second:
+        old = client.post("/auth/reset-password", json={"email": "asha@example.com", "code": first, "new_password": NEW},
+                          headers=GOOD)
+        assert old.status_code == 400  # only the newest code works
+    client.post("/auth/forgot-password", json={"email": "asha@example.com"}, headers=GOOD)
+    assert client.post("/auth/forgot-password", json={"email": "asha@example.com"}, headers=GOOD).status_code == 429
+    assert client.post("/auth/forgot-password", json={"email": "not-an-email"}, headers=GOOD).status_code == 422
+
+
+def test_five_wrong_codes_cancel_the_emailed_code_even_from_other_networks(client, outbox):
+    register(client)
+    client.post("/auth/forgot-password", json={"email": "asha@example.com"}, headers=GOOD)
+    code = outbox[0][1]
+    wrong = f"{(int(code) + 1) % 10**6:06d}"
+    for i in range(5):
+        auth._login_fail_account._hits.clear()  # as if each guess came from a different network
+        r = client.post("/auth/reset-password", json={"email": "asha@example.com", "code": wrong, "new_password": NEW},
+                        headers=GOOD)
+        assert r.status_code == 400
+    assert "Too many wrong codes" in r.json()["detail"]
+    auth._login_fail_account._hits.clear()
+    right = client.post("/auth/reset-password", json={"email": "asha@example.com", "code": code, "new_password": NEW},
+                        headers=GOOD)
+    assert right.status_code == 400  # the code was cancelled; a new one must be requested
+    auth._forgot_email._hits.clear()
+    client.post("/auth/forgot-password", json={"email": "asha@example.com"}, headers=GOOD)
+    fresh = client.post("/auth/reset-password", json={"email": "asha@example.com", "code": outbox[-1][1],
+                                                      "new_password": NEW}, headers=GOOD)
+    assert fresh.status_code == 200
+
+
+def test_mailer_prints_the_code_when_no_mail_server_is_set_and_builds_a_plain_message(monkeypatch, capsys):
+    from member3_backend import mailer
+    for k in ("SATYASCORE_SMTP_HOST", "SATYASCORE_SMTP_USER", "SATYASCORE_SMTP_PASSWORD"):
+        monkeypatch.delenv(k, raising=False)
+    assert not mailer.configured()
+    mailer.send_reset_code("asha@example.com", "123456", 30)
+    assert "123456" in capsys.readouterr().out
+    msg = mailer.reset_message("asha@example.com", "123456", 30, "app@example.com")
+    assert "123456" in msg["Subject"] and "123456" in msg.get_content() and msg["To"] == "asha@example.com"

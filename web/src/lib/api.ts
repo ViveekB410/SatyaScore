@@ -165,6 +165,11 @@ export async function changePassword(currentPassword: string, newPassword: strin
     postJson({ current_password: currentPassword, new_password: newPassword }))).user
 }
 
+/** Ask for a 6-digit reset code by email. The answer is the same whether or not the account exists. */
+export async function forgotPassword(email: string): Promise<string> {
+  return (await json<{ message: string }>('/auth/forgot-password', postJson({ email }))).message
+}
+
 export async function resetPassword(email: string, code: string, newPassword: string): Promise<User> {
   return (await json<{ user: User }>('/auth/reset-password',
     postJson({ email, code, new_password: newPassword }))).user

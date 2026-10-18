@@ -18,7 +18,7 @@ export default function LoadingGate({ offline, onRetry }) {
   }, [offline])
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-paper px-6">
+    <div className="flex min-h-screen items-center justify-center bg-paper px-4">
       <div className="animate-fade-in text-center">
         <h1 className="font-serif text-5xl font-semibold text-navy">SatyaScore</h1>
         <p className="mt-2 text-sm tracking-wide text-ink/50">
@@ -26,18 +26,18 @@ export default function LoadingGate({ offline, onRetry }) {
         </p>
 
         {offline ? (
-          <div className="mt-10">
-            <p className="text-flag-hallucinated">Couldn’t reach the backend.</p>
-            <p className="mx-auto mt-2 max-w-sm text-sm text-ink/60">
+          <div className="mx-auto mt-10 max-w-sm rounded-xl border border-rule bg-card p-6 shadow-card">
+            <p className="font-medium text-flag-hallucinated">Couldn’t reach the backend.</p>
+            <p className="mt-2 text-sm text-ink/60">
               Start it, then retry:
               <br />
-              <code className="mt-1 inline-block rounded bg-white px-2 py-1 text-xs text-ink/80 ring-1 ring-rule">
+              <code className="mt-2 inline-block rounded-md bg-subtle px-2 py-1 text-xs text-ink/80">
                 uvicorn member3_backend.api:app --port 8000
               </code>
             </p>
             <button
               onClick={onRetry}
-              className="mt-5 rounded-md bg-navy px-5 py-2 text-sm font-medium text-white transition hover:bg-navy/90"
+              className="mt-5 rounded-full bg-navy px-5 py-2 text-sm font-medium text-on-navy shadow-card transition hover:-translate-y-px hover:shadow-lift"
             >
               Retry connection
             </button>
@@ -48,8 +48,8 @@ export default function LoadingGate({ offline, onRetry }) {
               {[0, 1, 2].map((d) => (
                 <span
                   key={d}
-                  className="h-2.5 w-2.5 animate-bounce rounded-full bg-navy"
-                  style={{ animationDelay: `${d * 150}ms` }}
+                  className="animate-soft-pulse h-2.5 w-2.5 rounded-full bg-navy"
+                  style={{ animationDelay: `${d * 200}ms` }}
                 />
               ))}
             </div>

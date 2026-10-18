@@ -22,7 +22,7 @@ function worstVerdict(claims) {
   return 'Verified'
 }
 
-export default function HistoryPanel({ items, activeId, onSelect, onClear, className = '' }) {
+export default function HistoryPanel({ items, activeId, onSelect, onClear, className = '', sticky = true }) {
   // Tick every 30s so relative timestamps stay "alive" without a reload.
   const [, setTick] = useState(0)
   useEffect(() => {
@@ -32,15 +32,15 @@ export default function HistoryPanel({ items, activeId, onSelect, onClear, class
 
   return (
     <aside className={className}>
-      <div className="sticky top-8">
+      <div className={sticky ? 'sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto pb-4' : ''}>
         <div className="flex items-center justify-between border-b border-rule pb-2">
-          <h2 className="font-serif text-sm font-semibold uppercase tracking-wide text-navy">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-navy">
             History
           </h2>
           {items.length > 0 && (
             <button
               onClick={onClear}
-              className="text-xs text-ink/40 transition hover:text-flag-hallucinated"
+              className="rounded text-xs text-ink/40 transition hover:text-flag-hallucinated"
             >
               Clear
             </button>
@@ -48,11 +48,11 @@ export default function HistoryPanel({ items, activeId, onSelect, onClear, class
         </div>
 
         {items.length === 0 ? (
-          <p className="mt-4 text-xs leading-relaxed text-ink/40">
+          <p className="mt-4 text-[13px] leading-relaxed text-ink/40">
             Your analyses will appear here.
           </p>
         ) : (
-          <ul className="mt-3 space-y-1.5">
+          <ul className="mt-3 space-y-1">
             {items.map((it) => {
               const flagged = it.result.claims.filter(
                 (c) => c.verdict === 'Hallucinated' || c.verdict === 'Uncertain',
@@ -63,10 +63,10 @@ export default function HistoryPanel({ items, activeId, onSelect, onClear, class
                 <li key={it.id} className="animate-fade-in-up">
                   <button
                     onClick={() => onSelect(it)}
-                    className={`w-full rounded-md border p-2.5 text-left transition ${
+                    className={`w-full rounded-lg border-l-2 px-3 py-2.5 text-left transition ${
                       active
-                        ? 'border-navy bg-white shadow-sm'
-                        : 'border-transparent hover:border-rule hover:bg-white/70'
+                        ? 'border-l-navy bg-card shadow-card'
+                        : 'border-l-transparent hover:bg-card/70'
                     }`}
                   >
                     <div className="flex items-start gap-2">

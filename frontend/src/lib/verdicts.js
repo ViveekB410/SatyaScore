@@ -3,19 +3,19 @@
 export const VERDICT_META = {
   Hallucinated: {
     label: 'Not supported by evidence',
-    chip: 'bg-flag-hallucinated text-white',
+    chip: 'bg-flag-hallucinated text-on-flag',
     highlight: 'bg-flag-hallucinated/10 underline decoration-flag-hallucinated decoration-2 underline-offset-4',
     dot: 'bg-flag-hallucinated',
   },
   Uncertain: {
     label: 'Could not verify',
-    chip: 'bg-flag-uncertain text-white',
+    chip: 'bg-flag-uncertain text-on-flag',
     highlight: 'bg-flag-uncertain/10 underline decoration-flag-uncertain decoration-2 underline-offset-4',
     dot: 'bg-flag-uncertain',
   },
   Verified: {
     label: 'Supported by evidence',
-    chip: 'bg-flag-verified text-white',
+    chip: 'bg-flag-verified text-on-flag',
     // PRD FR-06: verified claims are highlighted GREEN (red / amber / green)
     highlight: 'bg-flag-verified/10 underline decoration-flag-verified decoration-2 underline-offset-4',
     dot: 'bg-flag-verified',

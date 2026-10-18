@@ -2,22 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Colour tokens (RGB triplets, used via tailwind.config.js). */
+:root {
+  --c-paper: 251 250 248;
+  --c-card: 255 255 255;
+  --c-ink: 26 26 26;
+  --c-rule: 226 224 219;
+  --c-navy: 11 37 69;
+  --c-subtle: 241 239 234;
+  --c-zebra: 250 249 246;
+  --c-on-navy: 255 255 255;
+  --c-on-flag: 255 255 255;
+  --c-hallucinated: 178 58 72;
+  --c-uncertain: 192 138 46;
+  --c-verified: 46 107 79;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-paper: 15 20 25;
+    --c-card: 22 28 35;
+    --c-ink: 230 230 230;
+    --c-rule: 42 50 60;
+    --c-navy: 143 179 232;
+    --c-subtle: 30 38 47;
+    --c-zebra: 26 33 41;
+    --c-on-navy: 15 20 25;
+    --c-on-flag: 15 20 25;
+    --c-hallucinated: 226 112 124;
+    --c-uncertain: 224 172 84;
+    --c-verified: 96 174 136;
+    color-scheme: dark;
+  }
+}
+
 @layer base {
   body {
     @apply bg-paper text-ink font-sans antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid rgb(var(--c-navy));
+    outline-offset: 2px;
   }
 }
 
 @layer utilities {
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(6px); }
+    from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: none; }
   }
-  .animate-fade-in-up { animation: fadeInUp 0.35s ease-out both; }
+  .animate-fade-in-up { animation: fadeInUp 0.25s ease-out both; }
 
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
   }
-  .animate-fade-in { animation: fadeIn 0.4s ease-out both; }
+  .animate-fade-in { animation: fadeIn 0.2s ease-out both; }
+
+  @keyframes shimmer {
+    from { background-position: -400px 0; }
+    to { background-position: 400px 0; }
+  }
+  .skeleton {
+    background: linear-gradient(90deg, rgb(var(--c-subtle)) 0%, rgb(var(--c-rule) / 0.6) 50%, rgb(var(--c-subtle)) 100%);
+    background-size: 800px 100%;
+    animation: shimmer 1.4s linear infinite;
+  }
+
+  @keyframes softPulse {
+    0%, 100% { opacity: 0.25; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+  .animate-soft-pulse { animation: softPulse 1.2s ease-in-out infinite; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -6,6 +6,7 @@ It takes about **2–3 minutes per claim**.
 ## What you are doing
 
 You are judging whether each **claim** is factually true, based on evidence — not on
+
 grammar or writing style. Two people label the **same** claims separately, so we can
 measure how much independent annotators agree.
 

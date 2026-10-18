@@ -1,0 +1,10 @@
+sources: 55 cited-paper abstracts, 13 cited-paper full texts, 6 own earlier documents
+== Journal paper (Abstract to Declarations)
+  8-word matches with published papers: 0 of 6340 words = 0.0%
+  6-word matches with published papers: 0 of 6340 words = 0.0%
+  8-word matches with your own earlier documents: 371 of 6340 words = 5.9%
+     own: IEEE paper v2                    244 words: of artificial intelligence and data science prof ram meghe institute of technology research badnera amravati | from fever mu shroom truthfulqa x fact and | by a factor of 1 85 95 ci 1 61 2 19 | e p 0 5 1 s 0 5 0 5
+     own: project report (college)         195 words: of artificial intelligence and data science prof ram meghe institute of technology research badnera amravati | from fever mu shroom truthfulqa x fact and | at least 0 80 and all numbers are | 60 true and 60 false items per set and language
+     own: synopsis v2                       53 words: data science prof ram meghe institute of technology research badnera amravati | false items caught 95 374 25 176 374 47 | 1 85 false items passed as verified 83 374 22 23 374 6 | true items verified 137 246 56 139 246 57
+     own: results paper                     51 words: 1 61 2 19 just short of the | 60 true and 60 false items per set | no 1 85 false items passed as verified 83 | on 28 of true ones requiring agreement with
+     own: original synopsis (group)         11 words: data science prof ram meghe institute of technology research badnera amravati

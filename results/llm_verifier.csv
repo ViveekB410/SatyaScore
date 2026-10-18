@@ -1,0 +1,4 @@
+set,mode,lang,n,n_hallu,auc_llm,auc_nli
+round3,grounded,en,40,15,0.54,0.704
+test,grounded,en,41,8,0.5397727272727273,0.42803030303030304
+test,grounded,hi,35,2,0.5378787878787878,0.803030303030303

@@ -1,0 +1,20 @@
+sources: 40 cited-paper abstracts, 13 cited-paper full texts, 2 own earlier documents
+
+== Synopsis v2 (Abstract to Future Work)
+  8-word matches with published papers: 0 of 3920 words = 0.0%
+  6-word matches with published papers: 6 of 3920 words = 0.2%
+     fulltext:FactKG                         6 words: a natural language inference nli model
+  8-word matches with your own earlier documents: 50 of 3920 words = 1.3%
+     own: original synopsis (group)         50 words: a claim level hallucination detection and scoring framework for english and hindi | for both english and hindi ii feasibility study the feasibility | knowledge graph grounding mu shroom shroom cap and knowledge graph grounded | multihal factkg kgr no reviewed system combines claim level
+     own: PRD                                8 words: a claim level hallucination detection and scoring framework
+
+== Project report v2 (Abstract to Chapter 6)
+  8-word matches with published papers: 0 of 11266 words = 0.0%
+  6-word matches with published papers: 0 of 11266 words = 0.0%
+  8-word matches with your own earlier documents: 9 of 11266 words = 0.1%
+     own: original synopsis (group)          9 words: spoken by hundreds of millions of people and appears
+
+== IEEE paper v2 (Abstract to Acknowledgment)
+  8-word matches with published papers: 0 of 4158 words = 0.0%
+  6-word matches with published papers: 0 of 4158 words = 0.0%
+  8-word matches with your own earlier documents: 0 of 4158 words = 0.0%

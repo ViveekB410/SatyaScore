@@ -1,0 +1,5 @@
+453 claims from 100 answers -> relabel\claims_v2_original.csv
+domain    government  healthcare  history  science  sports
+language                                                  
+en                66          75       30       44      48
+hi                48          37       26       37      42

@@ -1,0 +1,309 @@
+{
+ "farquhar": {
+  "doi": "10.1038/s41586-024-07421-0",
+  "title": "Detecting hallucinations in large language models using semantic entropy",
+  "year": 2024,
+  "journal": "Nature",
+  "vol": "630",
+  "issue": "8017",
+  "fp": "625",
+  "lp": "630",
+  "authors": [
+   "Sebastian Farquhar",
+   "Jannik Kossen",
+   "Lorenz Kuhn",
+   "Yarin Gal"
+  ],
+  "abstract": "Abstract Large language model (LLM) systems, such as ChatGPT 1 or Gemini 2 , can show impressive reasoning and question-answering capabilities but often ‘hallucinate’ false outputs and unsubstantiated answers 3,4 . Answering unreliably or without the necessary information prevents adoption in diverse fields, with problems including fabrication of legal precedents 5 or untrue facts in news articles 6 and even posing a risk to human life in medical domains such as radiology 7 . Encouraging truthfulness through supervision or reinforcement has been only partially successful 8 . Researchers need a general method for detecting hallucinations in LLMs that works even with new and unseen questions to which humans might not know the answer. Here we develop new methods grounded in statistics, proposing entropy-based uncertainty estimators for LLMs to detect a subset of hallucinations—confabulations—which are arbitrary and incorrect generations. Our method addresses the fact that one idea can be expressed in many ways by computing uncertainty at the level of meaning rather than specific sequences of words. Our method works across datasets and tasks without a priori knowledge of the task, requires no task-specific data and robustly generalizes to new tasks not seen before. By detecting when a prompt is likely to produce a confabulation, our method helps users understand when they must take extra care with LLMs and opens up new possibilities for using LLMs that are otherwise prevented by their unreliability.",
+  "artno": null,
+  "page_cr": "625-630"
+ },
+ "siren": {
+  "doi": "10.1162/coli.a.16",
+  "title": "🧜Siren’s Song in the AI Ocean: A Survey on Hallucination in Large Language Models",
+  "year": 2025,
+  "journal": "Computational Linguistics",
+  "vol": "51",
+  "issue": "4",
+  "fp": "1373",
+  "lp": "1418",
+  "authors": [
+   "Yue Zhang",
+   "Yafu Li",
+   "Leyang Cui",
+   "Deng Cai",
+   "Lemao Liu",
+   "Tingchen Fu",
+   "Xinting Huang",
+   "Enbo Zhao",
+   "Yu Zhang",
+   "Yulong Chen",
+   "Longyue Wang",
+   "Anh Tuan Luu",
+   "Wei Bi",
+   "Freda Shi",
+   "Shuming Shi"
+  ],
+  "abstract": "Abstract While large language models (LLMs) have demonstrated remarkable capabilities across a range of downstream tasks, a significant concern revolves around their propensity to exhibit hallucinations: LLMs occasionally generate content that diverges from the user input, contradicts previously generated context, or misaligns with established world knowledge. This phenomenon poses a substantial challenge to the reliability of LLMs in real-world scenarios. In this article, we survey recent efforts on the detection, explanation, and mitigation of hallucination, with an emphasis on the unique challenges posed by LLMs. We present taxonomies of the LLM hallucination phenomena and evaluation benchmarks, analyze existing approaches aiming at mitigating LLM hallucination, and discuss potential directions for future research.",
+  "artno": null,
+  "page_cr": "1373-1418"
+ },
+ "augenstein": {
+  "doi": "10.1038/s42256-024-00881-z",
+  "title": "Factuality challenges in the era of large language models and opportunities for fact-checking",
+  "year": 2024,
+  "journal": "Nature Machine Intelligence",
+  "vol": "6",
+  "issue": "8",
+  "fp": "852",
+  "lp": "863",
+  "authors": [
+   "Isabelle Augenstein",
+   "Timothy J. Baldwin",
+   "Meeyoung Cha",
+   "Tanmoy Chakraborty",
+   "Giovanni Luca Ciampaglia",
+   "David P. A. Corney",
+   "Renée DiResta",
+   "Emilio Ferrara",
+   "Scott A. Hale",
+   "Alon Y. Halevy",
+   "Eduard H. Hovy",
+   "Heng Ji",
+   "Filippo Menczer",
+   "Rubén Míguez",
+   "Preslav Nakov",
+   "Dietram A. Scheufele",
+   "Shivam Sharma",
+   "Giovanni Zagni"
+  ],
+  "abstract": "",
+  "artno": null,
+  "page_cr": "852-863"
+ },
+ "quelle": {
+  "doi": "10.3389/frai.2024.1341697",
+  "title": "The perils and promises of fact-checking with large language models",
+  "year": 2024,
+  "journal": "Frontiers in Artificial Intelligence",
+  "vol": "7",
+  "issue": null,
+  "fp": "1341697",
+  "lp": "1341697",
+  "authors": [
+   "Dorian Quelle",
+   "Alexandre Bovet"
+  ],
+  "abstract": "Automated fact-checking, using machine learning to verify claims, has grown vital as misinformation spreads beyond human fact-checking capacity. Large language models (LLMs) like GPT-4 are increasingly trusted to write academic papers, lawsuits, and news articles and to verify information, emphasizing their role in discerning truth from falsehood and the importance of being able to verify their outputs. Understanding the capacities and limitations of LLMs in fact-checking tasks is therefore essential for ensuring the health of our information ecosystem. Here, we evaluate the use of LLM agents in fact-checking by having them phrase queries, retrieve contextual data, and make decisions. Importantly, in our framework, agents explain their reasoning and cite the relevant sources from the retrieved context. Our results show the enhanced prowess of LLMs when equipped with contextual information. GPT-4 outperforms GPT-3, but accuracy varies based on query language and claim veracity. While LLMs show promise in fact-checking, caution is essential due to inconsistent accuracy. Our investigation calls for further research, fostering a deeper comprehension of when agents succeed and when they fail.",
+  "artno": "1341697",
+  "page_cr": null
+ },
+ "dunning": {
+  "doi": "10.1038/s41598-026-39046-w",
+  "title": "Large language models show Dunning-Kruger-like effects in multilingual fact-checking",
+  "year": 2026,
+  "journal": "Scientific Reports",
+  "vol": "16",
+  "issue": "1",
+  "fp": null,
+  "lp": null,
+  "authors": [
+   "Ihsan Ayyub Qazi",
+   "Zohaib Khan",
+   "Abdullah Ghani",
+   "Agha Ali Raza",
+   "Ihsan Ayyub Qazi",
+   "Wassay Sajjad",
+   "Ayesha Ali",
+   "Asher Javaid",
+   "Muhammad Abdullah Sohail",
+   "Abdul Hameed Azeemi"
+  ],
+  "abstract": "The rise of misinformation underscores the need for scalable and reliable fact-checking solutions. Large language models (LLMs) hold promise in automating fact verification, yet their effectiveness across global contexts remains uncertain. We systematically evaluate nine established LLMs across multiple categories (open/closed-source, multiple sizes, diverse architectures, reasoning-based) using 5,000 claims previously assessed by 174 professional fact-checking organizations across 47 languages. Our methodology tests model generalizability on claims postdating training cutoffs and four prompting strategies mirroring both citizen and professional fact-checker interactions, with over 240,000 human annotations as ground truth. Findings reveal a concerning pattern resembling the Dunning-Kruger effect: smaller, accessible models show high confidence despite lower accuracy, while larger models demonstrate higher accuracy but lower confidence. This risks systemic bias in information verification, as resource-constrained organizations typically use smaller models. Performance gaps are most pronounced for non-English languages and claims originating from the Global South, threatening to widen existing information inequalities. These results establish a multilingual benchmark for future research and provide an evidence base for policy aimed at ensuring equitable access to trustworthy, AI-assisted fact-checking.",
+  "artno": "7594",
+  "page_cr": null
+ },
+ "multigran": {
+  "doi": "10.1007/s10844-026-01047-6",
+  "title": "Hallucination detection in large language models based on multi-granularity consistency",
+  "year": 2026,
+  "journal": "Journal of Intelligent Information Systems",
+  "vol": "64",
+  "issue": "4",
+  "fp": "1777",
+  "lp": "1801",
+  "authors": [
+   "Jiale Zhang",
+   "Xinrui Ma",
+   "Qiyue Yang",
+   "Tianxiang Cui",
+   "X Chen",
+   "Qiao Lin",
+   "Bo Zhao"
+  ],
+  "abstract": "",
+  "artno": null,
+  "page_cr": "1777-1801"
+ },
+ "factualrag": {
+  "doi": "10.1007/s10844-026-01041-y",
+  "title": "FactualRAG: a RAG-Powered framework for LLM fact-checking via IFCN-Accredited sources",
+  "year": 2026,
+  "journal": "Journal of Intelligent Information Systems",
+  "vol": "64",
+  "issue": "4",
+  "fp": "1687",
+  "lp": "1718",
+  "authors": [
+   "Li-Di Chang",
+   "Chun-Ming Lai"
+  ],
+  "abstract": "",
+  "artno": null,
+  "page_cr": "1687-1718"
+ },
+ "kqfv": {
+  "doi": "10.1007/s10844-025-00956-2",
+  "title": "KQFV: a knowledge-enhanced method using question answering for fact verification",
+  "year": 2025,
+  "journal": "Journal of Intelligent Information Systems",
+  "vol": "63",
+  "issue": "5",
+  "fp": "1645",
+  "lp": "1666",
+  "authors": [
+   "Yexin Bian",
+   "Tinghuai Ma"
+  ],
+  "abstract": "",
+  "artno": null,
+  "page_cr": "1645-1666"
+ },
+ "mmrag": {
+  "doi": "10.1007/s10844-026-01042-x",
+  "title": "Multimodal misinformation detection across diverse languages using RAG and LLMs",
+  "year": 2026,
+  "journal": "Journal of Intelligent Information Systems",
+  "vol": "64",
+  "issue": "4",
+  "fp": "1719",
+  "lp": "1746",
+  "authors": [
+   "Sheetal Harris",
+   "Vinh Thong Ta",
+   "Marcello Trovati",
+   "Ghada Nakhla",
+   "Faiza Latif",
+   "Ioannis Korkontzelos"
+  ],
+  "abstract": "The rapid spread of multimodal fake news (FN) on Online Social Networks (OSNs) threatens digital information ecosystems, particularly in low-resource languages. Existing multimodal fake news detection (FND) methods are largely limited to high-resource settings, restricting their global applicability. We propose an M&M-RAG, a Multilingual & Multimodal Retrieval-Augmented Generation framework, that leverages Large Vision-Language Models (LVLMs) and Large Language Models (LLMs) to verify news claims across English, Chinese and Urdu. M&M-RAG integrates real-time multilingual evidence retrieval, language-aware prompting, and cross-modal reasoning for fact verification. We further propose Multi-Ax-to-Grind Urdu, the first large-scale, multi-domain multimodal benchmark for FND in Urdu. Experiments on typologically diverse monolingual multimodal datasets demonstrate that M&M-RAG achieves state-of-the-art (SOTA) performance, with 94.6% accuracy and 94.2% F1 score, surpassing models such as SpotFake, MPFN, MMCFND, and Semi-FND. The proposed framework remains robust in zero-shot and cross-lingual scenarios under frozen-model inference without task-specific fine-tuning. The results underscore the scalability and interpretability of LVLM-based approaches for combating multimodal misinformation, particularly in under-represented and typologically diverse languages.",
+  "artno": null,
+  "page_cr": "1719-1746"
+ },
+ "lresurvey": {
+  "doi": "10.1007/s10579-026-09938-4",
+  "title": "Hallucinations in generative artificial intelligence and large language models: tests, datasets, detection and correction methods",
+  "year": 2026,
+  "journal": "Language Resources and Evaluation",
+  "vol": "60",
+  "issue": "3",
+  "fp": null,
+  "lp": null,
+  "authors": [
+   "M. Z. Naser"
+  ],
+  "abstract": "Abstract Generative Artificial Intelligence (GAI) and Large Language Models (LLMs) have demonstrated significant capabilities in generating human-like content; however, they exhibit a propensity to fabricate spurious information, a phenomenon often termed hallucination . This review paper provides a comprehensive overview of hallucinations in GAI and LLMs. More specifically, this review encompasses their definitions, underlying mechanisms, taxonomies, commonly used tests, and datasets for evaluating hallucinations. In addition, this review dives into intrinsic and extrinsic factors contributing to these inaccuracies, including limitations in model architectures, training data biases, and inference algorithms, as well as examines various detection strategies [e.g., post-hoc consistency checks, external fact-checking, contrastive learning, uncertainty calibration methods, and Retrieval-Augmented Generation (RAG)]. The review also synthesizes a range of correction and mitigation techniques, from proactive measures during training to hybrid approaches that combine detection and intervention. Finally, this review integrates qualitative assessments and comparative insights to delineate the impact of hallucinations on user trust and acceptability, and to shed light on current challenges and future research trends.",
+  "artno": "64",
+  "page_cr": null
+ },
+ "entityhi": {
+  "doi": "10.1007/s42979-025-04684-w",
+  "title": "Reward-Driven Fine-Tuning with Entity Hallucination Index for Low-Resource Hindi Abstractive Summarisation",
+  "year": 2026,
+  "journal": "SN Computer Science",
+  "vol": "7",
+  "issue": "1",
+  "fp": null,
+  "lp": null,
+  "authors": [
+   "Praveenkumar Katwe",
+   "Rakesh Chandra Balabantaray",
+   "Kali Prasad Vittala"
+  ],
+  "abstract": "",
+  "artno": "102",
+  "page_cr": null
+ },
+ "inclusive": {
+  "doi": "10.13053/cys-29-3-5914",
+  "title": "Towards Inclusive Fact-Checking: Claim Verification in English, Hindi, Bengali, and Code-Mixed Languages",
+  "year": 2025,
+  "journal": "Computación y Sistemas",
+  "vol": "29",
+  "issue": "3",
+  "fp": null,
+  "lp": null,
+  "authors": [
+   "Pritam Pal",
+   "Shyamal Krishna Jana",
+   "Arpan Majumdar"
+  ],
+  "abstract": "Automated claim verification has gained significant attention in recent years due to the widespread dissemination of misinformation across various digital platforms. While substantial progress has been made for high-resource languages like English, claim verification for low-resource languages and specifically for Code-Mixed texts remains largely unexplored in a multilingual country like India. In the present work, we introduce a novel multilingual dataset for claim verification, covering English, Hindi, Bengali, and Hindi-English Code-Mixed languages. The dataset is developed by engaging large language models (LLMs) as well as human annotators. The dataset contains claims, evidence passages, and veracity labels (\\textit{SUPPORTS} or \\textit{REFUTES}) on news headlines collected from three important domains (Politics, Healthcare, Law and Order). We proposed a rule-based baseline algorithm and a dual-encoder framework based on transformer models to effectively verify claims across diverse languages. Our results show that XLM-RoBERTa achieves the best performance for English and Code-Mix texts, while IndicBERTv2 outperforms for Hindi and Bengali, respectively. This study highlights the challenges and opportunities in multilingual and Code-Mixed claim verification, offering a step towards building inclusive, language-diverse fact-checking systems even for low resource setup.",
+  "artno": null,
+  "page_cr": null
+ },
+ "mmhfnd": {
+  "doi": "10.1145/3686797",
+  "title": "MMHFND: Fusing Modalities for Multimodal Multiclass Hindi Fake News Detection via Contrastive Learning",
+  "year": 2024,
+  "journal": "ACM Transactions on Asian and Low-Resource Language Information Processing",
+  "vol": "23",
+  "issue": "11",
+  "fp": "1",
+  "lp": "25",
+  "authors": [
+   "Richa Sharma",
+   "Arti Arya"
+  ],
+  "abstract": "Multimodal content contains more deception than unimodal information, causing significant social and economic impacts. Current techniques often focus on a single modality, neglecting knowledge fusion. While most studies have concentrated on English fake news detection, this study explores multimodality for low-resource languages like Hindi. This work introduces the MMHFND model, based on M-CLIP, which uses late fusion for coarse (Fake vs Real) and fine-grained (World vs India vs Politics vs News vs Fact-Check) configurations. We extract deep representations from image and text using image transformer ResNet-50, a BERT-based L3cube-HindRoberta text transformer handling headlines, content, OCR text, and image captions, paired M-CLIP transformers, and an ELA (Error-Level Analysis) image forensic method incorporating EfficientNet B0 to analyze multimodal news in Hindi language based on Devanagari script. M-CLIP integrates cross-modal similarity mapping of images and texts with retrieved multimodal features. The extracted features undergo redundancy reduction before being channeled into the final classifier. The MAM (Modality Attention Mechanism) is introduced, which generates weights for each modality individually. The MMHFND model uses a computed modality divergence score to identify dissonance between modalities and a modified contrastive loss on the score. We thoroughly analyze the HinFakeNews dataset in a multimodal context, achieving accuracy in coarse- and fine-grained configurations. We also undertake an ablation study to evaluate outcomes and explore alternative fusion processes on three different setups. The results show that the MMHFND model effectively detects fake news in Hindi with an accuracy of 0.986, outperforming other existing multimodal approaches.",
+  "artno": null,
+  "page_cr": "1-25"
+ },
+ "kgbert": {
+  "doi": "10.1145/3624557",
+  "title": "Fact-checking Vietnamese Information Using Knowledge Graph, Datalog, and KG-BERT",
+  "year": 2023,
+  "journal": "ACM Transactions on Asian and Low-Resource Language Information Processing",
+  "vol": "22",
+  "issue": "10",
+  "fp": "1",
+  "lp": "23",
+  "authors": [
+   "Huong To Duong",
+   "Van Ho",
+   "Phuc Do"
+  ],
+  "abstract": "In the era of digital information, ensuring the accuracy and reliability of information is crucial, making fact-checking a vital process. Currently, English fact-checking has thrived due to various language processing tools and ample datasets. However, the same cannot be said for Vietnamese fact-checking, which faces significant challenges due to the lack of such resources. To address these challenges, we propose a model for checking Vietnamese facts by synthesizing three popular technologies: Knowledge Graph (KG), Datalog, and KG-BERT. The KG serves as the foundation for the fact-checking process, containing a dataset of Vietnamese information. Datalog, a logical programming language, is used with inference rules to complete the knowledge within the Vietnamese KG. KG-BERT, a Deep Learning (DL) model, is then trained on this KG to rapidly and accurately classify information that needs fact-checking. Furthermore, to put Vietnamese complex sentences into the fact-checking model, we present a solution for extracting triples from these sentences. This approach also contributes significantly to the ease of constructing foundational datasets for the Vietnamese KG. To evaluate the model's performance, we create a Vietnamese dataset comprising 130,190 samples to populate the KG. Using Datalog, we enrich this graph with additional knowledge. The KG is then utilized to train the KG-BERT model, achieving an impressive accuracy of 95%. Our proposed solution shows great promise for fact-checking Vietnamese information and has the potential to contribute to the development of fact-checking tools and techniques for other languages. Overall, this research makes a significant contribution to the field of data science by providing an accurate solution for fact-checking information in Vietnamese language contexts.",
+  "artno": null,
+  "page_cr": "1-23"
+ },
+ "synkg": {
+  "doi": "10.1145/3819585",
+  "title": "Synonym Knowledge Graph Enhanced Language Model for Inconsistent Hallucination Detection",
+  "year": 2026,
+  "journal": "ACM Transactions on Asian and Low-Resource Language Information Processing",
+  "vol": "25",
+  "issue": "7",
+  "fp": "1",
+  "lp": "15",
+  "authors": [
+   "Jie Yang",
+   "Haitao Zheng",
+   "Hui Wang",
+   "Hong‐Gee Kim"
+  ],
+  "abstract": "Neural sequence models, despite their proficiency in generating highly fluent sentences, have also exhibited a tendency to hallucinate, introducing additional content that lacks grounding in the input data, as evidenced by recent investigations. This variety of fluent yet erroneous outputs poses a significant challenge, as it is difficult for users to discern the veracity of the presented content and identify inaccuracies. Several methods have been proposed to address this challenge. However, they sometimes detect the synonym of the true token in the generation as hallucination. To alleviate the above problem, we propose a novel architecture, i.e., Synonym Knowledge Graph Enhanced Language Model (SKGELM). We construct and prune a synonym knowledge graph according to the source sentence, which can help the subsequently graph attention network and classifier detect hallucination. Empirical results on SUMMAC benchmark and multi-domain Chinese–English translation benchmark show that our method achieves state-of-the-art performance and improves the best baseline significantly.",
+  "artno": null,
+  "page_cr": "1-15"
+ }
+}

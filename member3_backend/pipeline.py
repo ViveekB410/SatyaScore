@@ -38,7 +38,7 @@ import re
 import time
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Literal
 
 from member1_model.cmhsa import (
@@ -49,7 +49,7 @@ from member1_model.embeddings import CrossLingualEmbedder
 from member1_model.nli_scorer import NLIScorer
 from member2_data import kg_extra, official_stats
 from member2_data.dates import DATE_PID, parse_date
-from member2_data.entity_linker import EntityLinker, english_capital_claim
+from member2_data.entity_linker import CAPITAL_PID, EntityLinker, english_capital_claim
 from member2_data.wikidata_connector import WikidataConnector
 from member3_backend.claim_extractor import ClaimExtractor, ExtractedClaim
 from member3_backend.crosscheck import crosscheck_verdict, llm_verdict_used, second_reading_candidate
@@ -774,6 +774,7 @@ class DetectionPipeline:
             v = self.wikidata.verify_triple(subject_qid=linked.subject_qid, property_pid=linked.property_pid,
                                             expected_value=linked.object_qid, language=language,
                                             alternatives=linked.object_candidates)
+            v = self._capital_by_name(v, linked, language)
             return v.confidence, v
         if self.claim_extractor is None:
             return None, None
@@ -822,9 +823,28 @@ class DetectionPipeline:
                 subject_qid=linked.subject_qid, property_pid=linked.property_pid,
                 expected_value=linked.object_qid, language="hi",
                 alternatives=linked.object_candidates)
+            v = self._capital_by_name(v, linked, "hi")
             if v.status in ("supported", "contradicted"):
                 return v.confidence, v
         return None, None
+
+    def _capital_by_name(self, v, linked, language: Language):
+        """A contradicted capital claim (P36) is supported when the claimed city's name is a whole word of the
+        real capital's name: "भारत की राजधानी दिल्ली है" / "Delhi is the capital of India" (capital: New Delhi,
+        नई दिल्ली). Wikidata's location chain from New Delhi no longer reaches Delhi, so the walk alone fails."""
+        if v.status != "contradicted" or v.property_pid != CAPITAL_PID or not v.actual_values:
+            return v
+        try:
+            names = self.wikidata.names([linked.subject_qid, *(linked.object_candidates or (linked.object_qid,)),
+                                         *v.actual_values], language)
+        except Exception:
+            return v
+        claimed = {n for q in (linked.object_candidates or (linked.object_qid,)) for n in names.get(q, ())}
+        claimed -= names.get(linked.subject_qid, set())  # "Mexico is the capital of Mexico" (Mexico City): not support
+        actual = {n for q in v.actual_values for n in names.get(q, ())}
+        if any(c and re.search(rf"(?<!\w){re.escape(c)}(?!\w)", a) for c in claimed for a in actual):
+            return replace(v, status="supported", found=True, confidence=1.0)
+        return v
 
     def _date_lookup(self, subject_text: str, date_pid: str, when: tuple, language: Language):
         """A claimed date against every item named exactly `subject_text` (at most

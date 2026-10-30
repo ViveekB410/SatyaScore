@@ -8,6 +8,23 @@ retrieved Wikipedia evidence and the Wikidata knowledge graph, and marks every c
 Research prototype (B.Tech capstone). Results and limits are measured, not assumed:
 see **`RESULTS_SUMMARY.md`**.
 
+## Team and contributors
+
+B.Tech final-year project, Department of Artificial Intelligence and Data Science,
+Prof. Ram Meghe Institute of Technology & Research, Badnera-Amravati (2026-27).
+
+| Contributor | |
+|---|---|
+| Vivek Yeshwantrao Borkar | Team member |
+| Piyush Devidas Nande | Team member |
+| Aasawari Sahebrao Jumade | Team member |
+| Arunima Tridip Wankhade | Team member |
+| Dr. R. R. Karwa | Project guide |
+
+Publication: V. Y. Borkar, P. D. Nande, A. S. Jumade, A. T. Wankhade and R. R. Karwa, "A web-based tool for
+checking factual claims in English and Hindi chatbot answers," *IRJMETS*, vol. 08, no. 10, pp. 4281–4286,
+Oct. 2026, doi: 10.56726/IRJMETS104031.
+
 ---
 
 ## Run it (demo)
